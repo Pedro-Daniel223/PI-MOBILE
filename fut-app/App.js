@@ -1,26 +1,26 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+// Importando telas
+import HomeScreen from './src/screens/HomeScreen';
+
+// Criando o stack
+const Stack = createNativeStackNavigator();
+
+
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.texto}>Bem vindo ao Drakos!!</Text>
-      <Text style={styles.texto}>Seja sócio e aproveite os benefícios</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+
+        <Stack.Screen 
+          name="Home" 
+          component={HomeScreen} 
+        />
+
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ca0101',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  texto: {
-    color:'white',
-    fontSize:20,
-  },
-});
-
