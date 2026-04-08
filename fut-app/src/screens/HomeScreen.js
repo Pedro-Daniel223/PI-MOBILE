@@ -1,5 +1,5 @@
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-
+import CustomButton from '../components/CustomButton';
 
 export default function HomeScreen() {
 
@@ -13,7 +13,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
 
-      {/* Cabeçalho */}
+
       <Text style={styles.titulo}>🛍️ Produtos</Text>
 
       <FlatList
@@ -30,10 +30,15 @@ export default function HomeScreen() {
             Produto de alta qualidade
           </Text>
 
+        <CustomButton
+          title="Ver mais"
+          onPress={() => alert(`Você clicou em ${item.nome}`)}
+        />
 
-
-  </View>)}
+  </View>
+)}
       />
+
     </View>
   );
 }
