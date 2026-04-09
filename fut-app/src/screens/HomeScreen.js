@@ -1,87 +1,77 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import CustomButton from '../components/CustomButton';
+import React from 'react';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import NavbarGlass from '../components/NavbarGlass';
 
-export default function HomeScreen() {
 
-  const dados = [
-    { id: '1', nome: 'Notebook' },
-    { id: '2', nome: 'Mouse' },
-    { id: '3', nome: 'Teclado' },
-    { id: '4', nome: 'Monitor' },
-  ];
 
+export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
 
-
-      <Text style={styles.titulo}>🛍️ Produtos</Text>
-
-      <FlatList
-        data={dados}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-
-        renderItem={({ item }) => (
-        <View style={styles.card}>
-
-          <Text style={styles.nome}>{item.nome}</Text>
-
-          <Text style={styles.descricao}>
-            Produto de alta qualidade
-          </Text>
-
-        <CustomButton
-          title="Ver mais"
-          onPress={() => alert(`Você clicou em ${item.nome}`)}
-        />
-
-  </View>
-)}
+      {/* FUNDO */}
+      <Image
+        source={require('../assets/img/img_teste.jpg')} // troca pelo seu caminho
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+        blurRadius={2}
       />
+
+      {/* SCROLL */}
+      <ScrollView contentContainerStyle={styles.scroll}>
+
+        <Text style={styles.title}>Seja bem-vindo 🔥</Text>
+
+        {/* SIMULANDO CONTEÚDO */}
+        {Array.from({ length: 20 }).map((_, i) => (
+          <View key={i} style={styles.card}>
+            <Text style={styles.cardText}>
+              Conteúdo {i + 1}
+            </Text>
+          </View>
+        ))}
+
+      </ScrollView>
+
+      {/* NAVBAR FIXA */}
+      <NavbarGlass navigation={navigation} />
 
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    paddingTop: 30,
-    marginTop: 40,
+    backgroundColor: '#ae0000',
   },
 
-  titulo: {
-    fontSize: 26,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    marginBottom: 20,
+  scroll: {
+    paddingTop: 80,
+    paddingBottom: 120, // espaço pra não esconder atrás da navbar
+    paddingHorizontal: 20,
   },
+
+  title: {
+    fontSize: 24,
+    color: '#fff',
+    marginBottom: 20,
+    fontWeight: 'bold',
+  },
+
 
   card: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
+    height: 120,
+    borderRadius: 16,
     marginBottom: 15,
+    justifyContent: 'center',
+    padding: 20,
 
-    // sombra (Android + iOS)
-    elevation: 3, // Android
-    shadowColor: '#000', // iOS
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 2 },
+    backgroundColor: '#1c1c1e', // 🔥 sólido (estilo iOS)
   },
 
-  nome: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  cardText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '500',
   },
-
-  descricao: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
-  },
-
 });
