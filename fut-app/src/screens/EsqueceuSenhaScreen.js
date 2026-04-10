@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   glassButton: {
     backgroundColor: 'rgba(255,255,255,0.7)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.6)',
+    borderColor: 'rgba(255,255,255,0.7)',
     borderRadius: 28,
     width: '100%',
     height: 55,
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   // O texto do botão "Proximo", com um estilo claro e legível para se destacar contra o fundo do botão de vidro fosco.
   glassButtonText: {
     color: '#000',
-    fontWeight: '700',
+    fontWeight: '600',
     fontSize: 18,
   }
 });
