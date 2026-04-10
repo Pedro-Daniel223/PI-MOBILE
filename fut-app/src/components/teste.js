@@ -1,12 +1,20 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+// import { LinearGradient } from 'expo-linear-gradient'
 
-export default function Teste() {
+export default function Botao({ onPress }) {
   return (
-    <View style={styles.botao}>
-      <Text style={styles.textoBotao}>Ingressos</Text>
-    </View>
+      <TouchableOpacity
+      style={styles.botao}
+      onPress={onPress}>
+        <Text style={styles.textoBotao}>Ingressos</Text>
+      </TouchableOpacity>
   );
 }
+
+
+// export function gradiente() {
+  
+// }
 
 
 const styles = StyleSheet.create({
@@ -18,10 +26,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: '20%',
+    margin: '20%',
   },
   textoBotao: {
-    color:'#fff',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   }
