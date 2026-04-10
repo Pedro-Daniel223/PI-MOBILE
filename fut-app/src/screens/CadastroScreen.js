@@ -1,235 +1,214 @@
 import { useState, useLayoutEffect } from 'react';
-import {View,Text,StyleSheet,Alert,SafeAreaView,TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, Alert, SafeAreaView, TouchableOpacity } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
-import colors from '../theme/colors';
+
+// DEFINIÇÃO DAS CORES (Direto do seu Figma)
+const colors = {
+    primary: '#880000',      // Vermelho do Covil
+    background: '#E0E0E0',   // Cinza do card
+    white: '#FFFFFF',        // Texto e botões
+    text: '#000000',         // Cor padrão do texto
+    mutedText: '#B9B9B9',    // Ícones e placeholder
+    link: '#880000',         // Vermelho para os links
+    cardBackground: '#E9E9E9' // Fundo dos inputs
+};
 
 export default function CadastroScreen({ navigation }) {
-	const [nome, setNome] = useState('');
-	const [email, setEmail] = useState('');
-	const [senha, setSenha] = useState('');
-	const [confirm, setConfirm] = useState('');
+    const [nome, setNome] = useState('');
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const [confirm, setConfirm] = useState('');
 
+    const handleCadastro = () => {
+        if (!nome || !email || !senha || !confirm) {
+            Alert.alert('Erro', 'Preencha todos os campos!');
+            return;
+        }
+        if (!email.includes('@') || !email.includes('.')) {
+            Alert.alert('Erro', 'Email inválido!');
+            return;
+        }
+        if (senha !== confirm) {
+            Alert.alert('Erro', 'As senhas não coincidem!');
+            return;
+        }
 
-	const handleCadastro = () => {
-		if (!nome || !email || !senha || !confirm) {
-			Alert.alert('Erro', 'Preencha todos os campos!');
-			return;
-		}
-		if (!email.includes('@') || !email.includes('.')) {
-			Alert.alert('Erro', 'Email inválido!');
-			return;
-		}
-		if (senha !== confirm) {
-			Alert.alert('Erro', 'As senhas não coincidem!');
-			return;
-		}
+        Alert.alert('Sucesso', 'Conta criada! Faça login.');
+        navigation.navigate('Login');
+    };
 
-		Alert.alert('Sucesso', 'Conta criada! Faça login.');
-		navigation.navigate('Login');
-	};
+    return (
+        <SafeAreaView style={styles.safe}>
+            <View style={styles.header}>
+                <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+                    <Text style={styles.backText}>←</Text>
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>BEM VINDO AO COVIL</Text>
+                <Text style={styles.headerSubtitle}>Faça seu Cadastro para entrar no Covil dos Drakos</Text>
+            </View>
 
-	return (
-		<View style={styles.safe}>
-			<View style={styles.header}>
-				<TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-					<Text style={styles.backText}>←</Text>
-				</TouchableOpacity>
-				<Text style={styles.headerTitle}>BEM VINDO DE VOLTA AO COVIL</Text>
-				<Text style={styles.headerSubtitle}>Faça seu Cadastro para entrar no Covil dos Drakos</Text>
-			</View>
+            <View style={styles.card}>
+                <Text style={styles.formTitle}>Cadastro</Text>
+                
+                <View style={styles.formContent}>
+                    <Text style={styles.label}>Seu nome:</Text>
+                    <CustomInput
+                        placeholder="Nome completo ou sobrenome"
+                        value={nome}
+                        onChangeText={setNome}
+                        style={styles.input}
+                    />
 
-			<View style={styles.card}>
-				<Text style={styles.formTitle}>Cadastro</Text>
-						<View style={styles.formContent}>
-						<Text style={styles.label}>Seu nome:</Text>
-				<CustomInput
-					placeholder="Nome completo ou sobrenome"
-					value={nome}
-					onChangeText={setNome}
-					style={styles.input}
-				/>
+                    <Text style={styles.label}>Seu Email/Cpf:</Text>
+                    <CustomInput
+                        placeholder="email@exemplo.com"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        style={styles.input}
+                    />
 
-				<Text style={styles.label}>Seu Email/Cpf:</Text>
-				<CustomInput
-					placeholder="email@exemplo.com"
-					value={email}
-					onChangeText={setEmail}
-					keyboardType="email-address"
-					autoCapitalize="none"
-					style={styles.input}
-				/>
+                    <Text style={styles.label}>Senha:</Text>
+                    <CustomInput
+                        placeholder="********"
+                        value={senha}
+                        onChangeText={setSenha}
+                        secureTextEntry
+                        style={styles.input}
+                    />
 
-				<Text style={styles.label}>Senha:</Text>
-				<CustomInput
-					placeholder="********"
-					value={senha}
-					onChangeText={setSenha}
-					secureTextEntry
-					style={styles.input}
-				/>
+                    <Text style={styles.label}>Confirmar Senha:</Text>
+                    <CustomInput
+                        placeholder="********"
+                        value={confirm}
+                        onChangeText={setConfirm}
+                        secureTextEntry
+                        style={styles.input}
+                    />
 
-				<Text style={styles.label}>Confirmar Senha:</Text>
-				<CustomInput
-					placeholder="********"
-					value={confirm}
-					onChangeText={setConfirm}
-					secureTextEntry
-					style={styles.input}
-				/>
-
-				<View style={styles.buttonWrap}>
-					<CustomButton title="Criar conta" onPress={handleCadastro} style={[styles.primaryButton, styles.glassButton]} />
-				</View>
-				</View>
-
-
-			</View>
-		</View>
-	);
+                    <View style={styles.buttonWrap}>
+                        <CustomButton title="Criar conta" onPress={handleCadastro} style={[styles.primaryButton, styles.glassButton]} />
+                    </View>
+                </View>
+            </View>
+        </SafeAreaView>
+    );
 }
 
-	const styles = StyleSheet.create({
-		safe: {
-			flex: 1,
-			backgroundColor: '#8b0000',
-		},
-		// O header é a parte superior da tela, que tem o título e o subtítulo.	
-		header: {
-			height: 210,
-			paddingTop: 25,
-			paddingHorizontal: 20,
-			backgroundColor: colors.primary,
-			alignItems: 'center',
-			justifyContent: 'center',
-		},
-		// O back é o botão de voltar, que fica no canto superior esquerdo do header.
-		back: {
-			position: 'absolute',
-			left: 14,
-			top: 36,
-			width: 42,
-			height: 36,
-			borderRadius: 10,
-			backgroundColor: 'rgba(255,255,255,0.14)',
-			borderWidth: 1,
-			borderColor: 'rgba(255,255,255,0.22)',
-			alignItems: 'center',
-			justifyContent: 'center',
-			shadowColor: '#000',
-			shadowOffset: { width: 0, height: 2 },
-			shadowOpacity: 0.08,
-			shadowRadius: 4,
-			elevation: 3,
-		},
-		// O backText é o texto do botão de voltar, que é a seta "←".
-		backText: {
-			fontSize: 19,
-			color: '#fff',
-			fontWeight: '700',
-		},
-		//  texto que fica dentro do header, o título principal.
-		headerTitle: {
-			color: colors.white,
-			fontSize: 17,
-			fontWeight: '600',
-			letterSpacing: 2,
-		},
-		// O headerSubtitle é o texto que fica abaixo do título, é uma descrição ou instrução para o usuário.
-		headerSubtitle: {
-			color: '#ffdede',
-			fontSize: 14,
-			marginTop: 10,
-		},
-		// O card é a parte principal da tela, onde ficam os inputs e o botão de cadastro.*
-		card: {
-			flex: 1,
-			backgroundColor: colors.background,
-			borderTopLeftRadius: 32,
-			borderTopRightRadius: 32,
-			padding: 32,
-			marginTop: -25,
-		},
-		// O formTitle é o título do formulário, no caso "Cadastro".
-		formTitle: {
-			fontSize: 24,
-			fontWeight: '600',
-			color: colors.primary,
-			marginBottom: 14,
-			alignContent: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-		},
-		// O label é o texto que fica acima do input, para indicar o que deve ser preenchido.
-		label: {
-			fontSize: 15,
-			fontWeight: '600',
-			color: colors.text,
-			marginBottom: 8,
-		},
-		// Esses estilos de input e justamente pra colocar as informações de validação.
-		input: {
-			borderWidth: 1,
-			borderColor: '#ccc',
-			paddingVertical: 16,
-			paddingHorizontal: 16,
-			borderRadius: 14,
-			backgroundColor: colors.cardBackground,
-			marginBottom: 1,
-		},
-		// Esses estilos de texto e justamente pra colocar as informações de validação.
-		forgotText: {
-			fontSize: 14,
-			color: colors.text,
-			marginBottom: 9,
-			marginTop: 4,
-			alignItems: 'center',
-            justifyContent: 'center',
-		},
-		// Esse é o estilo do link, que fica dentro do texto de "Esqueci minha senha" e "Não possui conta?".
-		link: {
-			color: colors,
-			fontWeight: '700',
-		},
-		// Esse é o estilo do botão de cadastro, que fica dentro do card.
-		buttonWrap: {
-			marginVertical: 19,
-			width: '100%',
-			// paddingHorizontal: 6,
-			alignItems: 'center',
-		},
-		// Esse é o estilo do botão de cadastro, que fica dentro do card.
-		formContent: {
-			width: '100%',
-			maxWidth: 360,
-			alignSelf: 'center',
-			marginTop: 9,
-		},
-		// Esse é o estilo do botão de cadastro, que fica dentro do card.
-		primaryButton: {
-			width: '100%',
-			maxWidth: 360,
-			alignSelf: 'center',
-		},
-		// Esse é o estilo do botão de cadastro, que fica dentro do card.
-		glassButton: {
-			backgroundColor: 'rgba(255,255,255,0.7)',
-			borderWidth: 1,
-			borderColor: 'rgba(255,255,255,0.6)',
-			shadowColor: '#000',
-			shadowOffset: { width: 0, height: 6 },
-			shadowOpacity: 0.06,
-			shadowRadius: 10,
-			elevation: 4,
-			paddingVertical: 14,
-			paddingHorizontal: 18,
-			borderRadius: 28,
-		},
-		// Esse é o estilo do texto de rodapé, que fica abaixo do botão de cadastro.
-		footerText: {
-			textAlign: 'center',
-			color: '#333',
-			marginTop: 5,
-			fontSize: 13,
-		},
-	});
+const styles = StyleSheet.create({
+    safe: {
+        flex: 1,
+        backgroundColor: colors.primary,
+    },
+	// O header é a parte superior da tela, que tem o título e o subtítulo.
+    header: {
+        height: 210,
+        paddingTop: 25,
+        paddingHorizontal: 20,
+        backgroundColor: colors.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+	// O back é o botão de voltar, que fica no canto superior esquerdo do header.
+    back: {
+        position: 'absolute',
+        left: 20,
+        top: 45,
+        width: 42,
+        height: 36,
+        borderRadius: 10,
+        backgroundColor: 'rgba(255,255,255,0.14)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.22)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 3,
+    },
+	// O título do header, com um estilo claro e legível para se destacar contra o fundo do header, e um espaçamento adequado para separar do subtítulo.
+    backText: {
+        fontSize: 19,
+        color: colors.white,
+        fontWeight: '700',
+    },
+	// O card é a parte inferior da tela, que tem o formulário de cadastro.
+    headerTitle: {
+        color: colors.white,
+        fontSize: 17,
+        fontWeight: '600',
+        letterSpacing: 2,
+        textAlign: 'center',
+    },
+	// O subtítulo do header, com um estilo claro e legível para se destacar contra o fundo do header, e um espaçamento adequado para separar do título.
+    headerSubtitle: {
+        color: '#ffdede',
+        fontSize: 14,
+        marginTop: 10,
+        textAlign: 'center',
+    },
+	// O card é a parte inferior da tela, que tem o formulário de cadastro.
+    card: {
+        flex: 1,
+        backgroundColor: colors.background,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        padding: 32,
+        marginTop: -25,
+    },
+	// O título do formulário, com um estilo claro e legível para se destacar contra o fundo do card, e um espaçamento adequado para separar do restante do conteúdo.
+    formTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: colors.primary,
+        marginBottom: 14,
+        textAlign: 'center',
+    },
+	// O rótulo do campo de input, com um estilo claro e legível para se destacar contra o fundo do card, e um espaçamento adequado para separar do campo de input.
+    label: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: colors.text,
+        marginBottom: 8,
+    },
+	// O campo de input, com um estilo claro e legível para se destacar contra o fundo do card, e um espaçamento adequado para separar do restante do conteúdo.
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 14,
+        backgroundColor: colors.cardBackground,
+        marginBottom: 12,
+    },
+	// O container do formulário, para centralizar o conteúdo e limitar a largura em telas maiores.
+    link: {
+        color: colors.link, // Corrigido aqui
+        fontWeight: '700',
+    },
+	// O container do formulário, para centralizar o conteúdo e limitar a largura em telas maiores.
+    buttonWrap: {
+        marginVertical: 19,
+        width: '100%',
+        alignItems: 'center',
+    },
+	// O estilo do botão "Criar conta", com uma aparência de vidro fosco para se destacar na tela, e um texto claro e legível.
+    formContent: {
+        width: '100%',
+        maxWidth: 360,
+        alignSelf: 'center',
+    },
+	// O estilo do botão "Criar conta", com uma aparência de vidro fosco para se destacar na tela, e um texto claro e legível.
+    primaryButton: {
+        width: '100%',
+    },
+	// O estilo do botão "Criar conta", com uma aparência de vidro fosco para se destacar na tela, e um texto claro e legível.
+    glassButton: {
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.6)',
+        paddingVertical: 14,
+        borderRadius: 28,
+        elevation: 4,
+    },
+});
