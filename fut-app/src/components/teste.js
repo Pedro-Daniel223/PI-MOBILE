@@ -12,11 +12,6 @@ export default function Botao({ onPress }) {
 }
 
 
-// export function gradiente() {
-  
-// }
-
-
 const styles = StyleSheet.create({
 
   botao: {

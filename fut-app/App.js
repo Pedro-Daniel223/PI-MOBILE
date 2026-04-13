@@ -7,6 +7,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // Importando telas
 import HomeScreen from './src/screens/HomeScreen';
 import IngressosScreen from './src/screens/IngressosScreen';
+import BoasVindasScreen from './src/screens/BoasVindasScreen';
+import BoasVindas2Screen from './src/screens/BoasVindas2Screen';
 
 // Criando o stack
 const Stack = createNativeStackNavigator();
@@ -27,6 +29,16 @@ export default function App() {
         <Stack.Screen 
           name="Ingressos" 
           component={IngressosScreen} 
+        />
+
+        <Stack.Screen
+        name="BoasVindas"
+        component={BoasVindasScreen}
+        />
+        
+        <Stack.Screen
+        name="BoasVindas2"
+        component={BoasVindas2Screen}
         />
 
       </Stack.Navigator>
