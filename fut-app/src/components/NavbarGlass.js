@@ -31,10 +31,7 @@ export default function NavbarGlass({ navigation }) {
   const tabWidth = containerWidth > 0 ? containerWidth / tabs.length : 0;
   
 
-
-
-
-  
+ 
 const dragX = useRef(new Animated.Value(0)).current;
 const lastOffset = useRef(0);
 
@@ -110,17 +107,6 @@ const panResponder = useRef(
     },
   })
 ).current;
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -200,16 +186,6 @@ const handlePress = (tab, index) => {
   // navigation.navigate(tab.name);
 };
 
-  // Descomente abaixo se estiver usando navegação:
-  // if (navigation?.navigate) {
-  //   navigation.navigate(tab.name);
-  // }
-
-
-  // Navegação comentada conforme seu código original
-  // if (navigation?.navigate) {
-  //   navigation.navigate(tab.name);
-  // }
 
 // 1. Loop de Brilho (Glow) - Mantém o efeito pulsante constante
 useEffect(() => {
