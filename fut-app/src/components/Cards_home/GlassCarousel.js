@@ -21,13 +21,11 @@ export default function GlassCarousel() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const [activeIndex, setActiveIndex] = useState(0);
 
+  
+    const img1 = require('.../assets/img/card_branco.png');
+    const img2 = require('.../assets/img/card_branco.png');
+    const img3 = require('.../assets/img/card_branco.png');
 
-
-
-
-    const img1 = require('../assets/img/card_branco.png');
-    const img2 = require('../assets/img/card_branco.png');
-    const img3 = require('../assets/img/card_branco.png');
   const data = [
     {
       title: 'Seja sócio',
@@ -42,9 +40,11 @@ export default function GlassCarousel() {
     {
       title: 'Eventos',
       desc: 'Confira os próximos jogos da temporada',
-      image: require('../assets/img/card_branco.png'),
+      image: img3,
     },
   ];
+
+
 
   const handleScroll = (e) => {
     const index = Math.round(

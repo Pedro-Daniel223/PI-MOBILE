@@ -13,9 +13,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 import NavbarGlass from '../components/NavbarGlass';
 // import GlassCard from '../components/CardGlass';
-import GlassCarousel from '../components/GlassCarousel';
-import CardProfileWelcome from '../components/CardProfileWelcome';
-import CardActionGlass from '../components/cardActionGlass';
+import GlassCarousel from '../components/Cards_home/GlassCarousel';
+import CardProfileWelcome from '../components/Cards_home/CardProfileWelcome';
+import CardActionGlass from '../components/Cards_home/cardActionGlass';
 
 
 
@@ -38,19 +38,19 @@ export default function Home({ navigation }) {
         {/* CARDS */}
         <View style={styles.row}>
 
+      <CardActionGlass
+        icon="storefront-outline"
+        title="Drakos Store"
+        desc="Veja produtos"
+        image={require('../assets/img/card_branco.png')}
+      />
+{/* 
           <CardActionGlass
-              icon="storefront-outline"
-              title="Drakos Store"
-              desc="Veja produtos"
-              style={{ width: '48%' }}
-            />
-
-            <CardActionGlass
-              icon="ticket-outline"
-              title="Ingressos"
-              desc="Eventos disponíveis"
-              style={{ width: '48%' }}
-            />
+            icon="storefront-outline"
+            title="Drakos Store"
+            desc="Veja produtos"
+            image={require('../assets/img/card_branco.png')}
+          /> */}
 
         </View>
 
