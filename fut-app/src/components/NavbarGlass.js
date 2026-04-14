@@ -15,6 +15,8 @@ export default function NavbarGlass({ navigation }) {
     { name: 'perfil', icon: 'person-outline', label: 'Perfil' },
   ];
   
+  const dragX = useRef(new Animated.Value(0)).current;
+  const lastOffset = useRef(0);
   const [active, setActive] = useState('home');
   const [containerWidth, setContainerWidth] = useState(0);
   // --- REFS DE ANIMAÇÃO ---
@@ -29,11 +31,18 @@ export default function NavbarGlass({ navigation }) {
   // --- DEFINIÇÃO DAS TABS E LARGURA ---
   // Certifique-se de que o array 'tabs' esteja declarado antes deste cálculo
   const tabWidth = containerWidth > 0 ? containerWidth / tabs.length : 0;
-  
+  const bubbleWidth = tabWidth > 0 ? tabWidth * 0.85 : 0;
+  // const bubbleOffset = (tabWidth - bubbleWidth) / 2;
+  const halfTab = tabWidth / 2;
+  const centerX = Animated.add(dragX, halfTab);
 
- 
-const dragX = useRef(new Animated.Value(0)).current;
-const lastOffset = useRef(0);
+
+
+
+
+
+
+
 
 
 const panResponder = useRef(
@@ -57,7 +66,9 @@ const panResponder = useRef(
 
       // 🔒 LIMITES (não sair da navbar)
       const max = (tabs.length - 1) * tabWidth;
-      newX = Math.max(0, Math.min(newX, max));
+      const maxLimit = containerWidth - tabWidth;
+
+      newX = Math.max(0, Math.min(newX, maxLimit));
 
       dragX.setValue(newX);
 
@@ -107,6 +118,17 @@ const panResponder = useRef(
     },
   })
 ).current;
+
+
+
+
+// const bubbleOffset = (tabWidth - bubbleWidth) / 2;
+
+
+
+
+
+
 
 
 
@@ -242,10 +264,7 @@ const opacity = pressAnim.interpolate({
 
 
 
-const translateXFinal = Animated.add(
-  dragX,
-  tabWidth * 0.075
-);
+
 
 
 return (
@@ -295,19 +314,20 @@ return (
             {containerWidth > 0 && (
               <Animated.View
                {...panResponder.panHandlers}
-                style={[
-                  styles.bubble,
+                          style={[
+              styles.bubble,
+              {
+                width: bubbleWidth,
+                left: '0%',
+                transform: [
                   {
-              width: tabWidth * 0.85,
-              // Centralização: (100% - 85%) / 2 = 7.5% de margem em cada lado
-              left: tabWidth * 0.075, 
-              transform: [
-                { translateX: translateXFinal },
-                { scaleX: stretchAnim },
-                { scaleY: bubbleWobble },  // O quanto achata (Y)
-              ],
-            },
-          ]}
+                    translateX: Animated.subtract(centerX, bubbleWidth / 2), // Centraliza a bolha no centro do tab
+                  },
+                  { scaleX: stretchAnim },
+                  { scaleY: bubbleWobble },
+                ]
+              },
+            ]}
         >
 
 
@@ -423,10 +443,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 14,
-    paddingHorizontal: 8,
+    paddingHorizontal: 0,
     borderRadius: 35, // Bordas mais curvas reforçam o aspecto "líquido"
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 1.5,
+    borderWidth: 1.9,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     overflow: 'hidden',
   },
