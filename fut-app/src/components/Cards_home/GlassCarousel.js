@@ -22,9 +22,13 @@ export default function GlassCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   
-    const img1 = require('.../assets/img/card_branco.png');
-    const img2 = require('.../assets/img/card_branco.png');
-    const img3 = require('.../assets/img/card_branco.png');
+    const img1 = require('../../assets/img/card_branco.png');
+    const img2 = require('../../assets/img/card_branco.png');
+    const img3 = require('../../assets/img/card_branco.png');
+
+    // const img1 = require('.../assets/img/card_branco.png');
+    // const img2 = require('.../assets/img/card_branco.png');
+    // const img3 = require('.../assets/img/card_branco.png');
 
   const data = [
     {

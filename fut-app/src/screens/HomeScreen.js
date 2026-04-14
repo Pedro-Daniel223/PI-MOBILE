@@ -42,7 +42,7 @@ export default function Home({ navigation }) {
         icon="storefront-outline"
         title="Drakos Store"
         desc="Veja produtos"
-        image={require('../assets/img/card_branco.png')}
+        image={require('../assets/img/img_home/milan_r2006(2).png')}
       />
 {/* 
           <CardActionGlass
