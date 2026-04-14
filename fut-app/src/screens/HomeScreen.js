@@ -1,24 +1,14 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation as nav} from '@react-navigation/native';
 import Botao from '../components/teste';
-import BemVindo from '../screens/BoasVindasScreen'
+import { dados } from '../data/dataHome';
 // Button é um componente nativo do React Native para criar botões simples. Ele é fácil de usar e tem uma aparência consistente em diferentes plataformas (iOS e Android). O Button aceita propriedades como title (texto do botão) e onPress (função a ser executada quando o botão é pressionado). É uma opção rápida para adicionar interatividade sem a necessidade de estilização personalizada, embora seja limitado em termos de personalização visual.
 
 export default function HomeScreen() {
   const navigation = nav();
-
-  const dados = [
-    { id: '1', nome: 'Notebook', descricao: 'Notebook de última geração' },
-    { id: '2', nome: 'Mouse', descricao: 'Mouse ergonômico' },
-    { id: '3', nome: 'Teclado', descricao: 'Teclado mecânico' },
-    { id: '4', nome: 'Monitor', descricao: 'Monitor 24 polegadas' },
-  ];
   
   return (
     <View style={styles.container}>
-
-      {/* Cabeçalho */}
-
       <FlatList
         data={dados}
         keyExtractor={(item) => item.id}

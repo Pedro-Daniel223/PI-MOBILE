@@ -15,7 +15,7 @@ export const estilos = StyleSheet.create({
     },
     camadaEscura: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.2)'
+        backgroundColor: 'rgba(0,0,0,0.5)'
     },
     btn: {
         backgroundColor: '#fff',
@@ -27,6 +27,12 @@ export const estilos = StyleSheet.create({
     textoButton: {
         color: '#880000',
         fontSize: 20,
-        fontFamily: 'Roboto'
+        fontFamily: 'Roboto',
+    },
+    background: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        justifyContent: 'flex-end',
     },
 });
