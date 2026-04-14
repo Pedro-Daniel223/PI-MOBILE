@@ -16,8 +16,9 @@ export default function EsqueceuSenhaScreen({ navigation }) {
       Alert.alert('Erro', 'Email inválido.');
       return;
     }
-    Alert.alert('Enviado', 'Instruções foram enviadas para o seu email.');
-    navigation.goBack();
+    
+    // Navega para a tela de verificação de código
+    navigation.navigate('VerificarCodigo', { email }); // Passa o email para a próxima tela, se necessário
   };
 
   return (
@@ -89,7 +90,7 @@ export default function EsqueceuSenhaScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#E5E5E5',
+    backgroundColor: '#EBEBEB',
   },
   // Novo estilo para centralizar o conteúdo verticalmente
   scrollGrow: {
@@ -213,24 +214,22 @@ const styles = StyleSheet.create({
   },
   // O estilo do botão "Proximo", com uma aparência de vidro fosco para se destacar na tela, e um texto claro e legível.
   glassButton: {
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.7)',
-    borderRadius: 28,
+    backgroundColor: '#F5F5F5', // Ajustado para combinar com o botão "Verificar"
+    borderRadius: 30,
     width: '100%',
-    height: 55,
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
     elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
   // O texto do botão "Proximo", com um estilo claro e legível para se destacar contra o fundo do botão de vidro fosco.
   glassButtonText: {
     color: '#000',
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: 18,
   }
 });
