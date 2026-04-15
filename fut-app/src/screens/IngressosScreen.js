@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
         paddingTop: 30,
         marginTop: 40,
+        marginBottom: 60,
     },
     titulo: {
         fontSize: 24,
@@ -115,9 +116,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    containerImg: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 30,
+        marginBottom: 8,
+        alignItems: 'center',
+        width: '100%',
+    },
     img: {
-        width: 60,
-        height: 60,
+        width: 80,
+        height: 80,
         borderRadius: 50,
         borderWidth: 2,
         borderColor: '#fff'
@@ -161,13 +170,6 @@ const styles = StyleSheet.create({
         color: '#880000',
         fontSize: 20,
         fontWeight: 'bold'
-    },
-    containerImg: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-        alignItems: 'center',
-        width: '100%',
     },
     qtdButtonContainer: {
         flexDirection: 'row',
