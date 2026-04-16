@@ -115,10 +115,11 @@ const styles = StyleSheet.create({
         marginBottom: 60,
     },
     titulo: {
-        fontSize: 24,
+        fontSize: 32,
         textAlign: 'center',
         fontWeight: 'bold',
-        marginBottom: 16,
+        marginBottom: 4,
+        color: '#880000',
     },
     // Ajustado para ser apenas o wrapper do ticket
     cardContainer: {
