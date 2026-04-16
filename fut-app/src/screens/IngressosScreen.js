@@ -11,17 +11,19 @@ import Svg, { Path } from 'react-native-svg';
 // Dessa forma, quando importamos IngressosScreen em App.js, estamos importando essa função diretamente, sem precisar usar chaves {}.
 export default function IngressosScreen() {
     const navigation = nav();
-    const [quantidade, setQuantidade] = useState(1);
+    const [quantidades, setQuantidades] = useState({});
 
-    function quantidadeDiminui() {
-        if (quantidade > 1) {
-            setQuantidade(quantidade - 1);
+    function quantidadeDiminui(id) {
+        const qtd = quantidades[id] || 1;
+        if (qtd > 1) {
+            setQuantidades({...quantidades, [id]: qtd - 1});
         }
     }
 
-    function quantidadeAumenta() {
-        if (quantidade < 10) {
-            setQuantidade(quantidade + 1);
+    function quantidadeAumenta(id) {
+        const qtd = quantidades[id] || 1;
+        if (qtd < 10) {
+            setQuantidades({...quantidades, [id]: qtd + 1});
         }
     }
 
@@ -34,10 +36,7 @@ export default function IngressosScreen() {
                 keyExtractor={(item) => item.id}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
-                    /* O container principal agora não tem cor de fundo, o fundo será o SVG */
                     <View style={styles.cardContainer}>
-                        
-                        {/* 1. O SVG como fundo absoluto */}
                         <View style={StyleSheet.absoluteFill}>
                             <Svg height="100%" width="100%" viewBox="0 0 350 200" preserveAspectRatio="none">
                                 <Path
@@ -60,7 +59,6 @@ export default function IngressosScreen() {
                             </Svg>
                         </View>
 
-                        {/* 2. Conteúdo posicionado sobre o SVG */}
                         <View style={styles.content}>
                             <View style={styles.containerImg}>
                                 <Image source={item.imgDrakos} style={styles.img} />
@@ -84,19 +82,19 @@ export default function IngressosScreen() {
                             <View style={styles.qtdButtonContainer}>
                                 <View style={styles.qtdButton}>
                                     <TouchableOpacity
-                                        onPress={() => quantidadeDiminui()}>
+                                        onPress={() => quantidadeDiminui(item.id)}>
                                         <Ionicons name="remove-circle-outline" size={40} color="#fff" />
                                     </TouchableOpacity>
-                                    <Text name="quantidade" style={styles.textoQtd}>{quantidade}</Text>
+                                    <Text style={styles.textoQtd}>{quantidades[item.id] || 1}</Text>
                                     <TouchableOpacity
-                                        onPress={() => quantidadeAumenta()}>
+                                        onPress={() => quantidadeAumenta(item.id)}>
                                         <Ionicons name="add-circle-outline" size={40} color="#fff" />
                                     </TouchableOpacity>
                                 </View>
                                 
                                 <TouchableOpacity
                                     style={styles.btn}
-                                    onPress={() => alert(`${item.nome} Adicionado ao carrinho`)}>
+                                    onPress={() => alert(`${quantidades[item.id]} ingressos para ${item.nome} adicionados ao carrinho`)}>
                                     <Text style={styles.textoBtn}>Comprar</Text>
                                 </TouchableOpacity>
                             </View>
