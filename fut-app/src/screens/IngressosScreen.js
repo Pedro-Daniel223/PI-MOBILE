@@ -1,4 +1,5 @@
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useState } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation as nav} from '@react-navigation/native';
 import { dadosIngresso } from '../data/dataIngresso';
@@ -10,6 +11,19 @@ import Svg, { Path } from 'react-native-svg';
 // Dessa forma, quando importamos IngressosScreen em App.js, estamos importando essa função diretamente, sem precisar usar chaves {}.
 export default function IngressosScreen() {
     const navigation = nav();
+    const [quantidade, setQuantidade] = useState(1);
+
+    function quantidadeDiminui() {
+        if (quantidade > 1) {
+            setQuantidade(quantidade - 1);
+        }
+    }
+
+    function quantidadeAumenta() {
+        if (quantidade < 10) {
+            setQuantidade(quantidade + 1);
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -64,17 +78,22 @@ export default function IngressosScreen() {
                                 <Ionicons name="time-outline" size={20} color="#ddd" />
                                 <Text style={styles.hora}>{item.hora}</Text>
                             </View>
+
                             <Text style={styles.valor}>{item.valor}</Text>
+
                             <View style={styles.qtdButtonContainer}>
                                 <View style={styles.qtdButton}>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => quantidadeDiminui()}>
                                         <Ionicons name="remove-circle-outline" size={40} color="#fff" />
                                     </TouchableOpacity>
-                                    <Text style={styles.textoQtd}>1</Text>
-                                    <TouchableOpacity>
+                                    <Text name="quantidade" style={styles.textoQtd}>{quantidade}</Text>
+                                    <TouchableOpacity
+                                        onPress={() => quantidadeAumenta()}>
                                         <Ionicons name="add-circle-outline" size={40} color="#fff" />
                                     </TouchableOpacity>
                                 </View>
+                                
                                 <TouchableOpacity
                                     style={styles.btn}
                                     onPress={() => alert(`${item.nome} Adicionado ao carrinho`)}>
