@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   glassButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 12,
     height: 56,
     justifyContent: 'center',
@@ -206,10 +206,10 @@ const styles = StyleSheet.create({
     elevation: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1.5,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     borderWidth: 0.6,
-    borderColor: '#F2F2F2',
+    borderColor: 'rgba(255,255,255,0.8)',
     paddingHorizontal: 6,
   },
   buttonTitle: { 
