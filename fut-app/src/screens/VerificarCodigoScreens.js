@@ -13,6 +13,16 @@ import {
 } from 'react-native';
 import CustomButton from '../components/CustomButton';
 
+// DEFINIÇÃO DAS CORES (Padronizadas com as outras telas)
+const colors = {
+  primary: '#8B3A3A',      // Vermelho Drakos
+  background: '#E8E8E8',   // Cinza do fundo
+  white: '#FFFFFF',
+  text: '#000000',
+  mutedText: '#888',
+  otpBackground: '#D1D1D1'
+};
+
 export default function VerificarCodigo({ navigation }) {
   const [code, setCode] = useState(['', '', '', '', '']);
   const [timer, setTimer] = useState(13);
@@ -59,7 +69,6 @@ export default function VerificarCodigo({ navigation }) {
     Alert.alert('Sucesso', 'Código verificado com sucesso!', [
       { 
         text: 'OK', 
-        // AQUI ESTÁ A MUDANÇA: O nome deve ser 'RedefinirSenha' para bater com o App.js
         onPress: () => navigation.navigate('NovaSenhaScreens') 
       } 
     ]);
@@ -77,7 +86,7 @@ export default function VerificarCodigo({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           
-          {/* BOTÃO VOLTAR */}
+          {/* BOTÃO VOLTAR PADRONIZADO */}
           <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
             <Text style={styles.backText}>←</Text>
           </TouchableOpacity>
@@ -90,7 +99,7 @@ export default function VerificarCodigo({ navigation }) {
             
             <Text style={styles.headerTitle}>Verifique seu email</Text>
             <Text style={styles.headerSubtitle}>
-              Insira o codigo de 5 digitos enviado para seu email
+              Insira o código de 5 dígitos enviado para seu email
             </Text>
           </View>
 
@@ -102,7 +111,7 @@ export default function VerificarCodigo({ navigation }) {
                 style={styles.otpInput}
                 keyboardType="number-pad"
                 maxLength={1}
-                selectTextOnFocus={true} // Facilita a edição
+                selectTextOnFocus={true} 
                 onChangeText={(text) => handleInputChange(text, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
                 value={digit}
@@ -127,7 +136,7 @@ export default function VerificarCodigo({ navigation }) {
               style={styles.resendButton}
             >
               <Text style={styles.resendText}>
-                Nao recebeu codigo?, <Text style={styles.resendTextBold}>reenviar({timer}s)</Text>
+                Não recebeu código? <Text style={styles.resendTextBold}>reenviar({timer}s)</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -141,7 +150,7 @@ export default function VerificarCodigo({ navigation }) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#E8E8E8',
+    backgroundColor: colors.background,
   },
   scrollGrow: {
     flexGrow: 1,
@@ -152,38 +161,42 @@ const styles = StyleSheet.create({
   back: {
     position: 'absolute',
     left: 20,
-    top: Platform.OS === 'ios' ? 50 : 20, 
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    backgroundColor: '#fff',
+    top: 50,
+    width: 42,
+    height: 42,
+    borderRadius: 12, // Padronizado com as outras telas
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.6)',
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
     zIndex: 10,
   },
   backText: {
-    fontSize: 24,
-    color: '#000',
+    fontSize: 22,
+    color: colors.text,
     fontWeight: 'bold',
   },
   header: {
     alignItems: 'center',
     marginBottom: 30,
+    width: '100%',
   },
   iconCircle: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#8B3A3A', 
+    backgroundColor: colors.primary, 
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
     borderWidth: 10,
     borderColor: 'rgba(139, 58, 58, 0.15)',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
   iconEmoji: {
     fontSize: 45,
@@ -191,12 +204,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#000',
+    color: colors.text,
     marginBottom: 10,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#888',
+    color: colors.mutedText,
     textAlign: 'center',
     paddingHorizontal: 50,
     lineHeight: 20,
@@ -205,41 +218,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '85%',
+    maxWidth: 320,
     marginBottom: 40,
   },
   otpInput: {
     width: 55,
-    height: 95,
-    backgroundColor: '#D1D1D1',
-    borderRadius: 20,
+    height: 80, // Ajustado levemente para melhor proporção
+    backgroundColor: colors.otpBackground,
+    borderRadius: 12, // Combinando com os outros inputs do app
     textAlign: 'center',
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#000',
-  },
-  formContent: {
-    width: '85%',
-    alignItems: 'center',
-  },
-  verifyButton: {
-    backgroundColor: '#F5F5F5',
-    width: '100%',
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
+    color: colors.text,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
   },
+  formContent: {
+    width: '100%',
+    maxWidth: 360,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+  },
+  verifyButton: {
+    backgroundColor: '#F5F5F5',
+    width: '100%',
+    borderRadius: 12, // Padronizado com o resto do app
+    height: 60,
+    elevation: 3,
+  },
   verifyButtonText: {
-    color: '#000',
+    color: colors.text,
     fontSize: 18,
     fontWeight: 'bold',
   },
   resendButton: {
-    marginTop: 20,
+    marginTop: 25,
   },
   resendText: {
     color: '#666',
@@ -247,6 +262,6 @@ const styles = StyleSheet.create({
   },
   resendTextBold: {
     fontWeight: 'bold',
-    color: '#8B3A3A', // Cor bordô para destacar
+    color: colors.primary, 
   }
 });
