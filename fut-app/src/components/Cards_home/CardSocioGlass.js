@@ -4,88 +4,76 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Image,
   Animated,
-
 } from 'react-native';
 
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
-
-
-
-export default function CardActionGlass({
-  icon,
-  title,
-  desc,
-  image,
-  onPress,
-  flatRight, // ✅
-  flatLeft,  // ✅
-  style,     // ✅ ESSENCIAL
-}) {
+export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) {
 
   const floatAnim = useRef(new Animated.Value(0)).current;
   const pressAnim = useRef(new Animated.Value(1)).current;
+
+  // 🔥 animação flutuante
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, {
+          toValue: -5,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatAnim, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  // 🔥 animação toque
   const handlePressIn = () => {
-  Animated.spring(pressAnim, {
-    toValue: 0.96,
-    useNativeDriver: true,
-  }).start();
-};
+    Animated.spring(pressAnim, {
+      toValue: 0.96,
+      useNativeDriver: true,
+    }).start();
+  };
 
-const handlePressOut = () => {
-  Animated.spring(pressAnim, {
-    toValue: 1,
-    friction: 4,
-    useNativeDriver: true,
-  }).start();
-};
-
-
-useEffect(() => {
-  Animated.loop(
-    Animated.sequence([
-      Animated.timing(floatAnim, {
-        toValue: -5,
-        duration: 2000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(floatAnim, {
-        toValue: 0,
-        duration: 2000,
-        useNativeDriver: true,
-      }),
-    ])
-  ).start();
-}, []);
+  const handlePressOut = () => {
+    Animated.spring(pressAnim, {
+      toValue: 1,
+      friction: 4,
+      useNativeDriver: true,
+    }).start();
+  };
 
   return (
     <TouchableOpacity
-    // tamanho do card, controlado pelo pai
-    style={{ flex: 9.9 }}
-        activeOpacity={1}
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-      >
+    style={{ flex: 0 }} // 👈 TESTE AQUI
+      activeOpacity={1}
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+
+    >
       <Animated.View
         style={[
           styles.wrapper,
           style,
-          flatRight && styles.flatRight,
           flatLeft && styles.flatLeft,
+          flatRight && styles.flatRight,
           {
             transform: [{ scale: pressAnim }],
           },
         ]}
       >
 
-        {/* BLUR */}
         <BlurView intensity={90} tint="dark" style={StyleSheet.absoluteFill} />
 
-        {/* REFRAÇÃO */}
         <LinearGradient
           colors={[
             'rgba(255,255,255,0.08)',
@@ -95,62 +83,50 @@ useEffect(() => {
           style={StyleSheet.absoluteFill}
         />
 
-        {/* PROFUNDIDADE */}
         <LinearGradient
           colors={['transparent', 'rgba(0,0,0,0.25)']}
           style={StyleSheet.absoluteFill}
         />
 
-        {/* HIGHLIGHT */}
         <View style={styles.highlight} />
-
-        {/* BORDA */}
         <View
           style={[
             styles.border,
-            flatRight && styles.flatRightBorderFix,
             flatLeft && styles.flatLeftBorderFix,
+            flatRight && styles.flatRightBorderFix,
           ]}
         />
 
-        {/* CONTEÚDO */}
         <View style={styles.content}>
 
-          {/* ÍCONE (agora mais sutil) */}
-          <Ionicons 
-            name={icon} 
-            size={18} 
-            color="rgba(255,255,255,0.7)" 
+          {/* ÍCONE */}
+          <Ionicons
+            name="people-outline"
+            size={18}
+            color="rgba(255,255,255,0.7)"
             style={{ marginBottom: 6 }}
           />
 
-          {/* 🔥 GLOW (fica atrás da imagem) */}
-        <View style={styles.glow} />
 
-
-        <Animated.Image
-          source={image}
-          style={[
-            styles.image,
-            {
-              transform: [
-                  { translateY: floatAnim },
-                  { scale: 1.05 },
-                ]
-            },
-          ]}
-        />
-
-
-
-
-
+      
+          {/* IMAGEM */}
+          <Animated.Image
+            source={require('../../assets/img/card_branco.png')}
+            style={[
+              styles.image,
+              {
+                transform: [{ translateY: floatAnim }],
+              },
+            ]}
+          />
 
           {/* TEXTO */}
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.desc}>{desc}</Text>
+          <Text style={styles.title}>Seja Sócio</Text>
+          <Text style={styles.desc}>
+            Tenha benefícios exclusivos
+          </Text>
 
-          {/* BOTÃO GLASS */}
+          {/* BOTÃO */}
           <View style={styles.button}>
             <BlurView
               intensity={60}
@@ -175,7 +151,7 @@ useEffect(() => {
         </View>
 
       </Animated.View>
-          </TouchableOpacity>
+    </TouchableOpacity>
   );
 }
 
@@ -199,20 +175,21 @@ wrapper: {
     flex: 1,
   },
 
-image: {
-  width: '100%',
-  height: 90,
-  resizeMode: 'contain',
-  alignSelf: 'center',
-  marginVertical: 10,
-  opacity: 0.95,
-},
+  image: {
+    width: '80%',
+    height: 90,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginVertical: 10,
+    opacity: 0.90,
+    // marginBottom: 35,
+    marginTop: 10,
+  },
 
   title: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '800',
-    marginTop: 6,
   },
 
   desc: {
@@ -229,7 +206,7 @@ image: {
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '55%',
+    width: '60%',
     alignSelf: 'flex-start',
   },
 
@@ -267,14 +244,16 @@ image: {
   position: 'absolute',
   width: 110,
   height: 110,
-  borderRadius: 90,
-  backgroundColor: 'rgba(255,255,255,0.06)',
-  top: 45,
-  alignSelf: 'center',
+  borderRadius: 80,
+  backgroundColor: 'rgba(255,255,255,0.05)',
+  right: 10,
+  top: 20,
 },
 
-flatRightBorderFix: {
-  borderRightWidth: 0,
+
+  flatLeft: {
+  borderTopLeftRadius: 4,
+  borderBottomLeftRadius: 4,
 },
 
 flatRight: {
@@ -282,8 +261,8 @@ flatRight: {
   borderBottomRightRadius: 4,
 },
 
-flatLeft: {
-  borderTopLeftRadius: 4,
-  borderBottomLeftRadius: 4,
+flatLeftBorderFix: {
+  borderLeftWidth: 0,
 },
+
 });

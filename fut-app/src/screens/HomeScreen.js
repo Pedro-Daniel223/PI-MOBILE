@@ -12,16 +12,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
 import NavbarGlass from '../components/NavbarGlass';
-// import GlassCard from '../components/CardGlass';
 import GlassCarousel from '../components/Cards_home/GlassCarousel';
 import CardProfileWelcome from '../components/Cards_home/CardProfileWelcome';
 import CardActionGlass from '../components/Cards_home/cardActionGlass';
-
+import CardSocioGlass from '../components/Cards_home/CardSocioGlass';
 
 
 export default function Home({ navigation }) {
   return (
     <View style={styles.container}>
+
+      
 
       {/* BACKGROUND */}
       <LinearGradient
@@ -36,21 +37,23 @@ export default function Home({ navigation }) {
 
 
         {/* CARDS */}
-        <View style={styles.row}>
+        <View style={{ flexDirection: 'row', gap: 12 }}>
 
-      <CardActionGlass
-        icon="storefront-outline"
-        title="Drakos Store"
-        desc="Veja produtos"
-        image={require('../assets/img/img_home/milan_r2006(2).png')}
+          <View style={styles.middleGlow} />
+        <CardActionGlass
+          style={{ flex: 1.3 }}
+          flatRight
+          icon="storefront-outline"
+          title="Drakos Store"
+          desc="Veja produtos"
+          image={require('../assets/img/img_home/milan_r2006(2).png')}
+          
+        />
+
+      <CardSocioGlass
+        style={{ flex: 0.7 }}
+        flatLeft
       />
-{/* 
-          <CardActionGlass
-            icon="storefront-outline"
-            title="Drakos Store"
-            desc="Veja produtos"
-            image={require('../assets/img/card_branco.png')}
-          /> */}
 
         </View>
 
@@ -69,9 +72,14 @@ export default function Home({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
 
+
+
+
   content: {
     padding: 20,
     paddingBottom: 120,
+    gap: 20, // 👈 ESSENCIAL (resolve 80% do visual)
+    justifyContent: 'space-between', // 👈 ESSENCIAL
   },
 
   headerCard: {
@@ -123,7 +131,10 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 12, // 👈 controla o espaço entre os dois
+    marginTop: 20, // 👈 afasta do card de cima
+    justifyContent: 'space-between', // 👈 ESSENCIAL (resolve 80% do visual)
+    alignItems: 'stretch', // 👈 garante altura igual
   },
 
   card: {
@@ -169,4 +180,19 @@ const styles = StyleSheet.create({
     width: 100,
     height: 70,
   },
+
+  middleGlow: {
+  position: 'absolute',
+  width: 2,
+  height: '90%',
+  backgroundColor: 'rgba(255,255,255,0.2)',
+  alignSelf: 'center',
+  left: '50%',
+
+  // glow
+  shadowColor: '#fff',
+  shadowOpacity: 0.6,
+  shadowRadius: 8,
+  elevation: 10,
+},
 });
