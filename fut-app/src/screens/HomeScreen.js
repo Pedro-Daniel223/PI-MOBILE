@@ -16,6 +16,30 @@ import GlassCarousel from '../components/Cards_home/GlassCarousel';
 import CardProfileWelcome from '../components/Cards_home/CardProfileWelcome';
 import CardActionGlass from '../components/Cards_home/cardActionGlass';
 import CardSocioGlass from '../components/Cards_home/CardSocioGlass';
+import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCarousel';
+import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
+
+const products = [
+  {
+    image: require('../assets/img/img_home/milan_r2006(2).png'),
+    title: 'Camisa Milan 2006',
+    price: 'R$ 199,90',
+  },
+  {
+    image: require('../assets/img/img_home/milan_r2006(2).png'),
+    title: 'Camisa Real Madrid',
+    price: 'R$ 249,90',
+  },
+  {
+    image: require('../assets/img/img_home/milan_r2006(2).png'),
+    title: 'Camisa Brasil',
+    price: 'R$ 179,90',
+  },
+];
+
+
+
+
 
 
 export default function Home({ navigation }) {
@@ -60,7 +84,56 @@ export default function Home({ navigation }) {
         {/* CARD GRANDE */}
           <GlassCarousel />
 
+
+
+              {/* CARROSEL DE PRODUTOS */}
+      <View style={{ marginTop: 25 }}>
+
+        <Text style={{
+          color: '#fff',
+          fontSize: 16,
+          fontWeight: '700',
+          marginBottom: 12,
+        }}>
+          Produtos em destaque
+        </Text>
+
+            
+      {/* <ProductCardGlassPro
+        image={require('../assets/img/img_home/milan_r2006(2).png')}
+        title="Camisa Milan 2006"
+        price="R$ 199,90"
+      />
+
+      <ProductCardGlassPro
+        image={require('../assets/img/img_home/milan_r2006(2).png')}
+        title="Camisa Milan 2006"
+        price="R$ 199,90"
+      />
+
+      <ProductCardGlassPro
+        image={require('../assets/img/img_home/milan_r2006(2).png')}
+        title="Camisa Milan 2006"
+        price="R$ 199,90"
+      /> */}
+
+        <InfiniteProductCarousel
+          data={products}
+          renderItem={({ item }) => (
+            <View style={{ width: 280 }}>
+              <ProductCardGlassPro
+                image={item.image}
+                title={item.title}
+                price={item.price}
+              />
+            </View>
+          )}
+        />
+      </View>
+
       </ScrollView>
+
+
 
       {/* NAVBAR */}
       <NavbarGlass navigation={navigation} />
@@ -71,10 +144,10 @@ export default function Home({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-
-
-
-
+  
+  
+  
+  
   content: {
     padding: 20,
     paddingBottom: 120,
@@ -195,4 +268,7 @@ const styles = StyleSheet.create({
   shadowRadius: 8,
   elevation: 10,
 },
+
+
+
 });

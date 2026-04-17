@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -50,8 +52,14 @@ export default function CardProfileWelcome() {
   }, [charIndex, lineIndex]);
 
   return (
+    
     <View style={styles.wrapper}>
-        <View style={styles.glowOverlay} />
+        
+        <TouchableOpacity style={styles.editButton} onPress={() => console.log('Editar perfil')}>
+            <BlurView intensity={40} tint="dark" style={styles.editBlur}>
+              <Ionicons name="settings-outline" size={16} color="#fff" />
+            </BlurView>
+          </TouchableOpacity><View style={styles.glowOverlay} />
       {/* GLASS */}
       <BlurView intensity={90} tint="dark" style={StyleSheet.absoluteFill} />
 
@@ -94,6 +102,19 @@ export default function CardProfileWelcome() {
 
         <Text style={styles.text}>{displayedText[2]}</Text>
       </View>
+      <View style={styles.actionsContainer}>
+
+
+  <TouchableOpacity style={styles.actionButton}>
+    <BlurView intensity={30} tint="dark" style={styles.actionBlur}>
+      <Ionicons name="card-outline" size={16} color="#fff" />
+      <Text style={styles.actionText}>Plano</Text>
+    </BlurView>
+  </TouchableOpacity>
+
+
+
+</View>
 
     </View>
   );
@@ -176,5 +197,51 @@ const styles = StyleSheet.create({
   bottom: 0,
   borderRadius: 28,
   backgroundColor: 'rgba(255, 0, 0, 0.06)',
+},
+
+editButton: {
+  position: 'absolute',
+  top: 16,
+  right: 16,
+  zIndex: 10,
+},
+
+editBlur: {
+  padding: 10,
+  borderRadius: 14,
+  overflow: 'hidden',
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.15)',
+},
+
+
+
+actionsContainer: {
+  marginTop: 20,
+  alignItems: 'flex-start',
+},
+
+actionButton: {
+  alignSelf: 'flex-start',
+},
+
+actionBlur: {
+  flexDirection: 'row',
+  alignItems: 'center',
+
+  paddingVertical: 8,
+  paddingHorizontal: 14, // 👈 importante
+  borderRadius: 14,
+  overflow: 'hidden',
+
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.12)',
+},
+
+actionText: {
+  color: '#fff',
+  marginLeft: 6,
+  fontSize: 13,
+  fontWeight: '500',
 },
 });

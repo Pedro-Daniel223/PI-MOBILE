@@ -386,7 +386,7 @@ return (
         <Ionicons
           name={tab.icon}
           size={22}
-          color={isActive ? '#a40000' : 'rgba(255,255,255,0.4)'}
+          color={isActive ? '#a40000' : 'rgb(255, 255, 255)'}
         />
 
         <Animated.Text
@@ -394,7 +394,7 @@ return (
             styles.label,
             {
               // O texto sobe suavemente quando ativo
-              color: isActive ? '#a40000' : 'rgba(255,255,255,0.5)',
+              color: isActive ? '#a40000' : 'rgb(255, 255, 255)',
               opacity: isActive ? 1 : 0.7,
               fontWeight: isActive ? '600' : '400',
               transform: [
