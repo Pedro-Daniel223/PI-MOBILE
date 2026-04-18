@@ -1,57 +1,120 @@
 import React, { useRef, useEffect } from 'react';
-import { Animated, View, Dimensions } from 'react-native';
+import {
+  View,
+  Animated,
+  PanResponder,
+} from 'react-native';
 
 const ITEM_WIDTH = 280;
-const SPEED = 0.5; // ajuste velocidade
+const AUTO_SPEED = 0.3;
 
 export default function InfiniteProductCarousel({ data, renderItem }) {
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const offset = useRef(0);
-  const listRef = useRef(null);
+  const translateX = useRef(new Animated.Value(0)).current;
+  const currentOffset = useRef(0);
 
-  useEffect(() => {
-    let animationId;
+  const animationRef = useRef(null);
+  const timeoutRef = useRef(null);
 
+  const isDragging = useRef(false);
+
+  const loopData = [...data, ...data, ...data];
+
+  // 🔥 ANIMAÇÃO
+  const startAutoScroll = () => {
     const animate = () => {
-      offset.current += SPEED;
+      if (isDragging.current) return;
 
-      // loop infinito suave
-      const maxOffset = data.length * ITEM_WIDTH;
+      currentOffset.current -= AUTO_SPEED;
 
-      if (offset.current >= maxOffset) {
-        offset.current = 0;
+      const maxWidth = data.length * ITEM_WIDTH;
+      const resetPoint = -maxWidth;
+
+      if (Math.abs(currentOffset.current) >= maxWidth * 2) {
+        currentOffset.current = resetPoint;
       }
 
-      listRef.current?.scrollToOffset({
-        offset: offset.current,
-        animated: false, // IMPORTANTE
-      });
+      translateX.setValue(currentOffset.current);
 
-      animationId = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animate);
     };
 
-    animationId = requestAnimationFrame(animate);
+    animationRef.current = requestAnimationFrame(animate);
+  };
 
-    return () => cancelAnimationFrame(animationId);
-  }, [data]);
+  const stopAutoScroll = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+
+  // ⏳ delay inteligente
+  const scheduleResume = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      if (!isDragging.current) {
+        startAutoScroll();
+      }
+    }, 1000); // 👈 4 segundos (pode mudar pra 5000)
+  };
+
+  useEffect(() => {
+    startAutoScroll();
+
+    return () => {
+      stopAutoScroll();
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  // 🖐️ TOQUE
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+
+      onPanResponderGrant: () => {
+        isDragging.current = true;
+
+        stopAutoScroll();
+
+        // cancela qualquer retorno automático
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      },
+
+      onPanResponderMove: (_, gesture) => {
+        const newOffset = currentOffset.current + gesture.dx;
+        translateX.setValue(newOffset);
+      },
+
+      onPanResponderRelease: (_, gesture) => {
+        currentOffset.current += gesture.dx;
+
+        isDragging.current = false;
+
+        // 👇 só volta depois de um tempo
+        scheduleResume();
+      },
+    })
+  ).current;
 
   return (
-    <Animated.FlatList
-      ref={listRef}
-      data={data}
-      horizontal
-      keyExtractor={(_, i) => i.toString()}
-      renderItem={renderItem}
-      showsHorizontalScrollIndicator={false}
-      scrollEnabled={false} // trava interação pra não quebrar fluidez
-      getItemLayout={(_, index) => ({
-        length: ITEM_WIDTH,
-        offset: ITEM_WIDTH * index,
-        index,
-      })}
-      contentContainerStyle={{
-        paddingHorizontal: 10,
-      }}
-    />
+    <View style={{ overflow: 'hidden' }} {...panResponder.panHandlers}>
+      <Animated.View
+        style={{
+          flexDirection: 'row',
+          transform: [{ translateX }],
+        }}
+      >
+        {loopData.map((item, index) => (
+          <View key={index} style={{ width: ITEM_WIDTH }}>
+            {renderItem({ item })}
+          </View>
+        ))}
+      </Animated.View>
+    </View>
   );
 }

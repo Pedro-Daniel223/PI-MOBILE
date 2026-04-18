@@ -89,14 +89,10 @@ export default function Home({ navigation }) {
               {/* CARROSEL DE PRODUTOS */}
       <View style={{ marginTop: 25 }}>
 
-        <Text style={{
-          color: '#fff',
-          fontSize: 16,
-          fontWeight: '700',
-          marginBottom: 12,
-        }}>
-          Produtos em destaque
-        </Text>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Produtos em destaque</Text>
+        <View style={styles.sectionLine} />
+      </View>
 
             
       {/* <ProductCardGlassPro
@@ -267,8 +263,37 @@ const styles = StyleSheet.create({
   shadowOpacity: 0.6,
   shadowRadius: 8,
   elevation: 10,
+
+
 },
 
 
+
+
+
+sectionHeader: {
+  marginBottom: 12,
+  marginTop: 20,
+},
+
+sectionTitle: {
+  color: '#fff',
+  fontSize: 18,
+  fontWeight: '800',
+},
+
+sectionLine: {
+  marginTop: 6,
+  width: 40,
+  height: 3,
+  borderRadius: 2,
+  backgroundColor: '#ff2b2b',
+
+  // glow
+  shadowColor: '#ff2b2b',
+  shadowOpacity: 0.8,
+  shadowRadius: 6,
+  elevation: 6,
+},
 
 });
