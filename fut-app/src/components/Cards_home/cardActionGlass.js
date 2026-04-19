@@ -62,10 +62,9 @@ useEffect(() => {
 }, []);
 
   return (
-    <TouchableOpacity
-    // tamanho do card, controlado pelo pai
-    style={{ flex: 9.9 }}
-        activeOpacity={1}
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          activeOpacity={1}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -181,8 +180,7 @@ useEffect(() => {
 
 const styles = StyleSheet.create({
 wrapper: {
-  flex: 1,
-  height: 250, // 👈 define altura padrão
+  height: 250,
   borderRadius: 22,
   overflow: 'hidden',
   backgroundColor: 'rgba(255,255,255,0.03)',

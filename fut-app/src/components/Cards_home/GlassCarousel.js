@@ -22,31 +22,37 @@ export default function GlassCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   
-    const img1 = require('../../assets/img/card_branco.png');
-    const img2 = require('../../assets/img/card_branco.png');
-    const img3 = require('../../assets/img/card_branco.png');
-
     // const img1 = require('.../assets/img/card_branco.png');
     // const img2 = require('.../assets/img/card_branco.png');
     // const img3 = require('.../assets/img/card_branco.png');
 
-  const data = [
-    {
-      title: 'Seja sócio',
-      desc: 'Torne-se sócio e pague menos',
-      image: img1,
-    },
-    {
-      title: 'Promoções',
-      desc: 'Aproveite descontos exclusivos',
-      image: img2,
-    },
-    {
-      title: 'Eventos',
-      desc: 'Confira os próximos jogos da temporada',
-      image: img3,
-    },
-  ];
+
+const data = [
+  {
+    teamA: 'Drakos',
+    teamB: 'Vasco',
+    logoA: require('../../assets/img/img_home/img_jogos/Drakos HD.png'),
+    logoB: require('../../assets/img/img_home/img_jogos/Vasco da Gama HD.png'),
+    date: '27/09/2026',
+    home: true, // ou false (fora)
+  },
+  {
+    teamA: 'Drakos',
+    teamB: 'Corinthians',
+    logoA: require('../../assets/img/img_home/img_jogos/Drakos HD.png'),
+    logoB: require('../../assets/img/img_home/img_jogos/Corinthians HD.png'),
+    date: '02/10/2026',
+    home: false,
+  },
+  {
+    teamA: 'Drakos',
+    teamB: 'Bahia',
+    logoA: require('../../assets/img/img_home/img_jogos/Drakos HD.png'),
+    logoB: require('../../assets/img/img_home/img_jogos/Bahia HD.png'),
+    date: '10/10/2026',
+    home: true,
+  },
+];
 
 
 
@@ -84,97 +90,103 @@ useEffect(() => {
     
 
 
-  return (
-    <View style={{ marginTop: 10 }}>
+return (
+  <View style={{ marginTop: 10 }}>
 
-      <Animated.ScrollView
-        ref={scrollRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: true }
-        )}
-        onMomentumScrollEnd={handleScroll}
-      >
-        {data.map((item, index) => (
-          <View key={index} style={{ width: CARD_WIDTH }}>
+    <Animated.ScrollView
+      ref={scrollRef}
+      horizontal
+      pagingEnabled
+      showsHorizontalScrollIndicator={false}
+      onScroll={Animated.event(
+        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+        { useNativeDriver: true }
+      )}
+      onMomentumScrollEnd={handleScroll}
+    >
+      {data.map((item, index) => (
+        <View key={index} style={{ width: CARD_WIDTH }}>
 
-            {/* 🧊 GLASS CARD */}
-            <View style={styles.wrapper}>
+          <View style={styles.wrapper}>
 
-              {/* BLUR */}
-              <BlurView
-                intensity={90}
-                tint="dark"
-                style={StyleSheet.absoluteFill}
-              />
+            <BlurView
+              intensity={90}
+              tint="dark"
+              style={StyleSheet.absoluteFill}
+            />
 
-              {/* REFRAÇÃO */}
-              <LinearGradient
-                colors={[
-                  'rgba(255,255,255,0.05)',
-                  'rgba(255,255,255,0.01)',
-                  'transparent',
-                ]}
-                style={StyleSheet.absoluteFill}
-              />
+            <LinearGradient
+              colors={[
+                'rgba(255,255,255,0.05)',
+                'rgba(255,255,255,0.01)',
+                'transparent',
+              ]}
+              style={StyleSheet.absoluteFill}
+            />
 
-              {/* PROFUNDIDADE */}
-              <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.2)']}
-                style={StyleSheet.absoluteFill}
-              />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.2)']}
+              style={StyleSheet.absoluteFill}
+            />
 
-              {/* HIGHLIGHT */}
-              <View style={styles.highlight} />
+            <View style={styles.highlight} />
+            <View style={styles.border} />
 
-              {/* BORDA */}
-              <View style={styles.border} />
+            {/* CONTEÚDO */}
+            <View style={styles.content}>
 
-              {/* CONTEÚDO */}
-              <View style={styles.content}>
+              {/* ESQUERDA */}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.smallTitle}>próximos jogos</Text>
 
-                {/* TEXTO */}
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.title}>{item.title}</Text>
-                  <Text style={styles.desc}>{item.desc}</Text>
+                <Text style={styles.dateLabel}>Data:</Text>
+                <Text style={styles.date}>{item.date}</Text>
 
-                  <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>VER</Text>
-                  </TouchableOpacity>
+                <TouchableOpacity style={styles.button}>
+                  <Text style={styles.buttonText}>VER</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* DIREITA */}
+              <View style={styles.matchContainer}>
+
+                <View style={styles.team}>
+                  <Image source={item.logoA} style={styles.logo} />
+                  <Text style={styles.teamName}>{item.teamA}</Text>
                 </View>
 
-                {/* IMAGEM */}
-                <Image
-                  source={item.image}
-                  style={styles.image}
-                />
+                <Text style={styles.vs}>X</Text>
+
+                <View style={styles.team}>
+                  <Image source={item.logoB} style={styles.logo} />
+                  <Text style={styles.teamName}>{item.teamB}</Text>
+                </View>
 
               </View>
 
             </View>
 
           </View>
-        ))}
-      </Animated.ScrollView>
 
-      {/* 🔘 INDICADORES */}
-      <View style={styles.dots}>
-        {data.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              activeIndex === index && styles.dotActive,
-            ]}
-          />
-        ))}
-      </View>
+        </View>
+      ))}
+    </Animated.ScrollView>
 
+    {/* INDICADORES */}
+    <View style={styles.dots}>
+      {data.map((_, index) => (
+        <View
+          key={index}
+          style={[
+            styles.dot,
+            activeIndex === index && styles.dotActive,
+          ]}
+        />
+      ))}
     </View>
-  );
+
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
@@ -269,4 +281,54 @@ const styles = StyleSheet.create({
   dotActive: {
     backgroundColor: '#fff',
   },
+
+
+  smallTitle: {
+  color: '#fff',
+  fontSize: 14,
+  letterSpacing: 2,
+  opacity: 0.7,
+},
+
+dateLabel: {
+  color: '#fff',
+  marginTop: 10,
+  opacity: 0.6,
+},
+
+date: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '600',
+  marginTop: 2,
+},
+
+matchContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+},
+
+team: {
+  alignItems: 'center',
+},
+
+logo: {
+  width: 45,
+  height: 45,
+  resizeMode: 'contain',
+},
+
+teamName: {
+  color: '#fff',
+  fontSize: 12,
+  marginTop: 4,
+},
+
+vs: {
+  color: '#fff',
+  fontSize: 18,
+  fontWeight: '700',
+  opacity: 0.7,
+},
 });

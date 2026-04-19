@@ -53,17 +53,17 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
 
   return (
     <TouchableOpacity
-    style={{ flex: 0 }} // 👈 TESTE AQUI
+      style={{ flex: 1 }}
       activeOpacity={1}
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
 
     >
+      
       <Animated.View
         style={[
           styles.wrapper,
-          style,
           flatLeft && styles.flatLeft,
           flatRight && styles.flatRight,
           {
@@ -157,17 +157,17 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
 
 const styles = StyleSheet.create({
 wrapper: {
-  flex: 1,
   height: 250, // 👈 define altura padrão
   borderRadius: 22,
   overflow: 'hidden',
   backgroundColor: 'rgba(255,255,255,0.03)',
-
   shadowColor: '#ff2b2b',
   shadowOpacity: 0.25,
   shadowRadius: 20,
   shadowOffset: { width: 0, height: 0 },
   elevation: 10,
+   
+
 },
 
   content: {

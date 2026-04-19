@@ -21,17 +21,17 @@ import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
 
 const products = [
   {
-    image: require('../assets/img/img_home/milan_r2006(2).png'),
+    image: require('../assets/img/Produtos/acessorios/objeto 1/cachecol_transparent (3).png'),
     title: 'Camisa Milan 2006',
     price: 'R$ 199,90',
   },
   {
-    image: require('../assets/img/img_home/milan_r2006(2).png'),
+      image: require('../assets/img/Produtos/acessorios/objeto 2/boneco_transparent (3).png'),
     title: 'Camisa Real Madrid',
     price: 'R$ 249,90',
   },
   {
-    image: require('../assets/img/img_home/milan_r2006(2).png'),
+    image: require('../assets/img/Produtos/acessorios/objeto 3/touca_transparent.png'),
     title: 'Camisa Brasil',
     price: 'R$ 179,90',
   },
@@ -60,32 +60,34 @@ export default function Home({ navigation }) {
         <CardProfileWelcome />
 
 
-        {/* CARDS */}
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-
-          <View style={styles.middleGlow} />
+        <View style={{
+                flexDirection: 'row',
+                gap: 12,
+                alignItems: 'stretch', // 🔥 ISSO AQUI RESOLVE
+              }}>
+                
         <CardActionGlass
-          style={{ flex: 1.3 }}
+          style={{ flex: 1 }}
           flatRight
           icon="storefront-outline"
           title="Drakos Store"
           desc="Veja produtos"
           image={require('../assets/img/img_home/milan_r2006(2).png')}
-          
         />
 
-      <CardSocioGlass
-        style={{ flex: 0.7 }}
-        flatLeft
-      />
+        <CardSocioGlass
+          flatLeft
+        />
 
-        </View>
+      </View>
+
+
+
+
+
 
         {/* CARD GRANDE */}
           <GlassCarousel />
-
-
-
               {/* CARROSEL DE PRODUTOS */}
       <View style={{ marginTop: 25 }}>
 
@@ -94,25 +96,9 @@ export default function Home({ navigation }) {
         <View style={styles.sectionLine} />
       </View>
 
+
+
             
-      {/* <ProductCardGlassPro
-        image={require('../assets/img/img_home/milan_r2006(2).png')}
-        title="Camisa Milan 2006"
-        price="R$ 199,90"
-      />
-
-      <ProductCardGlassPro
-        image={require('../assets/img/img_home/milan_r2006(2).png')}
-        title="Camisa Milan 2006"
-        price="R$ 199,90"
-      />
-
-      <ProductCardGlassPro
-        image={require('../assets/img/img_home/milan_r2006(2).png')}
-        title="Camisa Milan 2006"
-        price="R$ 199,90"
-      /> */}
-
         <InfiniteProductCarousel
           data={products}
           renderItem={({ item }) => (
@@ -140,9 +126,6 @@ export default function Home({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  
-  
-  
   
   content: {
     padding: 20,
@@ -295,5 +278,8 @@ sectionLine: {
   shadowRadius: 6,
   elevation: 6,
 },
+
+
+
 
 });
