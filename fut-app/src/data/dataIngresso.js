@@ -9,7 +9,7 @@
             local: 'Mangueirão',
             valor: 'R$50.00',
             imgDrakos: require('../assets/images/drakos.png'), 
-            img: require('../assets/images/palmeiras.png')
+            img: require('../assets/img/img_home/img_jogos/Palmeiras HD.png')
         },
         {
             id: '2',
