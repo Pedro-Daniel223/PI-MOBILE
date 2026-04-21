@@ -18,6 +18,7 @@ import CardActionGlass from '../components/Cards_home/cardActionGlass';
 import CardSocioGlass from '../components/Cards_home/CardSocioGlass';
 import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCarousel';
 import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
+import { useNavigation } from "@react-navigation/native";
 
 const products = [
   {
@@ -190,8 +191,18 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: '48%',
-    borderRadius: 20,
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 15,
+    width: '93%',
+    alignSelf: 'center',
+    // sombra (Android + iOS)
+    elevation: 3, // Android
+    shadowColor: '#000', // iOS
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
   },
 
   bigCard: {
@@ -213,6 +224,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.7,
     marginTop: 5,
+  },
+  btnBemVindo: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: '#880000',
+    padding: 16,
+    width: '80%',
+    borderRadius: 8
+  },
+  textoBtn:{
+    color: '#fff'
   },
 
   button: {

@@ -8,11 +8,11 @@ import { PanResponder } from 'react-native';
 
 export default function NavbarGlass({ navigation }) {
   const tabs = [
-    { name: 'ticket', icon: 'ticket-outline', label: 'Ticket' },
-    { name: 'socio', icon: 'people-outline', label: 'Sócio' },
-    { name: 'home', icon: 'home', label: 'Home' },
-    { name: 'loja', icon: 'cart-outline', label: 'Loja' },
-    { name: 'perfil', icon: 'person-outline', label: 'Perfil' },
+    { name: 'ticket', icon: 'ticket-outline', label: 'Ticket', tela: 'Ingressos' },
+    { name: 'socio', icon: 'people-outline', label: 'Sócio', tela: 'Socio' },
+    { name: 'home', icon: 'home', label: 'Home', tela: 'Home' },
+    { name: 'loja', icon: 'cart-outline', label: 'Loja', tela: 'Loja' },
+    { name: 'perfil', icon: 'person-outline', label: 'Perfil', tela: 'Perfil' },
   ];
   
   const dragX = useRef(new Animated.Value(0)).current;
@@ -205,7 +205,7 @@ const handlePress = (tab, index) => {
 
   });
 
-  // navigation.navigate(tab.name);
+  navigation.navigate(tab.tela);
 };
 
 
