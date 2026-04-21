@@ -19,7 +19,7 @@ export default function BoasVindas3Screen() {
                 </View>
 
                 <TouchableOpacity
-                onPress={()=>navigation.navigate('Home')}
+                onPress={()=>navigation.navigate('Login')}
                 style={estilos.btn}>
                     <Text style={estilos.textoButton}>COMEÇAR</Text>
                 </TouchableOpacity>

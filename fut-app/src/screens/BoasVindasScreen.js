@@ -16,7 +16,7 @@ export default function BoasVindasScreen() {
 
                 <View style={styles.conteudo}>
                     <TouchableOpacity
-                    onPress={()=>navigation.navigate('Home')}
+                    onPress={()=>navigation.navigate('Login')}
                     style={styles.icone}>
                         <Text style={estilos.texto2}>Pular</Text>
                         <Ionicons name='arrow-forward' size={20} color='#fff'/>
