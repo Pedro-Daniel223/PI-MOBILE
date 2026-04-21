@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './src/screens/LoginScreen';
 import CadastroScreen from './src/screens/CadastroScreen';
 import EsqueceuSenhaScreen from './src/screens/EsqueceuSenhaScreen';
+import HomeScreen from './src/screens/HomeScreen';
 
 // O import está correto se o arquivo se chama VerificarCodigoScreens.js
 import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens'; 
@@ -18,23 +19,41 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName="Login" 
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Login" component={LoginScreen}/>
-
-        <Stack.Screen name="CadastroScreen" component={CadastroScreen}/>
-
-        <Stack.Screen name="EsqueceuSenhaScreen" component={EsqueceuSenhaScreen}/>
+      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
         
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+        />
+
+        <Stack.Screen
+          name="CadastroScreen"
+          component={CadastroScreen}
+        />
+
+        <Stack.Screen
+          name="EsqueceuSenhaScreen"
+          component={EsqueceuSenhaScreen}
+        />
+
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+        />
+
         {/* MUDEI O 'name' PARA 'VerificarCodigo'. 
             O arquivo continua sendo VerificarCodigoScreens.js, 
             mas o "apelido" da tela na navegação agora é o que o seu código espera.
         */}
-        <Stack.Screen name="VerificarCodigo" component={VerificarCodigoScreens}/>
+        <Stack.Screen
+          name="VerificarCodigo"
+          component={VerificarCodigoScreens}
+        />
 
-        <Stack.Screen name="NovaSenhaScreens" component={NovaSenhaScreens}/>
+        <Stack.Screen
+          name="NovaSenhaScreens"
+          component={NovaSenhaScreens}
+        />
 
       </Stack.Navigator>
     </NavigationContainer>
