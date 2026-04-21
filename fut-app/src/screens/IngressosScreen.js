@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation as nav} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { dadosIngresso } from '../data/dataIngresso';
 import { estilos } from '../styles/styles';
 import Svg, { Path } from 'react-native-svg';
+import NavbarGlass from '../components/NavbarGlass';
 
 // default é a exportação padrão do módulo, ou seja, quando importamos esse arquivo em outro lugar,
 // ele vai importar essa função por padrão. Isso é útil para exportar um componente principal de um arquivo, como é o caso do IngressosScreen aqui.
 // Dessa forma, quando importamos IngressosScreen em App.js, estamos importando essa função diretamente, sem precisar usar chaves {}.
-export default function IngressosScreen() {
-    const navigation = nav();
+export default function IngressosScreen({navigation}) {
+
     const [quantidades, setQuantidades] = useState({});
 
     function quantidadeDiminui(id) {
@@ -102,6 +103,7 @@ export default function IngressosScreen() {
                     </View>
                 )}
             />
+            <NavbarGlass navigation={navigation} />
         </View>
     );
 }
