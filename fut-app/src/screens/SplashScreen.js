@@ -43,7 +43,7 @@ export default function Splash({ navigation }) {
         }),
       ]).start(() => {
         setTimeout(() => {
-          navigation.replace('Home');
+          navigation.replace('BoasVindas');
         }, 800);
       });
 
