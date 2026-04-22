@@ -18,6 +18,7 @@ export default function CadastroScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [confirm, setConfirm] = useState('');
+    const [accepted, setAccepted] = useState(false);
 
     const handleCadastro = () => {
         if (!nome || !email || !senha || !confirm) {
@@ -43,15 +44,20 @@ export default function CadastroScreen({ navigation }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
                 style={{ flex: 1 }}
             >
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
+                <ScrollView
+                    contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', paddingBottom: 40 }}
+                    bounces={false}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                >
                     
                     {/* HEADER PADRONIZADO */}
                     <View style={styles.header}>
                         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
                             <Text style={styles.backText}>←</Text>
                         </TouchableOpacity>
-                        <Text style={styles.headerTitle}>BEM VINDO AO COVIL</Text>
-                        <Text style={styles.headerSubtitle}>Faça seu Cadastro para entrar no Covil dos Drakos</Text>
+                        <Text style={styles.headerTitle}>AQUI COMEÇA TUDO PARA VOCÊ!</Text>
+                        <Text style={styles.headerSubtitle}>Crie sua conta para desbloquear o conteúdo exclusivo</Text>
                     </View>
 
                     {/* CARD DE FORMULÁRIO */}
@@ -64,7 +70,7 @@ export default function CadastroScreen({ navigation }) {
                                 placeholder="Nome completo ou sobrenome"
                                 value={nome}
                                 onChangeText={setNome}
-                                // O CustomInput já tem o estilo base, passamos apenas o fundo customizado
+                                containerStyle={{ marginBottom: 12 }}
                                 style={{ backgroundColor: colors.cardBackground }}
                             />
 
@@ -75,16 +81,22 @@ export default function CadastroScreen({ navigation }) {
                                 onChangeText={setEmail}
                                 keyboardType="email-address"
                                 autoCapitalize="none"
+                                containerStyle={{ marginBottom: 12 }}
                                 style={{ backgroundColor: colors.cardBackground }}
+                                rightComponent={email.includes('@') && email.includes('.') ? (
+                                    <View style={styles.iconContainer}><Text style={styles.checkIcon}>✓</Text></View>
+                                ) : null}
                             />
 
-                            <Text style={styles.label}>Senha:</Text>
+                            <Text style={[styles.label, styles.passwordLabel]}>Senha:</Text>
                             <CustomInput
                                 placeholder="********"
                                 value={senha}
                                 onChangeText={setSenha}
                                 secureTextEntry
+                                containerStyle={{ marginBottom: 12 }}
                                 style={{ backgroundColor: colors.cardBackground }}
+                                rightComponent={<TouchableOpacity onPress={() => {}} style={styles.iconContainer}><Text>👁</Text></TouchableOpacity>}
                             />
 
                             <Text style={styles.label}>Confirmar Senha:</Text>
@@ -93,15 +105,22 @@ export default function CadastroScreen({ navigation }) {
                                 value={confirm}
                                 onChangeText={setConfirm}
                                 secureTextEntry
+                                containerStyle={{ marginBottom: 12 }}
                                 style={{ backgroundColor: colors.cardBackground }}
+                                rightComponent={<TouchableOpacity onPress={() => {}} style={styles.iconContainer}><Text>👁</Text></TouchableOpacity>}
                             />
 
-                            {/* BOTÃO PADRONIZADO */}
+                            <View style={styles.acceptRow}>
+                                <TouchableOpacity style={[styles.checkbox, accepted && styles.checkboxActive]} onPress={() => setAccepted(!accepted)}>
+                                    {accepted && <Text style={styles.checkIconSmall}>✓</Text>}
+                                </TouchableOpacity>
+                                <Text style={styles.acceptText}>Eu aceito políticas é privacidade desse app</Text>
+                            </View>
+
                             <View style={styles.buttonWrap}>
                                 <CustomButton 
                                     title="Criar conta" 
                                     onPress={handleCadastro} 
-                                    // Usando o estilo glass que combina com o header
                                     style={styles.glassButton}
                                     textStyle={styles.glassButtonText}
                                 />
@@ -123,13 +142,14 @@ export default function CadastroScreen({ navigation }) {
 const styles = StyleSheet.create({
     safe: {
         flex: 1,
-        backgroundColor: colors.primary,
+        backgroundColor: colors.background,
     },
     header: {
-        height: 220,
+        height: 200,
+        backgroundColor: colors.primary,
+        paddingHorizontal: 25,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 20,
     },
     back: {
         position: 'absolute',
@@ -151,30 +171,33 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         color: colors.white,
-        fontSize: 18,
+        fontSize: 15.5,
         fontWeight: 'bold',
-        letterSpacing: 2,
+        letterSpacing: 1.2,
+        textAlign: 'center',
     },
     headerSubtitle: {
-        color: 'rgba(255,255,255,0.7)',
+        color: '#FFDEDE',
         fontSize: 14,
         marginTop: 10,
         textAlign: 'center',
+        opacity: 0.8,
     },
     card: {
         flex: 1,
         backgroundColor: colors.background,
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
-        paddingHorizontal: 25,
-        paddingTop: 30,
+        paddingTop: 35,
         paddingBottom: 40,
+        paddingHorizontal: 30,
+        marginTop: -20,
     },
     formTitle: {
         fontSize: 26,
         fontWeight: 'bold',
         color: colors.primary,
-        marginBottom: 20,
+        marginBottom: 25,
         textAlign: 'center',
     },
     formContent: {
@@ -187,21 +210,68 @@ const styles = StyleSheet.create({
         marginBottom: 6,
         marginLeft: 4,
     },
+    acceptRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 6,
+        marginBottom: 12,
+    },
+    checkbox: {
+        width: 20,
+        height: 20,
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#888',
+        backgroundColor: 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 8,
+    },
+    checkboxActive: {
+        backgroundColor: '#DDD',
+        borderColor: '#666',
+    },
+    checkIconSmall: {
+        fontSize: 12,
+        color: '#222',
+        fontWeight: '700',
+    },
+    acceptText: {
+        color: '#333',
+        fontSize: 12,
+        flex: 1,
+        flexWrap: 'wrap',
+    },
     buttonWrap: {
-        marginTop: 15,
-        marginBottom: 20,
+        marginTop: 30,
+        width: '100%',
     },
     glassButton: {
-        backgroundColor: colors.primary, // Botão de ação principal em vermelho
+        backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 12,
-        elevation: 4,
+        height: 56,
+        justifyContent: 'center',
+        alignItems: 'center',
+        opacity: 1,
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.18,
+        shadowRadius: 8,
+        borderWidth: 0.6,
+        borderColor: 'rgba(255,255,255,0.9)',
+        paddingHorizontal: 6,
     },
     glassButtonText: {
-        color: colors.white,
+        color: '#181818',
+        fontWeight: '700',
+        fontSize: 18,
+        letterSpacing: 1.5,
     },
     footerText: {
         textAlign: 'center',
-        color: '#666',
+        color: colors.text,
+        marginTop: 25,
         fontSize: 14,
     },
     link: {
