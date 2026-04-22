@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     },
     // Ajustado para ser apenas o wrapper do ticket
     cardContainer: {
-        width: '93%',
+        width: '90%',
         height: 290, // Altura fixa para o SVG não distorcer
         marginVertical: 10,
         alignSelf: 'center',
