@@ -183,7 +183,6 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 30,
         borderRadius: 20,
-        marginTop: 10,
     },
     textoBtn: {
         color: '#880000',
