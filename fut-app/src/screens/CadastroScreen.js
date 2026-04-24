@@ -1,7 +1,21 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, Alert, SafeAreaView, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    Alert, 
+    SafeAreaView, 
+    TouchableOpacity, 
+    ScrollView, 
+    KeyboardAvoidingView, 
+    Platform,
+    Image 
+} from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
+
+// Ativos (Assets)
+const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
 const colors = {
     primary: '#880000',      
@@ -15,7 +29,7 @@ const colors = {
 export default function CadastroScreen({ navigation }) {
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
-    const [cpf, setCpf] = useState(''); // Novo campo Opcional
+    const [cpf, setCpf] = useState('');
     const [senha, setSenha] = useState('');
     const [confirm, setConfirm] = useState('');
     const [accepted, setAccepted] = useState(false);
@@ -52,12 +66,21 @@ export default function CadastroScreen({ navigation }) {
                     showsVerticalScrollIndicator={false}
                 >
                     
+                    {/* HEADER COM ESCUDO INTEGRADO (IGUAL AO LOGIN) */}
                     <View style={styles.header}>
+                        <Image 
+                            source={escudoDrakos}
+                            style={styles.escudoHeader}
+                            resizeMode="contain"
+                        />
                         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
                             <Text style={styles.backText}>←</Text>
                         </TouchableOpacity>
-                        <Text style={styles.headerTitle}>AQUI COMEÇA TUDO PARA VOCÊ!</Text>
-                        <Text style={styles.headerSubtitle}>Crie sua conta para desbloquear o conteúdo exclusivo</Text>
+                        
+                        <View style={styles.headerContent}>
+                            <Text style={styles.headerTitle}>AQUI COMEÇA TUDO PARA VOCÊ!</Text>
+                            <Text style={styles.headerSubtitle}>Crie sua conta para desbloquear o conteúdo exclusivo</Text>
+                        </View>
                     </View>
 
                     <View style={styles.card}>
@@ -83,7 +106,6 @@ export default function CadastroScreen({ navigation }) {
                                 ) : null}
                             />
 
-                            {/* CAMPO CPF OPCIONAL */}
                             <Text style={[styles.label, styles.spacing]}>CPF (OPCIONAL):</Text>
                             <CustomInput
                                 placeholder="000.000.000-00"
@@ -140,7 +162,10 @@ export default function CadastroScreen({ navigation }) {
                                 />
                             </View>
 
-                            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                            <TouchableOpacity 
+                                onPress={() => navigation.navigate('Login')}
+                                style={styles.footerTouchable}
+                            >
                                 <Text style={styles.footerText}>
                                     Já tem conta? <Text style={styles.link}>Entrar</Text>
                                 </Text>
@@ -156,19 +181,34 @@ export default function CadastroScreen({ navigation }) {
 const styles = StyleSheet.create({
     safe: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.primary, // Mantém o topo sólido
     },
     header: {
-        height: 180,
+        height: 200,
         backgroundColor: colors.primary,
-        paddingHorizontal: 25,
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
+    },
+    escudoHeader: {
+        position: 'absolute',
+        width: 250,
+        height: 250,
+        opacity: 0.12,
+        right: -40,
+        top: -30,
+        transform: [{ rotate: '-15deg' }],
+    },
+    headerContent: {
+        zIndex: 2,
+        paddingHorizontal: 40,
+        alignItems: 'center',
     },
     back: {
         position: 'absolute',
         left: 20,
-        top: 40,
+        top: 20, // Ajustado para não colidir com o SafeArea em alguns dispositivos
+        zIndex: 10,
         width: 40,
         height: 40,
         borderRadius: 12,
@@ -199,9 +239,10 @@ const styles = StyleSheet.create({
         backgroundColor: colors.background,
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
-        paddingTop: 25,
+        paddingTop: 30,
         paddingHorizontal: 30,
         marginTop: -30,
+        zIndex: 5,
     },
     formTitle: {
         fontSize: 26,
@@ -222,7 +263,7 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     spacing: {
-        marginTop: 11,
+        marginTop: 12,
     },
     inputStyle: {
         backgroundColor: colors.cardBackground,
@@ -241,12 +282,12 @@ const styles = StyleSheet.create({
     acceptRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 15,
+        marginTop: 20,
     },
     checkbox: {
-        width: 20,
-        height: 20,
-        borderRadius: 5,
+        width: 22,
+        height: 22,
+        borderRadius: 6,
         borderWidth: 1.5,
         borderColor: colors.primary,
         marginRight: 10,
@@ -263,15 +304,14 @@ const styles = StyleSheet.create({
     },
     acceptText: {
         color: '#333',
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: '500',
     },
     buttonWrap: {
-        marginTop: 25,
+        marginTop: 30,
     },
-    // PADRONIZADO COM O ESTILO GLASS DO LOGIN
     glassButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+        backgroundColor: 'rgba(255, 255, 255, 0.25)', 
         borderRadius: 30, 
         height: 60,
         justifyContent: 'center',
@@ -290,12 +330,14 @@ const styles = StyleSheet.create({
         fontSize: 18,
         letterSpacing: 1.5,
     },
+    footerTouchable: {
+        marginTop: 25,
+        paddingVertical: 15,
+        alignItems: 'center',
+    },
     footerText: {
-        textAlign: 'center',
         color: colors.text,
-        marginTop: 20,
         fontSize: 14,
-        paddingBottom: 20,
     },
     link: {
         color: colors.primary,
