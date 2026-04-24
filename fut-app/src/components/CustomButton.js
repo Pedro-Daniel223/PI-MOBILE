@@ -1,7 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, Image } from 'react-native';
 
-// Componente de botão reutilizável que suporta ícone/imagem à direita ou esquerda
 export default function CustomButton({
   title,
   onPress,
@@ -14,7 +13,7 @@ export default function CustomButton({
 }) {
   return (
     <TouchableOpacity
-      activeOpacity={0.85}
+      activeOpacity={0.9}
       style={[styles.button, style, disabled && styles.disabled]}
       onPress={onPress}
       disabled={disabled}
@@ -37,20 +36,24 @@ export default function CustomButton({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#fff',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 36,
+    backgroundColor: '#FFFFFF', // Branco puro como na imagem
+    paddingVertical: 18,        // Altura interna
+    paddingHorizontal: 80,      // Bem largo para dar o formato da imagem
+    borderRadius: 50,           // Bordas totalmente circulares (pílula)
     alignItems: 'center',
     justifyContent: 'center',
+    // Sombra para dar profundidade
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 5,
+    // Borda muito sutil
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
   disabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   content: {
     flexDirection: 'row',
@@ -58,50 +61,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    color: '#111',
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: 3,
+    color: '#000000',           // Preto total
+    fontSize: 24,               // Tamanho de fonte generoso
+    fontWeight: '600',          // Semi-bold/Bold
+    letterSpacing: 4,           // Espaçamento largo (chave do design da imagem)
+    textAlign: 'center',
   },
   icon: {
     width: 20,
     height: 20,
     marginHorizontal: 8,
-    tintColor: '#333',
   },
 });
-
-// Versão anterior sem suporte a ícones
-// import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-
-// // Componente de botão reutilizável
-// export default function CustomButton({ title, onPress }) {
-//   return (
-
-//     // TouchableOpacity = botão clicável com efeito de opacidade
-//     <TouchableOpacity style={styles.button} onPress={onPress}>
-
-//       {/* Texto do botão */}
-//       <Text style={styles.text}>
-//         {title}
-//       </Text>
-
-//     </TouchableOpacity>
-//   );
-// }
-// // Estilos
-// const styles = StyleSheet.create({
-
-//   button: {
-//     backgroundColor: '#007bff',
-//     padding: 15,
-//     borderRadius: 8,
-//     alignItems: 'center',
-//   },
-
-//   text: {
-//     color: '#fff',
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//   },
-// });

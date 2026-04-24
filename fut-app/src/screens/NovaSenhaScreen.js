@@ -13,13 +13,13 @@ import {
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 
-// DEFINIÇÃO DAS CORES (Padronizadas com as outras telas)
+// DEFINIÇÃO DAS CORES
 const colors = {
-  primary: '#8B3A3A',      // Vermelho do ícone/tema
+  primary: '#8B3A3A',      // Vermelho Drakos
   background: '#EBEBEB',   // Cinza do fundo
   white: '#FFFFFF',
-  text: '#000000',
-  mutedText: '#666',
+  text: '#121212',         // Preto mais nítido para legibilidade
+  mutedText: '#707070',
   inputBackground: '#D1D1D1' 
 };
 
@@ -47,6 +47,9 @@ export default function NovaSenhaScreens({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Elemento decorativo de fundo */}
+      <View style={styles.bgCircle} />
+
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={{ flex: 1 }}
@@ -57,26 +60,30 @@ export default function NovaSenhaScreens({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           
-          {/* BOTÃO VOLTAR */}
-          // O back é o botão de voltar, que fica no canto superior esquerdo do header.
+          {/* BOTÃO VOLTAR PADRONIZADO */}
           <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
             <Text style={styles.backText}>←</Text>
           </TouchableOpacity>
 
-          {/* HEADER: Identidade visual mantida */}
+          {/* HEADER REESTILIZADO */}
           <View style={styles.header}>
-            // Estilos para o ícone de chave, centralizado dentro de um círculo.
-            <View style={styles.iconCircle}>
-              <Text style={styles.iconEmoji}>🔑</Text>
+            <View style={styles.iconWrap}>
+              <View style={styles.iconRingOuter}>
+                <View style={styles.iconRingInner}>
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>🔑</Text>
+                  </View>
+                </View>
+              </View>
             </View>
             
-            <Text style={styles.headerTitle}>Nova senha</Text>
+            <Text style={styles.headerTitle}>Nova Senha</Text>
             <Text style={styles.headerSubtitle}>
-              Insira sua nova senha. Atenção ao confirmar os dados.
+              Crie uma senha forte e fácil de lembrar. Atenção ao confirmar os dados.
             </Text>
           </View>
 
-          {/* FORMULÁRIO */}
+          {/* FORMULÁRIO - MANTENDO SEUS INPUTS ORIGINAIS */}
           <View style={styles.formContent}>
             
             <View style={styles.inputGroup}>
@@ -87,7 +94,6 @@ export default function NovaSenhaScreens({ navigation }) {
                 onChangeText={setSenha}
                 secureTextEntry={true}
                 style={{ backgroundColor: colors.inputBackground }}
-                // Feedback visual de preenchimento
                 rightComponent={
                   senha.length >= 6 ? (
                     <Text style={styles.checkIcon}>✓</Text>
@@ -104,7 +110,6 @@ export default function NovaSenhaScreens({ navigation }) {
                 onChangeText={setConfirmarSenha}
                 secureTextEntry={true}
                 style={{ backgroundColor: colors.inputBackground }}
-                // Feedback visual de coincidência
                 rightComponent={
                   senhasCoincidem ? (
                     <Text style={styles.checkIcon}>✓</Text>
@@ -113,13 +118,13 @@ export default function NovaSenhaScreens({ navigation }) {
               />
             </View>
 
-            {/* BOTÃO CONFIRMAR */}
+            {/* BOTÃO CONFIRMAR COM EFEITO GLASS */}
             <View style={styles.buttonWrap}>
               <CustomButton 
-                title="Confirmar" 
+                title="Redefinir Senha" 
                 onPress={handleConfirm} 
-                style={styles.confirmButton} 
-                textStyle={styles.confirmButtonText}
+                style={styles.glassButton} 
+                textStyle={styles.buttonTitle}
               />
             </View>
           </View>
@@ -134,26 +139,32 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
+    overflow: 'hidden',
+  },
+  bgCircle: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    zIndex: -1,
   },
   scrollGrow: {
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingBottom: 40,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-    width: '100%',
-    paddingHorizontal: 20,
+    paddingTop: 50,
   },
   back: {
     position: 'absolute',
     left: 20,
     top: 50,
-    width: 42,
-    height: 42,
-    borderRadius: 12,
+    width: 45,
+    height: 45,
+    borderRadius: 15,
     backgroundColor: 'rgba(255,255,255,0.4)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.6)',
@@ -162,75 +173,110 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   backText: {
-    fontSize: 22,
+    fontSize: 24,
     color: colors.text,
-    fontWeight: 'bold',
+    fontWeight: '300',
   },
-  iconCircle: {
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+    width: '100%',
+    paddingHorizontal: 35,
+  },
+  iconWrap: {
+    marginBottom: 30,
+  },
+  iconRingOuter: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(139, 58, 58, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconRingInner: {
     width: 120,
     height: 120,
     borderRadius: 60,
+    backgroundColor: 'rgba(139, 58, 58, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
-    borderWidth: 10,
-    borderColor: 'rgba(139, 58, 58, 0.15)',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    elevation: 10,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
   },
   iconEmoji: {
     fontSize: 45,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '800',
     color: colors.text,
-    marginBottom: 10,
+    marginBottom: 12,
+    letterSpacing: -0.8,
   },
   headerSubtitle: {
     fontSize: 15,
     color: colors.mutedText,
     textAlign: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: 20,
     lineHeight: 22,
   },
   formContent: {
     width: '100%',
-    maxWidth: 360,
+    maxWidth: 400,
     paddingHorizontal: 30,
   },
   inputGroup: {
-    marginBottom: 15,
+    marginBottom: 20,
   },
   label: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '700',
     color: colors.text,
-    marginBottom: 8,
-    marginLeft: 4,
+    marginBottom: 10,
+    marginLeft: 5,
+    opacity: 0.7,
   },
   checkIcon: {
     fontSize: 18,
-    color: '#2E8B57', // Verde para indicar sucesso
+    color: '#2D6A4F', // Verde floresta mais sofisticado
     fontWeight: 'bold',
     marginRight: 10,
   },
   buttonWrap: {
-    marginTop: 15,
+    marginTop: 20,
   },
-  confirmButton: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12, // Padronizado com os inputs
+  // --- PADRÃO GLASS ---
+  glassButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+    borderRadius: 30, 
     height: 60,
-    elevation: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    elevation: 4,
+    shadowColor: '#FFFFFF',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
   },
-  confirmButtonText: {
-    color: colors.text,
+  buttonTitle: {
+    color: '#181818', 
+    fontWeight: '700',
     fontSize: 18,
-    fontWeight: 'bold',
-  }
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
 });

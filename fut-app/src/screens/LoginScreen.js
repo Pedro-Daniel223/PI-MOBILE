@@ -53,13 +53,15 @@ export default function LoginScreen({ navigation }) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false} showsVerticalScrollIndicator={false}>
 
+          {/* HEADER MANTIDO EXATAMENTE COMO VOCÊ ENVIOU */}
           <View style={styles.header}>
             <Text style={styles.headerTitle}>BEM VINDO DE VOLTA AO COVIL</Text>
             <Text style={styles.headerSubtitle}>Faça seu Login para entrar no Covil dos Drakos</Text>
           </View>
 
+          {/* CARD COM REFINAMENTO DE UI */}
           <View style={styles.card}>
             <Text style={styles.formTitle}>Login</Text>
 
@@ -71,7 +73,7 @@ export default function LoginScreen({ navigation }) {
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                style={{ backgroundColor: colors.cardBackground }}
+                style={styles.inputStyle}
                 rightComponent={
                   emailValid && (
                     <View style={styles.iconContainer}>
@@ -87,10 +89,10 @@ export default function LoginScreen({ navigation }) {
                 value={senha}
                 onChangeText={setSenha}
                 secureTextEntry={!showPass}
-                style={{ backgroundColor: colors.cardBackground }}
+                style={styles.inputStyle}
                 rightComponent={
                   <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.iconContainer}>
-                    <Text style={{ fontSize: 18 }}>{showPass ? '🙈' : '👁'}</Text>
+                    <Text style={{ fontSize: 18, opacity: 0.6 }}>{showPass ? '🙈' : '👁'}</Text>
                   </TouchableOpacity>
                 }
               />
@@ -107,14 +109,15 @@ export default function LoginScreen({ navigation }) {
                   title="Entrar"
                   onPress={handleLogin}
                   style={styles.glassButton}
-                  glass={true}
-                  glassRadius={12}
                   textStyle={styles.buttonTitle}
                 />
               </View>
             </View>
 
-            <TouchableOpacity onPress={() => navigation.navigate('CadastroScreen')}>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('CadastroScreen')}
+              activeOpacity={0.7}
+            >
               <Text style={styles.footerText}>
                 Não possui conta? <Text style={styles.linkBold}>Registrar</Text>
               </Text>
@@ -132,15 +135,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background
   },
-  // Estilos para o LoginScreen
   header: {
-    height: 200,
+    height: 220, // Ajuste leve para equilibrar o respiro do texto
     backgroundColor: colors.primary,
     paddingHorizontal: 25,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // esse e o  titulo do header, o texto grande
   headerTitle: {
     color: colors.white,
     fontSize: 16,
@@ -148,7 +149,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     textAlign: 'center',
   },
-  // esse e o subtitulo do header, o texto pequeno
   headerSubtitle: {
     color: '#FFDEDE',
     fontSize: 14,
@@ -156,106 +156,102 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     opacity: 0.8,
   },
-  // esse e o card que fica por cima do header, onde tem o formulario de login
   card: {
     flex: 1,
     backgroundColor: colors.background,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    paddingTop: 35,
+    paddingTop: 40,
     paddingBottom: 40,
     paddingHorizontal: 30,
-    marginTop: -20,
+    marginTop: -25,
+    // Sombra leve para destacar a sobreposição do card no header
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  // esse e o titulo do formulario, o texto "Login"
   formTitle: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
     color: colors.primary,
-    marginBottom: 25,
+    marginBottom: 30,
     textAlign: 'center',
   },
-  // esse e o container do formulario, onde tem os inputs e o botao de login
   formContent: {
     width: '100%'
   },
-  // esses sao os labels dos inputs, o texto "Seu Email/Cpf:" e "Senha:"
   label: {
     fontSize: 14,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 6,
+    marginBottom: 8,
     marginLeft: 4,
+    opacity: 0.8,
   },
-  // esse e o estilo do label da senha, tem uma margem maior em cima para separar do input de email
+  inputStyle: {
+    backgroundColor: colors.cardBackground,
+    borderRadius: 12,
+    height: 55,
+  },
   passwordLabel: {
-    marginTop: 13,
+    marginTop: 18,
   },
-  // esse e o container do icone de check que aparece quando o email e valido, ou do icone de olho para mostrar/ocultar a senha
   iconContainer: {
-    paddingRight: 10,
+    paddingRight: 15,
     justifyContent: 'center',
   },
-  // esse e o estilo do icone de check que aparece quando o email e valido
   checkIcon: {
-    color: 'green',
+    color: '#2E8B57',
     fontWeight: 'bold',
     fontSize: 18
   },
-  // esse e o container da linha de "Esqueceu Senha?" e "Redefinir", eles ficam na mesma linha
   forgotRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: 12,
+    justifyContent: 'flex-end', // Alinhado à direita fica mais intuitivo
   },
-  // esse e o estilo do botao de redefinir senha, ele tem uma margem a esquerda para separar do texto "Esqueceu Senha?"
   redefineBtn: {
-    marginLeft: 8,
+    marginLeft: 5,
   },
-  // esse e o estilo do texto "Esqueceu Senha?" e "Redefinir", eles tem a mesma cor e tamanho, mas o "Redefinir" tem um estilo diferente para parecer um link
   forgotText: {
     fontSize: 14,
     color: colors.text
   },
-  // esse e o estilo do texto "Registrar" no rodape, ele tem a mesma cor e tamanho do texto "Não possui conta?", mas tem um estilo diferente para parecer um link
   linkBold: {
     color: colors.link,
     fontWeight: 'bold'
   },
-  // esse e o container do botao de login, ele tem uma margem em cima para separar dos inputs e ocupa toda a largura do formulario
   buttonWrap: {
-    marginTop: 30,
+    marginTop: 35,
     width: '100%',
   },
-  // esse e o estilo do botao de login, ele tem um fundo branco com opacidade para parecer um vidro, bordas arredondadas, sombra e um texto grande e negrito
   glassButton: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 12,
-    height: 56,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)', 
+    borderRadius: 30, 
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    opacity: 1,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    borderWidth: 0.6,
-    borderColor: 'rgba(255,255,255,0.9)',
-    paddingHorizontal: 6,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.8)', 
+    shadowColor: '#FFFFFF', 
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 3, 
   },
-  // esse e o estilo do texto do botao de login, ele tem uma cor escura para contrastar com o fundo claro do botao, e um tamanho grande e negrito para chamar a atencao
   buttonTitle: {
-    color: '#181818',
+    color: '#181818', 
     fontWeight: '700',
     fontSize: 18,
     letterSpacing: 1.5,
   },
-  // esse e o estilo do texto do rodape, ele tem uma cor escura para contrastar com o fundo claro do card, um tamanho pequeno e uma margem em cima para separar do botao de login
   footerText: {
     textAlign: 'center',
     color: colors.text,
-    marginTop: 25,
+    marginTop: 30,
     fontSize: 14,
   },
 });

@@ -87,7 +87,7 @@ export default function App() {
         name="BoasVindas3"
         component={BoasVindas3Screen}
         />
-
+ 
       </Stack.Navigator>
     </NavigationContainer>
   );
