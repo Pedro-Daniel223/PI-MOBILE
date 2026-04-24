@@ -1,17 +1,21 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Alert, 
-  SafeAreaView, 
-  TouchableOpacity, 
-  ScrollView, 
-  KeyboardAvoidingView, 
-  Platform 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  SafeAreaView,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Image
 } from 'react-native';
+
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
+
+const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
 const colors = {
   primary: '#880000',
@@ -21,7 +25,9 @@ const colors = {
   mutedText: '#B9B9B9',
   link: '#880000',
   cardBackground: '#E9E9E9',
-  border: '#CCCCCC'
+  border: '#CCCCCC',
+  success: '#2E8B57',
+  headerSubtitle: '#FFDEDE'
 };
 
 export default function LoginScreen({ navigation }) {
@@ -51,17 +57,26 @@ export default function LoginScreen({ navigation }) {
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        style={styles.container}
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false} showsVerticalScrollIndicator={false}>
-
-          {/* HEADER MANTIDO EXATAMENTE COMO VOCÊ ENVIOU */}
+        <ScrollView 
+          contentContainerStyle={styles.scrollGrow} 
+          bounces={false} 
+          showsVerticalScrollIndicator={false}
+        >
+          {/* HEADER COM ESCUDO INTEGRADO */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>BEM VINDO DE VOLTA AO COVIL</Text>
-            <Text style={styles.headerSubtitle}>Faça seu Login para entrar no Covil dos Drakos</Text>
+            <Image 
+              source={escudoDrakos}
+              style={styles.escudoHeader}
+              resizeMode="contain"
+            />
+            <View style={styles.headerContent}>
+              <Text style={styles.headerTitle}>BEM VINDO DE VOLTA AO COVIL</Text>
+              <Text style={styles.headerSubtitle}>Faça seu Login para entrar no Covil dos Drakos</Text>
+            </View>
           </View>
 
-          {/* CARD COM REFINAMENTO DE UI */}
           <View style={styles.card}>
             <Text style={styles.formTitle}>Login</Text>
 
@@ -91,15 +106,21 @@ export default function LoginScreen({ navigation }) {
                 secureTextEntry={!showPass}
                 style={styles.inputStyle}
                 rightComponent={
-                  <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.iconContainer}>
-                    <Text style={{ fontSize: 18, opacity: 0.6 }}>{showPass ? '🙈' : '👁'}</Text>
+                  <TouchableOpacity 
+                    onPress={() => setShowPass(!showPass)} 
+                    style={styles.iconContainer}
+                  >
+                    <Text style={styles.eyeIcon}>{showPass ? '🙈' : '👁'}</Text>
                   </TouchableOpacity>
                 }
               />
 
               <View style={styles.forgotRow}>
                 <Text style={styles.forgotText}>Esqueceu Senha?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('EsqueceuSenhaScreen')} style={styles.redefineBtn}>
+                <TouchableOpacity 
+                  onPress={() => navigation.navigate('EsqueceuSenhaScreen')} 
+                  style={styles.redefineBtn}
+                >
                   <Text style={[styles.forgotText, styles.linkBold]}>Redefinir</Text>
                 </TouchableOpacity>
               </View>
@@ -114,16 +135,20 @@ export default function LoginScreen({ navigation }) {
               </View>
             </View>
 
+            {/* BOTÃO DE REGISTRAR - PRIORIDADE DE TOQUE ALTA */}
             <TouchableOpacity 
-              onPress={() => navigation.navigate('CadastroScreen')}
+              onPress={() => {
+                console.log("Navegando para Cadastro...");
+                navigation.navigate('CadastroScreen');
+              }}
               activeOpacity={0.7}
+              style={styles.footerContainer}
             >
               <Text style={styles.footerText}>
                 Não possui conta? <Text style={styles.linkBold}>Registrar</Text>
               </Text>
             </TouchableOpacity>
           </View>
-          
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -133,14 +158,35 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background
+    backgroundColor: colors.primary, // Cor do topo para o SafeArea superior
+  },
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scrollGrow: {
+    flexGrow: 1,
   },
   header: {
-    height: 220, // Ajuste leve para equilibrar o respiro do texto
+    height: 200,
     backgroundColor: colors.primary,
-    paddingHorizontal: 25,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden', // Mantém o escudo dentro do limite
+  },
+  escudoHeader: {
+    position: 'absolute',
+    width: 250,
+    height: 250,
+    opacity: 0.15, // Opacidade baixa para não brigar com o texto
+    right: -50,
+    top: -20,
+    transform: [{ rotate: '-15deg' }],
+  },
+  headerContent: {
+    zIndex: 2,
+    paddingHorizontal: 25,
+    alignItems: 'center',
   },
   headerTitle: {
     color: colors.white,
@@ -150,11 +196,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSubtitle: {
-    color: '#FFDEDE',
+    color: colors.headerSubtitle,
     fontSize: 14,
     marginTop: 10,
     textAlign: 'center',
-    opacity: 0.8,
+    opacity: 0.9,
   },
   card: {
     flex: 1,
@@ -164,13 +210,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 40,
     paddingHorizontal: 30,
-    marginTop: -25,
-    // Sombra leve para destacar a sobreposição do card no header
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    marginTop: -30, // Encaixe perfeito no header
+    zIndex: 10, // Garante que o card e seus botões fiquem por cima de tudo
   },
   formTitle: {
     fontSize: 28,
@@ -180,7 +221,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   formContent: {
-    width: '100%'
+    width: '100%',
   },
   label: {
     fontSize: 14,
@@ -203,55 +244,64 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkIcon: {
-    color: '#2E8B57',
+    color: colors.success,
     fontWeight: 'bold',
-    fontSize: 18
+    fontSize: 18,
+  },
+  eyeIcon: {
+    fontSize: 18, 
+    opacity: 0.6,
   },
   forgotRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
-    justifyContent: 'flex-end', // Alinhado à direita fica mais intuitivo
+    justifyContent: 'flex-end',
   },
   redefineBtn: {
     marginLeft: 5,
   },
   forgotText: {
     fontSize: 14,
-    color: colors.text
+    color: colors.text,
   },
   linkBold: {
     color: colors.link,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   buttonWrap: {
     marginTop: 35,
     width: '100%',
   },
   glassButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)', 
-    borderRadius: 30, 
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderRadius: 30,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.8)', 
-    shadowColor: '#FFFFFF', 
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    shadowColor: '#FFFFFF',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
-    elevation: 3, 
+    elevation: 3,
   },
   buttonTitle: {
-    color: '#181818', 
+    color: '#181818',
     fontWeight: '700',
     fontSize: 18,
     letterSpacing: 1.5,
   },
+  footerContainer: {
+    marginTop: 30,
+    paddingVertical: 20, // Área de toque bem generosa
+    width: '100%',
+    alignItems: 'center',
+  },
   footerText: {
     textAlign: 'center',
     color: colors.text,
-    marginTop: 30,
     fontSize: 14,
   },
 });
