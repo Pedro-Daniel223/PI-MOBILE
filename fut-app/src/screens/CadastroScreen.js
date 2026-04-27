@@ -222,14 +222,14 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         color: colors.white,
-        fontSize: 15,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontWeight: '700',
         textAlign: 'center',
         letterSpacing: 1,
     },
     headerSubtitle: {
         color: '#FFDEDE',
-        fontSize: 13,
+        fontSize: 16,
         marginTop: 8,
         textAlign: 'center',
         opacity: 0.8,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     },
     formTitle: {
         fontSize: 26,
-        fontWeight: 'bold',
+        fontWeight: '700',
         color: colors.primary,
         marginBottom: 20,
         textAlign: 'center',
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     },
     checkIcon: {
         color: 'green',
-        fontWeight: 'bold',
+        fontWeight: '700',
         fontSize: 18
     },
     acceptRow: {
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     checkIconSmall: {
         fontSize: 12,
         color: colors.white,
-        fontWeight: 'bold',
+        fontWeight: '700',
     },
     acceptText: {
         color: '#333',
@@ -311,27 +311,28 @@ const styles = StyleSheet.create({
         marginTop: 30,
     },
     glassButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.25)', 
-        borderRadius: 30, 
-        height: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1.5,
-        borderColor: 'rgba(255, 255, 255, 0.8)', 
-        shadowColor: '#FFFFFF', 
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        elevation: 3, 
-    },
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderRadius: 35,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    shadowColor: '#FFFFFF',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 3,
+  },
     glassButtonText: {
         color: '#181818',
-        fontWeight: '700',
+        fontWeight: '750',
         fontSize: 18,
         letterSpacing: 1.5,
+
     },
     footerTouchable: {
-        marginTop: 25,
+        marginTop: 4,
         paddingVertical: 15,
         alignItems: 'center',
     },

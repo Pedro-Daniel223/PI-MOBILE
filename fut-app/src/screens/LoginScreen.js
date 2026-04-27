@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   glassButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    borderRadius: 30,
+    borderRadius: 35,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
@@ -294,8 +294,8 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   footerContainer: {
-    marginTop: 30,
-    paddingVertical: 20, // Área de toque bem generosa
+    marginTop: 20,
+    paddingVertical: 4, // Área de toque bem generosa
     width: '100%',
     alignItems: 'center',
   },
