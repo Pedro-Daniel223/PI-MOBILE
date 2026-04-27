@@ -9,7 +9,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Image
+  Image,
+  StatusBar
 } from 'react-native';
 
 import CustomInput from '../components/CustomInput';
@@ -55,6 +56,9 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Define a cor da barra de status do celular */}
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -64,7 +68,7 @@ export default function LoginScreen({ navigation }) {
           bounces={false} 
           showsVerticalScrollIndicator={false}
         >
-          {/* HEADER COM ESCUDO INTEGRADO */}
+          {/* HEADER VERMELHO */}
           <View style={styles.header}>
             <Image 
               source={escudoDrakos}
@@ -77,6 +81,7 @@ export default function LoginScreen({ navigation }) {
             </View>
           </View>
 
+          {/* CARD CINZA */}
           <View style={styles.card}>
             <Text style={styles.formTitle}>Login</Text>
 
@@ -135,7 +140,6 @@ export default function LoginScreen({ navigation }) {
               </View>
             </View>
 
-            {/* BOTÃO DE REGISTRAR - PRIORIDADE DE TOQUE ALTA */}
             <TouchableOpacity 
               onPress={() => {
                 console.log("Navegando para Cadastro...");
@@ -158,7 +162,8 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.primary, // Cor do topo para o SafeArea superior
+    // Cor de fundo igual ao resto da tela para evitar faixas estranhas no notch/rodapé
+    backgroundColor: colors.background, 
   },
   container: {
     flex: 1,
@@ -168,17 +173,17 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    height: 200,
+    height: 220,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden', // Mantém o escudo dentro do limite
+    overflow: 'hidden',
   },
   escudoHeader: {
     position: 'absolute',
     width: 250,
     height: 250,
-    opacity: 0.15, // Opacidade baixa para não brigar com o texto
+    opacity: 0.15,
     right: -50,
     top: -20,
     transform: [{ rotate: '-15deg' }],
@@ -210,8 +215,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 40,
     paddingHorizontal: 30,
-    marginTop: -30, // Encaixe perfeito no header
-    zIndex: 10, // Garante que o card e seus botões fiquem por cima de tudo
+    marginTop: -40, // Encaixe sobre o header vermelho
+    zIndex: 10,
   },
   formTitle: {
     fontSize: 28,
@@ -275,7 +280,7 @@ const styles = StyleSheet.create({
   },
   glassButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    borderRadius: 30,
+    borderRadius: 35,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
@@ -294,8 +299,8 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   footerContainer: {
-    marginTop: 30,
-    paddingVertical: 20, // Área de toque bem generosa
+    marginTop: 20,
+    paddingVertical: 10,
     width: '100%',
     alignItems: 'center',
   },

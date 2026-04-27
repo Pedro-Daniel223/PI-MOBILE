@@ -59,7 +59,7 @@ export default function EsqueceuSenhaScreen({ navigation }) {
               </View>
             </View>
             
-            <Text style={styles.headerTitle}>Esqueceu Senha?</Text>
+            <Text style={styles.headerTitle}>Você esqueceu a senha?</Text>
             
             <Text style={styles.headerSubtitle}>
               Não se preocupe! Por favor, insira o endereço associado. Nós enviaremos instruções de redefinição.
@@ -117,11 +117,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     zIndex: -1,
   },
+  // O scrollGrow é o container do ScrollView, centralizando o conteúdo verticalmente
   scrollGrow: {
     flexGrow: 1,
     justifyContent: 'center', 
     paddingBottom: 40,
   },
+  // O header é a parte superior com o título e o ícone, centralizado
   header: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -129,6 +131,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     marginBottom: 20,
   },
+  // O botão de voltar é um círculo com uma seta, posicionado no canto superior esquerdo
   back: {
     position: 'absolute',
     left: 20,
@@ -143,19 +146,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 10,
   },
+  // O texto da seta é simples, mas pode ser substituído por um ícone se desejar
   backText: {
     fontSize: 22,
     color: colors.text,
     fontWeight: '700',
   },
+  // O título é grande e chamativo, com um toque de estilo para parecer mais moderno
   headerTitle: {
     color: colors.text,
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '800',
     textAlign: 'center',
-    marginBottom: 12,
-    letterSpacing: -0.5,
+    marginBottom: 9,
+    letterSpacing: 0.5,
   },
+  // O subtítulo é mais suave, com uma cor mais clara e um pouco de espaçamento para melhorar a legibilidade
   headerSubtitle: {
     color: colors.mutedText,
     fontSize: 16,
