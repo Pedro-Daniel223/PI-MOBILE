@@ -235,14 +235,14 @@ const styles = StyleSheet.create({
     fontSize: 45,
   },
   headerTitle: {
-    fontSize: 30,
+    fontSize: 31,
     fontWeight: '800',
     color: colors.text,
     marginBottom: 12,
-    letterSpacing: -0.5,
+    letterSpacing: 0.5,
   },
   headerSubtitle: {
-    fontSize: 15,
+    fontSize: 17,
     color: colors.mutedText,
     textAlign: 'center',
     lineHeight: 22,
