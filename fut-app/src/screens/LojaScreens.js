@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  TextInput,
-  Dimensions,
-  ScrollView
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  FlatList, 
+  Image, 
+  TouchableOpacity, 
+  StatusBar, 
+  TextInput, 
+  Dimensions 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Importação da sua Navbar
 import NavbarGlass from '../components/NavbarGlass'; 
@@ -22,29 +21,59 @@ const { width } = Dimensions.get('window');
 
 const THEME = {
   background: '#121212',
-  card: 'rgba(255, 255, 255, 0.08)', // Efeito vidro
+  card: 'rgba(255, 255, 255, 0.08)',
   accent: '#ff2b2b',
   text: '#FFFFFF',
   secondary: '#888',
   border: 'rgba(255, 255, 255, 0.15)'
 };
 
+// Dados de exemplo com informações completas para a tela de detalhes
 const PRODUTOS_EXEMPLO = [
-  { id: '1', nome: 'Drakos Temp 24/25', preco: 169.99, categoria: 'Camisa', imagem: require('../assets/img/img_home/milan_r2006(2).png') },
-  { id: '2', nome: 'Drakos Temp 24/25', preco: 169.99, categoria: 'Camisa', imagem: require('../assets/img/img_home/milan_r2006(2).png') },
-  { id: '3', nome: 'Drakos Temp 24/25', preco: 169.99, categoria: 'Camisa', imagem: require('../assets/img/img_home/milan_r2006(2).png') },
+  { 
+    id: '1', 
+    nome: 'Drakos Temp 24/25', 
+    preco: 169.99, 
+    precoAntigo: 285.00,
+    desconto: '40% off',
+    categoria: 'Camisa', 
+    imagem: require('../assets/img/img_home/milan_r2006(2).png'),
+    descricao: 'Camisa oficial da temporada 24/25. Confeccionada com tecido dry-fit de alta performance, tecnologia antichamas e corte ergonômico que garante máxima liberdade de movimento. Possui gola reforçada e detalhes em vermelho que remetem à tradição do clube. Ideal para jogadores que buscam estilo e conforto dentro e fora de campo.'
+  },
+  { 
+    id: '2', 
+    nome: 'Drakos Temp 24/25 - Edição Limitada', 
+    preco: 189.99,
+    precoAntigo: 320.00,
+    desconto: '41% off',
+    categoria: 'Camisa', 
+    imagem: require('../assets/img/img_home/milan_r2006(2).png'),
+    descricao: 'Versão limitada da camisa Drakos 24/25, comemorativa aos 20 anos do clube. Possui acabamento premium, escudo bordado e numeração especial. Tecido respirável com proteção UV e costuras planas para evitar atrito. Disponível apenas nesta temporada.'
+  },
+  { 
+    id: '3', 
+    nome: 'Drakos Temp 24/25 - Torcedor', 
+    preco: 149.99,
+    precoAntigo: 210.00,
+    desconto: '29% off',
+    categoria: 'Camisa', 
+    imagem: require('../assets/img/img_home/milan_r2006(2).png'),
+    descricao: 'Versão torcedor da camisa Drakos 24/25. Confortável e durável, ideal para uso casual e dias de jogo. Feita em algodão e poliéster, proporciona equilíbrio entre respirabilidade e resistência. Design elegante com escudo aplicado em silk.'
+  },
 ];
 
-export default function LojaScreens({ navigation }) {
+function LojaContent({ navigation }) {
   const [search, setSearch] = useState('');
+  const insets = useSafeAreaInsets();
 
-  // Componente de Cabeçalho da Lista (Banner + Título Seção)
   const ListHeader = () => (
     <View style={styles.headerContent}>
-      <Text style={styles.promoTitle}>NOVAS{"\n"}CAMISAS{"\n"}<Text style={styles.promoRed}>PREMIUM</Text></Text>
+      <Text style={styles.promoTitle}>
+        NOVAS{"\n"}CAMISAS{"\n"}
+        <Text style={styles.promoRed}>PREMIUM</Text>
+      </Text>
       <Text style={styles.promoSub}>Olhe para seu bolso antes</Text>
 
-      {/* Banner de Destaque vazio (como no Figma) */}
       <View style={styles.highlightBanner}>
         <LinearGradient
           colors={['rgba(255,255,255,0.1)', 'transparent']}
@@ -65,74 +94,91 @@ export default function LojaScreens({ navigation }) {
   );
 
   const renderProduto = ({ item }) => (
-    <TouchableOpacity style={styles.card} activeOpacity={0.9}>
+    <TouchableOpacity 
+      style={styles.card} 
+      activeOpacity={0.9}
+      onPress={() => navigation.navigate('DetalhesProdutosScreens', { produto: item })}
+    >
       <View style={styles.cartIconContainer}>
          <Ionicons name="cart" size={18} color="#fff" />
       </View>
-      
       <Image source={item.imagem} style={styles.cardImage} resizeMode="contain" />
-      
       <View style={styles.cardInfo}>
         <Text style={styles.cardCategoria}>{item.categoria}</Text>
         <Text style={styles.cardNome}>{item.nome}</Text>
-        <Text style={styles.cardPreco}>{item.preco.toFixed(2)}</Text>
+        <Text style={styles.cardPreco}>R$ {item.preco.toFixed(2)}</Text>
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       
-      <SafeAreaView style={{ flex: 1 }}>
-        {/* HEADER SUPERIOR */}
-        <View style={styles.topBar}>
-          <Image source={{uri: 'https://i.pravatar.cc/100'}} style={styles.avatar} />
-          <View style={styles.searchBar}>
-             <TextInput 
-                placeholder="pesquisar produtos" 
-                placeholderTextColor="#555" 
-                style={styles.searchTextInput}
-                value={search}
-                onChangeText={setSearch}
-             />
-             <Ionicons name="search" size={16} color="#888" />
-          </View>
-          <TouchableOpacity style={styles.cartBtn}>
-             <Ionicons name="cart-outline" size={20} color="#ff2b2b" />
-          </TouchableOpacity>
+      {/* BARRA SUPERIOR */}
+      <View style={styles.topBar}>
+        <Image source={{uri: 'https://i.pravatar.cc/100'}} style={styles.avatar} />
+        <View style={styles.searchBar}>
+           <TextInput 
+              placeholder="pesquisar produtos" 
+              placeholderTextColor="#555" 
+              style={styles.searchTextInput}
+              value={search}
+              onChangeText={setSearch}
+           />
+           <Ionicons name="search" size={16} color="#888" />
         </View>
+        <TouchableOpacity style={styles.cartBtn}>
+           <Ionicons name="cart-outline" size={20} color="#ff2b2b" />
+        </TouchableOpacity>
+      </View>
 
-        <FlatList
-          data={PRODUTOS_EXEMPLO}
-          keyExtractor={(item) => item.id}
-          renderItem={renderProduto}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          ListHeaderComponent={ListHeader}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
-      </SafeAreaView>
+      <FlatList
+        data={PRODUTOS_EXEMPLO}
+        keyExtractor={(item) => item.id}
+        renderItem={renderProduto}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
+        ListHeaderComponent={ListHeader}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
 
       <NavbarGlass navigation={navigation} />
     </View>
   );
 }
 
+export default function LojaScreens(props) {
+  return (
+    <SafeAreaProvider>
+      <LojaContent {...props} />
+    </SafeAreaProvider>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#101010' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#101010' 
+  },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: 10,
+    paddingVertical: 10,
     justifyContent: 'space-between'
   },
-  avatar: { width: 45, height: 45, borderRadius: 22, borderWidth: 1, borderColor: '#fff' },
+  avatar: { 
+    width: 45, 
+    height: 45, 
+    borderRadius: 22, 
+    borderWidth: 1, 
+    borderColor: '#fff' 
+  },
   searchBar: {
     flex: 1,
-    height: 38,
+    height: 40,
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
     marginHorizontal: 12,
@@ -142,10 +188,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333'
   },
-  searchTextInput: { flex: 1, color: '#fff', fontSize: 12 },
+  searchTextInput: { 
+    flex: 1, 
+    color: '#fff', 
+    fontSize: 13 
+  },
   cartBtn: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     backgroundColor: '#1a1a1a',
     borderRadius: 10,
     justifyContent: 'center',
@@ -153,17 +203,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333'
   },
-  headerContent: { paddingHorizontal: 20, marginTop: 30 },
+  headerContent: { 
+    paddingHorizontal: 20, 
+    marginTop: 20 
+  },
   promoTitle: { 
     color: '#fff', 
-    fontSize: 42, 
+    fontSize: 40, 
     fontWeight: '900', 
-    lineHeight: 45,
-    letterSpacing: 2,
-    fontFamily: 'serif' // Ou a fonte Serifada que você instalou
+    lineHeight: 42,
+    letterSpacing: 1,
   },
   promoRed: { color: '#8b0000' },
-  promoSub: { color: '#666', fontSize: 12, marginTop: 5, marginBottom: 20 },
+  promoSub: { 
+    color: '#666', 
+    fontSize: 12, 
+    marginTop: 8, 
+    marginBottom: 20 
+  },
   highlightBanner: {
     height: 160,
     backgroundColor: '#1a1a1a',
@@ -174,23 +231,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 15
   },
-  paginationDotContainer: { flexDirection: 'row', gap: 8 },
-  dot: { width: 18, height: 3, backgroundColor: '#fff', borderRadius: 2, opacity: 0.3 },
-  activeDot: { backgroundColor: '#ff2b2b', opacity: 1 },
-  
-  sectionHeader: { marginTop: 40, marginBottom: 15 },
-  sectionSubtitle: { color: '#666', fontSize: 12, fontWeight: '600' },
-  sectionTitle: { color: '#fff', fontSize: 32, fontWeight: '900', fontFamily: 'serif' },
-
-  listContent: { paddingBottom: 140 },
-  row: { justifyContent: 'space-between', paddingHorizontal: 15 },
-  
+  paginationDotContainer: { 
+    flexDirection: 'row', 
+    gap: 8 
+  },
+  dot: { 
+    width: 18, 
+    height: 3, 
+    backgroundColor: '#fff', 
+    borderRadius: 2, 
+    opacity: 0.3 
+  },
+  activeDot: { 
+    backgroundColor: '#ff2b2b', 
+    opacity: 1 
+  },
+  sectionHeader: { 
+    marginTop: 35, 
+    marginBottom: 15 
+  },
+  sectionSubtitle: { 
+    color: '#666', 
+    fontSize: 12, 
+    fontWeight: '600' 
+  },
+  sectionTitle: { 
+    color: '#fff', 
+    fontSize: 32, 
+    fontWeight: '900' 
+  },
+  listContent: { paddingBottom: 120 }, 
+  row: { 
+    justifyContent: 'space-between', 
+    paddingHorizontal: 15 
+  },
   card: { 
     backgroundColor: THEME.card, 
-    width: (width - 50) / 2, 
-    marginBottom: 20, 
+    width: (width - 45) / 2, 
+    marginBottom: 15, 
     borderRadius: 24, 
-    padding: 15,
+    padding: 12,
     borderWidth: 1, 
     borderColor: THEME.border 
   },
@@ -198,16 +278,33 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10
   },
-  cardImage: { width: '100%', height: 130, marginBottom: 10 },
-  cardCategoria: { color: '#666', fontSize: 10, fontWeight: '600' },
-  cardNome: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
-  cardPreco: { color: '#fff', fontSize: 16, fontWeight: '900', marginTop: 5 },
+  cardImage: { 
+    width: '100%', 
+    height: 120, 
+    marginBottom: 8 
+  },
+  cardCategoria: { 
+    color: '#666', 
+    fontSize: 10, 
+    fontWeight: '600' 
+  },
+  cardNome: { 
+    color: '#fff', 
+    fontSize: 14, 
+    fontWeight: 'bold' 
+  },
+  cardPreco: { 
+    color: '#fff', 
+    fontSize: 16, 
+    fontWeight: '900', 
+    marginTop: 4 
+  },
 });

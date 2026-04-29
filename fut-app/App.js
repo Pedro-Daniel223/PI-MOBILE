@@ -15,9 +15,9 @@ import EsqueceuSenhaScreen from './src/screens/EsqueceuSenhaScreen';
 import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens';
 import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
 
-// Novas telas
+// Telas da loja
 import LojaScreens from './src/screens/LojaScreens';
-// Removi a importação da DetalhesProdutosScreen aqui
+import DetalhesProdutosScreens from './src/screens/DetalhesProdutosScreens'; // <-- IMPORTE AQUI
 
 const Stack = createNativeStackNavigator();
 
@@ -40,7 +40,8 @@ export default function App() {
         {/* Rota da Loja */}
         <Stack.Screen name="Loja" component={LojaScreens} />
         
-        {/* A tela DetalhesProduto foi removida daqui */}
+        {/* Rota de Detalhes do Produto - ADICIONADA */}
+        <Stack.Screen name="DetalhesProdutosScreens" component={DetalhesProdutosScreens} />
       </Stack.Navigator>
     </NavigationContainer>
   );
