@@ -5,10 +5,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useCart } from '../contexts/CartContext';
+import CartBadge from '../components/CartBadge';
 
 const { width } = Dimensions.get('window');
 
 export default function DetalhesProdutosScreens({ route, navigation }) {
+  const { addToCart, getCartCount } = useCart();
+
   const { produto } = route.params || {
     produto: {
       nome: 'Camisa Drakos 25/26 PUMA',
@@ -16,7 +20,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
       precoAntigo: 285.00,
       desconto: '45% off',
       // Substitua pelo caminho real da sua imagem
-      imagem: require('../assets/img/img_home/milan_r2006(2).png'), 
+      imagem: require('../assets/img/img_home/milan_r2006(2).png'),
       descricao: 'criada para quem busca estilo sem esforço e conforto o dia inteiro. Confeccionada em algodão premium 100% penteado, ela oferece um toque macio e respirável, ideal tanto para dias quentes quanto para composições em camadas. Seu design minimalista ganha destaque com um corte oversized moderno, caimento solto e ombros levemente deslocados, trazendo uma pegada urbana e atual. A gola reforçada garante durabilidade, enquanto a costura dupla nas mangas e barra proporciona resistência ao uso contínuo.'
     }
   };
@@ -37,6 +41,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
         <Text style={styles.headerTitle}>Detalhes do Produto</Text>
         <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Carrinho')}>
           <Ionicons name="cart-outline" size={26} color="#d90429" />
+          <CartBadge count={getCartCount()} />
         </TouchableOpacity>
       </View>
 
@@ -102,15 +107,18 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             <Text style={styles.descriptionText}>{produto.descricao}</Text>
           </View>
 
-          {/* Botão para ir ao Carrinho */}
+          {/* Botão para adicionar ao Carrinho */}
           <TouchableOpacity
             style={styles.cartButton}
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('Carrinho')}
+            onPress={() => {
+              addToCart({ ...produto, id: produto.nome, tamanho: tamanhoSelecionado });
+              Alert.alert('Sucesso', 'Produto adicionado ao carrinho!');
+            }}
           >
             <View style={styles.cartButtonContent}>
-              <Ionicons name="cart-outline" size={22} color="#FFF" />
-              <Text style={styles.cartButtonText}>Ir para Carrinho</Text>
+              <Ionicons name="bag-outline" size={22} color="#FFF" />
+              <Text style={styles.cartButtonText}>Adicionar ao Carrinho</Text>
             </View>
           </TouchableOpacity>
         </View>

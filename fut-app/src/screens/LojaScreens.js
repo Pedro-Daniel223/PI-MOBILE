@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  Image, 
-  TouchableOpacity, 
-  StatusBar, 
-  TextInput, 
-  Dimensions 
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  StatusBar,
+  TextInput,
+  Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCart } from '../contexts/CartContext';
+import CartBadge from '../components/CartBadge';
 
 // Importação da sua Navbar
 import NavbarGlass from '../components/NavbarGlass'; 
@@ -65,6 +67,7 @@ const PRODUTOS_EXEMPLO = [
 function LojaContent({ navigation }) {
   const [search, setSearch] = useState('');
   const insets = useSafeAreaInsets();
+  const { getCartCount } = useCart();
 
   const ListHeader = () => (
     <View style={styles.headerContent}>
@@ -131,8 +134,9 @@ function LojaContent({ navigation }) {
            />
            <Ionicons name="search" size={16} color="#888" />
         </View>
-        <TouchableOpacity style={styles.cartBtn}>
+        <TouchableOpacity style={styles.cartBtn} onPress={() => navigation.navigate('Carrinho')}>
            <Ionicons name="cart-outline" size={20} color="#ff2b2b" />
+           <CartBadge count={getCartCount()} />
         </TouchableOpacity>
       </View>
 

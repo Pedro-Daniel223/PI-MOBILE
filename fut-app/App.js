@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CartProvider } from './src/contexts/CartContext';
 
 // Telas existentes
 import SplashScreen from './src/screens/SplashScreen';
@@ -17,32 +18,38 @@ import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
 
 // Telas da loja
 import LojaScreens from './src/screens/LojaScreens';
-import DetalhesProdutosScreens from './src/screens/DetalhesProdutosScreens'; // <-- IMPORTE AQUI
+import DetalhesProdutosScreens from './src/screens/DetalhesProdutosScreens';
+import CarrinhoScreens from './src/screens/CarrinhoScreens';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="CadastroScreen" component={CadastroScreen} />
-        <Stack.Screen name="EsqueceuSenhaScreen" component={EsqueceuSenhaScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="VerificarCodigo" component={VerificarCodigoScreens} />
-        <Stack.Screen name="NovaSenhaScreens" component={NovaSenhaScreens} />
-        <Stack.Screen name="Ingressos" component={IngressosScreen} />
-        <Stack.Screen name="BoasVindas" component={BoasVindasScreen} />
-        <Stack.Screen name="BoasVindas2" component={BoasVindas2Screen} />
-        <Stack.Screen name="BoasVindas3" component={BoasVindas3Screen} />
-        
-        {/* Rota da Loja */}
-        <Stack.Screen name="Loja" component={LojaScreens} />
-        
-        {/* Rota de Detalhes do Produto - ADICIONADA */}
-        <Stack.Screen name="DetalhesProdutosScreens" component={DetalhesProdutosScreens} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <CartProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Splash" component={SplashScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="CadastroScreen" component={CadastroScreen} />
+          <Stack.Screen name="EsqueceuSenhaScreen" component={EsqueceuSenhaScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="VerificarCodigo" component={VerificarCodigoScreens} />
+          <Stack.Screen name="NovaSenhaScreens" component={NovaSenhaScreens} />
+          <Stack.Screen name="Ingressos" component={IngressosScreen} />
+          <Stack.Screen name="BoasVindas" component={BoasVindasScreen} />
+          <Stack.Screen name="BoasVindas2" component={BoasVindas2Screen} />
+          <Stack.Screen name="BoasVindas3" component={BoasVindas3Screen} />
+
+          {/* Rota da Loja */}
+          <Stack.Screen name="Loja" component={LojaScreens} />
+
+          {/* Rota de Detalhes do Produto */}
+          <Stack.Screen name="DetalhesProdutosScreens" component={DetalhesProdutosScreens} />
+
+          {/* Rota do Carrinho */}
+          <Stack.Screen name="Carrinho" component={CarrinhoScreens} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </CartProvider>
   );
 }
