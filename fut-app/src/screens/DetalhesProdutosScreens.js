@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     height: 60,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#000',
   },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   productName: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
     marginBottom: 20,
   },
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   descriptionText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
     lineHeight: 20,
     textAlign: 'left',
