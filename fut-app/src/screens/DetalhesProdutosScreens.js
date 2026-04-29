@@ -35,7 +35,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
           <Ionicons name="arrow-back-outline" size={26} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes do Produto</Text>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Carrinho')}>
           <Ionicons name="cart-outline" size={26} color="#d90429" />
         </TouchableOpacity>
       </View>
@@ -101,6 +101,18 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             <View style={styles.descLine} />
             <Text style={styles.descriptionText}>{produto.descricao}</Text>
           </View>
+
+          {/* Botão para ir ao Carrinho */}
+          <TouchableOpacity
+            style={styles.cartButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('Carrinho')}
+          >
+            <View style={styles.cartButtonContent}>
+              <Ionicons name="cart-outline" size={22} color="#FFF" />
+              <Text style={styles.cartButtonText}>Ir para Carrinho</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -276,5 +288,32 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 20,
     textAlign: 'left',
+  },
+  cartButton: {
+    backgroundColor: '#000',
+    paddingVertical: 18,
+    paddingHorizontal: 40,
+    borderRadius: 35,
+    alignSelf: 'center',
+    marginTop: 30,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  cartButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cartButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 10,
+    letterSpacing: 0.5,
   },
 });

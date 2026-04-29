@@ -94,11 +94,7 @@ function LojaContent({ navigation }) {
   );
 
   const renderProduto = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.card} 
-      activeOpacity={0.9}
-      onPress={() => navigation.navigate('DetalhesProdutosScreens', { produto: item })}
-    >
+    <View style={styles.card}>
       <View style={styles.cartIconContainer}>
          <Ionicons name="cart" size={18} color="#fff" />
       </View>
@@ -108,7 +104,14 @@ function LojaContent({ navigation }) {
         <Text style={styles.cardNome}>{item.nome}</Text>
         <Text style={styles.cardPreco}>R$ {item.preco.toFixed(2)}</Text>
       </View>
-    </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.verMaisBtn}
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate('DetalhesProdutosScreens', { produto: item })}
+      >
+        <Text style={styles.verMaisText}>Ver Mais</Text>
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -265,14 +268,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', 
     paddingHorizontal: 15 
   },
-  card: { 
-    backgroundColor: THEME.card, 
-    width: (width - 45) / 2, 
-    marginBottom: 15, 
-    borderRadius: 24, 
-    padding: 12,
-    borderWidth: 1, 
-    borderColor: THEME.border 
+  card: {
+    backgroundColor: THEME.card,
+    width: (width - 45) / 2,
+    marginBottom: 15,
+    borderRadius: 24,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: THEME.border
   },
   cartIconContainer: {
     position: 'absolute',
@@ -301,10 +304,29 @@ const styles = StyleSheet.create({
     fontSize: 14, 
     fontWeight: 'bold' 
   },
-  cardPreco: { 
-    color: '#fff', 
-    fontSize: 16, 
-    fontWeight: '900', 
-    marginTop: 4 
+  cardPreco: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '900',
+    marginTop: 4
+  },
+  verMaisBtn: {
+    backgroundColor: THEME.accent,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignSelf: 'center',
+    marginTop: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  verMaisText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
