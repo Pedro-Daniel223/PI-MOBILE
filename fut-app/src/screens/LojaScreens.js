@@ -135,7 +135,7 @@ function LojaContent({ navigation }) {
            <Ionicons name="search" size={16} color="#888" />
         </View>
         <TouchableOpacity style={styles.cartBtn} onPress={() => navigation.navigate('Carrinho')}>
-           <Ionicons name="cart-outline" size={20} color="#ff2b2b" />
+           <Ionicons name="cart-outline" size={20} color="#880000" />
            <CartBadge count={getCartCount()} />
         </TouchableOpacity>
       </View>
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     lineHeight: 42,
     letterSpacing: 1,
   },
-  promoRed: { color: '#8b0000' },
+  promoRed: { color: '#880000' },
   promoSub: { 
     color: '#666', 
     fontSize: 12, 
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     opacity: 0.3 
   },
   activeDot: { 
-    backgroundColor: '#ff2b2b', 
+    backgroundColor: '#880000', 
     opacity: 1 
   },
   sectionHeader: { 

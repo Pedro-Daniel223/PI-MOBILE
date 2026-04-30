@@ -25,9 +25,9 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
     }
   };
 
-  // Os tamanhos da imagem são P, M, L, XL (padrão internacional)
+  // Os tamanhos da imagem são P, M, G, GG (padrão)
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState('M');
-  const tamanhos = ['M', 'P', 'L', 'XL'];
+  const tamanhos = ['P', 'M', 'G', 'GG'];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -61,8 +61,8 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
         <View style={styles.infoSection}>
           {/* Preços e Desconto */}
           <View style={styles.priceRow}>
-            <Text style={styles.currentPrice}>${produto.preco.toFixed(2)}</Text>
-            <Text style={styles.oldPrice}>${produto.precoAntigo.toFixed(2)}</Text>
+            <Text style={styles.currentPrice}>{produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
+            <Text style={styles.oldPrice}>{produto.precoAntigo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
             <View style={styles.discountBadge}>
               <Text style={styles.discountText}>{produto.desconto}</Text>
             </View>
