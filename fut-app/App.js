@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CartProvider } from './src/contexts/CartContext';
 
+
 // Telas existentes
 import SplashScreen from './src/screens/SplashScreen';
 import IngressosScreen from './src/screens/IngressosScreen';
@@ -19,7 +20,7 @@ import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
 // Telas da loja
 import LojaScreens from './src/screens/LojaScreens';
 import DetalhesProdutosScreens from './src/screens/DetalhesProdutosScreens';
-import CarrinhoScreens from './src/screens/CarrinhoScreens';
+import CarrinhosScreen from './src/screens/CarrinhosScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,7 +48,7 @@ export default function App() {
           <Stack.Screen name="DetalhesProdutosScreens" component={DetalhesProdutosScreens} />
 
           {/* Rota do Carrinho */}
-          <Stack.Screen name="Carrinho" component={CarrinhoScreens} />
+          <Stack.Screen name="Carrinho" component={CarrinhosScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </CartProvider>

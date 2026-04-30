@@ -13,8 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCart } from '../contexts/CartContext';
-import CartBadge from '../components/CartBadge';
+
 
 // Importação da sua Navbar
 import NavbarGlass from '../components/NavbarGlass'; 
@@ -67,7 +66,6 @@ const PRODUTOS_EXEMPLO = [
 function LojaContent({ navigation }) {
   const [search, setSearch] = useState('');
   const insets = useSafeAreaInsets();
-  const { getCartCount } = useCart();
 
   const ListHeader = () => (
     <View style={styles.headerContent}>
@@ -98,14 +96,13 @@ function LojaContent({ navigation }) {
 
   const renderProduto = ({ item }) => (
     <View style={styles.card}>
-      <View style={styles.cartIconContainer}>
-         <Ionicons name="cart" size={18} color="#fff" />
-      </View>
-      <Image source={item.imagem} style={styles.cardImage} resizeMode="contain" />
-      <View style={styles.cardInfo}>
-        <Text style={styles.cardCategoria}>{item.categoria}</Text>
-        <Text style={styles.cardNome}>{item.nome}</Text>
-        <Text style={styles.cardPreco}>R$ {item.preco.toFixed(2)}</Text>
+      <View style={styles.cardContent}>
+        <Image source={item.imagem} style={styles.cardImage} resizeMode="contain" />
+        <View style={styles.cardInfo}>
+          <Text style={styles.cardCategoria}>{item.categoria}</Text>
+          <Text style={styles.cardNome} numberOfLines={2}>{item.nome}</Text>
+          <Text style={styles.cardPreco}>R$ {item.preco.toFixed(2)}</Text>
+        </View>
       </View>
       <TouchableOpacity
         style={styles.verMaisBtn}
@@ -134,10 +131,7 @@ function LojaContent({ navigation }) {
            />
            <Ionicons name="search" size={16} color="#888" />
         </View>
-        <TouchableOpacity style={styles.cartBtn} onPress={() => navigation.navigate('Carrinho')}>
-           <Ionicons name="cart-outline" size={20} color="#880000" />
-           <CartBadge count={getCartCount()} />
-        </TouchableOpacity>
+
       </View>
 
       <FlatList
@@ -200,16 +194,7 @@ const styles = StyleSheet.create({
     color: '#fff', 
     fontSize: 13 
   },
-  cartBtn: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#333'
-  },
+
   headerContent: { 
     paddingHorizontal: 20, 
     marginTop: 20 
@@ -279,20 +264,15 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 16,
     borderWidth: 1,
-    borderColor: THEME.border
+    borderColor: THEME.border,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    height: 280
   },
-  cartIconContainer: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10
+  cardContent: {
+    flex: 0
   },
+
   cardImage: { 
     width: '100%', 
     height: 120, 
@@ -320,7 +300,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 25,
     alignSelf: 'center',
-    marginTop: 10,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
