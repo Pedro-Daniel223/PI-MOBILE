@@ -19,7 +19,6 @@ import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
 // Telas da loja
 import LojaScreens from './src/screens/LojaScreens';
 import DetalhesProdutosScreens from './src/screens/DetalhesProdutosScreens';
-import CarrinhoScreens from './src/screens/CarrinhoScreens';
 
 const Stack = createNativeStackNavigator();
 
