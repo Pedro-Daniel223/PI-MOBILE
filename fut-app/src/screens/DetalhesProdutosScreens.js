@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, Image, TouchableOpacity, ScrollView,
   StatusBar, Dimensions, Alert
@@ -19,15 +19,36 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
       preco: 115.00,
       precoAntigo: 285.00,
       desconto: '45% off',
-      // Substitua pelo caminho real da sua imagem
+      imagens: [require('../assets/img/img_home/milan_r2006(2).png')],
       imagem: require('../assets/img/img_home/milan_r2006(2).png'),
       descricao: 'criada para quem busca estilo sem esforço e conforto o dia inteiro. Confeccionada em algodão premium 100% penteado, ela oferece um toque macio e respirável, ideal tanto para dias quentes quanto para composições em camadas. Seu design minimalista ganha destaque com um corte oversized moderno, caimento solto e ombros levemente deslocados, trazendo uma pegada urbana e atual. A gola reforçada garante durabilidade, enquanto a costura dupla nas mangas e barra proporciona resistência ao uso contínuo.'
     }
   };
 
-  // Os tamanhos da imagem são P, M, G, GG (padrão)
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState('M');
+  const [indiceImagem, setIndiceImagem] = useState(0);
+  const scrollViewRef = useRef(null);
   const tamanhos = ['P', 'M', 'G', 'GG'];
+
+  const imagens = produto.imagens || (produto.imagem ? [produto.imagem] : []);
+  const mostrarTamanhos = produto.categoria && produto.categoria.toLowerCase() !== 'acessório';
+
+  const slideWidth = width - 40; // 20 de margem de cada lado do imageCard
+
+  const scrollToImage = (index) => {
+    if (scrollViewRef.current && imagens.length > 0) {
+      const offset = index * slideWidth;
+      scrollViewRef.current.scrollTo({ x: offset, animated: true });
+    }
+  };
+
+  const handleScroll = (event) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x;
+    const newIndex = Math.round(contentOffsetX / slideWidth);
+    if (newIndex !== indiceImagem && newIndex >= 0 && newIndex < imagens.length) {
+      setIndiceImagem(newIndex);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,15 +68,57 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         
-        {/* Container da Imagem com fundo cinza suave */}
+        {/* Container da Imagem com Scroll Horizontal */}
         <View style={styles.imageCard}>
-          <Image source={produto.imagem} style={styles.productImage} resizeMode="contain" />
-          <View style={styles.pagination}>
-            <View style={[styles.dot, styles.dotActive]} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-          </View>
+      <ScrollView
+            ref={scrollViewRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={styles.imagesScrollContent}
+            snapToAlignment="center"
+          >
+            {imagens.map((img, index) => (
+              <View key={index} style={styles.imageSlide}>
+                <Image source={img} style={styles.productImage} resizeMode="contain" />
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* Paginação dinâmica */}
+          {imagens.length > 1 && (
+            <View style={styles.pagination}>
+              {imagens.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    index === indiceImagem && styles.dotActive
+                  ]}
+                />
+              ))}
+            </View>
+          )}
+
+          {/* Botões de navegação lateral */}
+          {imagens.length > 1 && (
+            <>
+              <TouchableOpacity
+                style={[styles.navButton, styles.navButtonLeft]}
+                onPress={() => scrollToImage(Math.max(0, indiceImagem - 1))}
+              >
+                <Ionicons name="chevron-back" size={24} color="#666" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.navButton, styles.navButtonRight]}
+                onPress={() => scrollToImage(Math.min(imagens.length - 1, indiceImagem + 1))}
+              >
+                <Ionicons name="chevron-forward" size={24} color="#666" />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
 
         <View style={styles.infoSection}>
@@ -81,24 +144,26 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             <Text style={styles.brandNameText}>Puma</Text>
           </View>
 
-          {/* Grade de Tamanhos - Ajustada para o estilo da imagem */}
-          <View style={styles.sizeGrid}>
-            {tamanhos.map((tam) => (
-              <TouchableOpacity
-                key={tam}
-                onPress={() => setTamanhoSelecionado(tam)}
-                style={[
-                  styles.sizeBox,
-                  tamanhoSelecionado === tam && styles.sizeBoxActive
-                ]}
-              >
-                <Text style={[
-                  styles.sizeLabel,
-                  tamanhoSelecionado === tam && styles.sizeLabelActive
-                ]}>{tam}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {mostrarTamanhos && (
+            <View style={styles.sizeGrid}>
+              <Text style={styles.sizeLabelTitle}>Tamanho</Text>
+              {tamanhos.map((tam) => (
+                <TouchableOpacity
+                  key={tam}
+                  onPress={() => setTamanhoSelecionado(tam)}
+                  style={[
+                    styles.sizeBox,
+                    tamanhoSelecionado === tam && styles.sizeBoxActive
+                  ]}
+                >
+                  <Text style={[
+                    styles.sizeLabel,
+                    tamanhoSelecionado === tam && styles.sizeLabelActive
+                  ]}>{tam}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
           {/* Descrição */}
           <View style={styles.descriptionContainer}>
@@ -112,12 +177,20 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             style={styles.cartButton}
             activeOpacity={0.8}
             onPress={() => {
-              addToCart({ 
-                ...produto, 
-                id: produto.nome, 
-                tamanho: tamanhoSelecionado,
-                imagens: produto.imagens || (produto.imagem ? [produto.imagem] : [])
-              });
+              if (mostrarTamanhos) {
+                addToCart({ 
+                  ...produto, 
+                  id: produto.nome, 
+                  tamanho: tamanhoSelecionado,
+                  imagens: produto.imagens || [produto.imagem]
+                });
+              } else {
+                addToCart({ 
+                  ...produto, 
+                  id: produto.nome,
+                  imagens: produto.imagens || [produto.imagem]
+                });
+              }
               Alert.alert('Sucesso', 'Produto adicionado ao carrinho!');
             }}
           >
@@ -164,34 +237,66 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 30,
   },
-  imageCard: {
-    backgroundColor: '#EFEFEF',
-    margin: 20,
-    height: 280,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  productImage: {
-    width: '75%',
-    height: '75%',
-  },
-  pagination: {
-    flexDirection: 'row',
-    position: 'absolute',
-    bottom: 15,
-  },
-  dot: {
-    width: 30,
-    height: 5,
-    backgroundColor: '#333',
-    marginHorizontal: 4,
-    borderRadius: 3,
-    opacity: 0.8,
-  },
-  dotActive: {
-    backgroundColor: '#A52A2A', // Tom de vermelho escuro da barra
-  },
+   imageCard: {
+     backgroundColor: '#EFEFEF',
+     margin: 20,
+     height: 280,
+     borderRadius: 25,
+     justifyContent: 'center',
+     alignItems: 'center',
+     overflow: 'hidden',
+   },
+   imagesScrollContent: {
+     // Não precisa de flexGrow, o paging cuida da largura
+   },
+   imageSlide: {
+     width: width - 40, // Largura da tela menos as margens do imageCard (20+20)
+     height: 280,
+     justifyContent: 'center',
+     alignItems: 'center',
+   },
+   productImage: {
+     width: '85%',
+     height: '85%',
+   },
+   pagination: {
+     flexDirection: 'row',
+     position: 'absolute',
+     bottom: 15,
+     gap: 6,
+   },
+   dot: {
+     width: 8,
+     height: 8,
+     borderRadius: 4,
+     backgroundColor: '#999',
+   },
+   dotActive: {
+     backgroundColor: '#A52A2A',
+     width: 20,
+   },
+   navButton: {
+     position: 'absolute',
+     top: '45%',
+     transform: [{ translateY: -30 }],
+     width: 36,
+     height: 36,
+     borderRadius: 18,
+     backgroundColor: 'rgba(255, 255, 255, 0.9)',
+     justifyContent: 'center',
+     alignItems: 'center',
+     elevation: 4,
+     shadowColor: '#000',
+     shadowOffset: { width: 0, height: 2 },
+     shadowOpacity: 0.15,
+     shadowRadius: 4,
+   },
+   navButtonLeft: {
+     left: 8,
+   },
+   navButtonRight: {
+     right: 8,
+   },
   infoSection: {
     paddingHorizontal: 20,
   },
@@ -255,11 +360,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#BBB',
   },
-  sizeGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 30,
-  },
+   sizeGrid: {
+     flexDirection: 'row',
+     flexWrap: 'wrap',
+     justifyContent: 'space-between',
+     marginBottom: 30,
+     gap: 12,
+   },
+   sizeLabelTitle: {
+     fontSize: 16,
+     fontWeight: '700',
+     color: '#333',
+     marginBottom: 10,
+     width: '100%',
+   },
   sizeBox: {
     width: width * 0.2,
     height: 50,

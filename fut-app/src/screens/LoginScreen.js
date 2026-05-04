@@ -76,8 +76,8 @@ export default function LoginScreen({ navigation }) {
               resizeMode="contain"
             />
             <View style={styles.headerContent}>
-              <Text style={styles.headerTitle}>BEM VINDO DE VOLTA AO COVIL</Text>
-              <Text style={styles.headerSubtitle}>Faça seu Login para entrar no Covil dos Drakos</Text>
+              <Text style={styles.headerTitle}>BEM-VINDO DE VOLTA AO COVIL</Text>
+              <Text style={styles.headerSubtitle}>Faça seu login para entrar no Covil dos Drakos</Text>
             </View>
           </View>
 
@@ -148,9 +148,9 @@ export default function LoginScreen({ navigation }) {
               activeOpacity={0.7}
               style={styles.footerContainer}
             >
-              <Text style={styles.footerText}>
-                Não possui conta? <Text style={styles.linkBold}>Registrar</Text>
-              </Text>
+               <Text style={styles.footerText}>
+                 Não possui uma conta? <Text style={styles.linkBold}>Registrar</Text>
+               </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

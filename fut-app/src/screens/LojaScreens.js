@@ -33,31 +33,87 @@ const THEME = {
 const PRODUTOS_EXEMPLO = [
   { 
     id: '1', 
-    nome: 'Drakos Temp 24/25', 
+    nome: 'Cachecol Drakos - Premium', 
+    preco: 89.99, 
+    precoAntigo: 149.00,
+    desconto: '40% off',
+    categoria: 'Acessório', 
+    imagens: [
+      require('../assets/img/Produtos/acessorios/objeto 1/cachecol_drakos (1).jpg'),
+      require('../assets/img/Produtos/acessorios/objeto 1/cachecol_transparent (3).png'),
+      require('../assets/img/Produtos/acessorios/objeto 1/cachecol_drakos (2).webp'),
+    ],
+    imagem: require('../assets/img/Produtos/acessorios/objeto 1/cachecol_drakos (1).jpg'),
+    descricao: 'Cachecol oficial Drakos em material premium, 100% algodão. Design exclusivo com as cores do clube, acabamento reforçado e tamanho generoso. Perfeito para os dias mais frios, oferece conforto e estilo. Lavável à máquina sem perder a qualidade.'
+  },
+  { 
+    id: '2', 
+    nome: 'Boneco Drakos - Edição Especial', 
+    preco: 129.99,
+    precoAntigo: 220.00,
+    desconto: '41% off',
+    categoria: 'Acessório', 
+    imagens: [
+      require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (1).jpg'),
+      require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (2).jpg'),
+      require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (3).jpg'),
+      require('../assets/img/Produtos/acessorios/objeto 2/boneco_transparent (3).png'),
+    ],
+    imagem: require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (1).jpg'),
+    descricao: 'Boneco colecionável Drakos edição especial. Material de alta qualidade, detalhes pintados manualmente, uniforme oficial da temporada. Altura aproximada de 30cm. Acompanha base decorativa. Item perfeito para colecionadores e torcedores.'
+  },
+  { 
+    id: '3', 
+    nome: 'Touca Drakos - Inverno', 
+    preco: 59.99,
+    precoAntigo: 89.00,
+    desconto: '33% off',
+    categoria: 'Acessório', 
+    imagens: [
+      require('../assets/img/Produtos/acessorios/objeto 3/touca_Drakos (1).jpg'),
+      require('../assets/img/Produtos/acessorios/objeto 3/touca_Drakos (2).jpg'),
+      require('../assets/img/Produtos/acessorios/objeto 3/touca_transparent.png'),
+      require('../assets/img/Produtos/acessorios/objeto 3/touca_Drakos (1).webp'),
+    ],
+    imagem: require('../assets/img/Produtos/acessorios/objeto 3/touca_Drakos (1).jpg'),
+    descricao: 'Touca de inverno oficial Drakos, confeccionada em lã acrílica de alta qualidade. Interior felpudo para maior conforto térmico, ajuste perfeito e bordado do escudo. Disponível na cor tradicional. Ideal para dias frios e dias de jogo.'
+  },
+  { 
+    id: '4', 
+    nome: 'Drakos Temp 24/25 - Camisa Oficial', 
     preco: 169.99, 
     precoAntigo: 285.00,
     desconto: '40% off',
     categoria: 'Camisa', 
+    imagens: [
+      require('../assets/img/img_home/milan_r2006(2).png'),
+    ],
     imagem: require('../assets/img/img_home/milan_r2006(2).png'),
     descricao: 'Camisa oficial da temporada 24/25. Confeccionada com tecido dry-fit de alta performance, tecnologia antichamas e corte ergonômico que garante máxima liberdade de movimento. Possui gola reforçada e detalhes em vermelho que remetem à tradição do clube. Ideal para jogadores que buscam estilo e conforto dentro e fora de campo.'
   },
   { 
-    id: '2', 
+    id: '5', 
     nome: 'Drakos Temp 24/25 - Edição Limitada', 
     preco: 189.99,
     precoAntigo: 320.00,
     desconto: '41% off',
     categoria: 'Camisa', 
+    imagens: [
+      require('../assets/img/img_home/milan_r2006(2).png'),
+    ],
     imagem: require('../assets/img/img_home/milan_r2006(2).png'),
     descricao: 'Versão limitada da camisa Drakos 24/25, comemorativa aos 20 anos do clube. Possui acabamento premium, escudo bordado e numeração especial. Tecido respirável com proteção UV e costuras planas para evitar atrito. Disponível apenas nesta temporada.'
   },
   { 
-    id: '3', 
+    id: '6', 
     nome: 'Drakos Temp 24/25 - Torcedor', 
     preco: 149.99,
     precoAntigo: 210.00,
     desconto: '29% off',
     categoria: 'Camisa', 
+    imagens: [
+      require('../assets/img/img_home/milan_r2006(2).png'),
+    ],
     imagem: require('../assets/img/img_home/milan_r2006(2).png'),
     descricao: 'Versão torcedor da camisa Drakos 24/25. Confortável e durável, ideal para uso casual e dias de jogo. Feita em algodão e poliéster, proporciona equilíbrio entre respirabilidade e resistência. Design elegante com escudo aplicado em silk.'
   },
@@ -163,6 +219,7 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#101010' 
   },
+  // BARRA SUPERIOR
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -170,6 +227,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     justifyContent: 'space-between'
   },
+  // BARRA SUPERIOR - AVATAR E BUSCA
   avatar: { 
     width: 45, 
     height: 45, 
@@ -177,6 +235,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: '#fff' 
   },
+  // BARRA SUPERIOR - CAMPO DE BUSCA
   searchBar: {
     flex: 1,
     height: 40,
@@ -189,16 +248,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333'
   },
+  // BARRA SUPERIOR - CAMPO DE BUSCA - INPUT
   searchTextInput: { 
     flex: 1, 
     color: '#fff', 
     fontSize: 13 
   },
-
+  // HEADER
   headerContent: { 
     paddingHorizontal: 20, 
     marginTop: 20 
   },
+  // HEADER - PROMOÇÃO
   promoTitle: { 
     color: '#fff', 
     fontSize: 40, 
@@ -206,6 +267,7 @@ const styles = StyleSheet.create({
     lineHeight: 42,
     letterSpacing: 1,
   },
+  // HEADER - PROMOÇÃO - "PREMIUM" EM VERMELHO
   promoRed: { color: '#880000' },
   promoSub: { 
     color: '#666', 
@@ -213,6 +275,7 @@ const styles = StyleSheet.create({
     marginTop: 8, 
     marginBottom: 20 
   },
+  // BANNER DE DESTAQUE
   highlightBanner: {
     height: 160,
     backgroundColor: '#1a1a1a',
@@ -223,10 +286,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 15
   },
+  // BANNER DE DESTAQUE - PONTOS DE PAGINAÇÃO
   paginationDotContainer: { 
     flexDirection: 'row', 
     gap: 8 
   },
+  // BANNER DE DESTAQUE - PONTOS DE PAGINAÇÃO - ESTILO PADRÃO
   dot: { 
     width: 18, 
     height: 3, 
@@ -234,69 +299,80 @@ const styles = StyleSheet.create({
     borderRadius: 2, 
     opacity: 0.3 
   },
+  // BANNER DE DESTAQUE - PONTOS DE PAGINAÇÃO - ESTILO ATIVO
   activeDot: { 
     backgroundColor: '#880000', 
     opacity: 1 
   },
+  // SEÇÃO DE PRODUTOS EM DESTAQUE
   sectionHeader: { 
     marginTop: 35, 
     marginBottom: 15 
   },
+  // SEÇÃO DE PRODUTOS EM DESTAQUE - SUBTÍTULO
   sectionSubtitle: { 
     color: '#666', 
     fontSize: 12, 
     fontWeight: '600' 
   },
+  // SEÇÃO DE PRODUTOS EM DESTAQUE - TÍTULO
   sectionTitle: { 
     color: '#fff', 
     fontSize: 32, 
     fontWeight: '900' 
   },
+  // LISTA DE PRODUTOS
   listContent: { paddingBottom: 120 }, 
-  row: { 
-    justifyContent: 'space-between', 
-    paddingHorizontal: 15 
-  },
+   row: {
+     justifyContent: 'space-between',
+     paddingHorizontal: 15,
+     gap: 15,
+   },
+  // CARD DE PRODUTO
   card: {
     backgroundColor: THEME.card,
     width: (width - 45) / 2,
-    marginBottom: 15,
+    marginBottom: 20,
     borderRadius: 24,
     padding: 16,
     borderWidth: 1,
     borderColor: THEME.border,
     flexDirection: 'column',
-    justifyContent: 'flex-end',
-    height: 280
+    justifyContent: 'space-between',
+    height: 300,
   },
   cardContent: {
-    flex: 0
+    flex: 1,
+    justifyContent: 'flex-end',
   },
 
-  cardImage: { 
-    width: '100%', 
-    height: 120, 
-    marginBottom: 8 
+  cardImage: {
+    width: '100%',
+    height: 130,
+    marginBottom: 10,
   },
-  cardCategoria: { 
-    color: '#666', 
-    fontSize: 10, 
-    fontWeight: '600' 
+  cardCategoria: {
+    color: '#666',
+    fontSize: 11,
+    fontWeight: '600',
+    marginBottom: 4,
   },
-  cardNome: { 
-    color: '#fff', 
-    fontSize: 14, 
-    fontWeight: 'bold' 
+  cardNome: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 6,
+    lineHeight: 18,
   },
   cardPreco: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
-    marginTop: 4
+    marginBottom: 8,
   },
   verMaisBtn: {
     backgroundColor: THEME.accent,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 25,
     alignSelf: 'center',
@@ -305,7 +381,58 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    marginTop: 8,
+    width: '90%',
   },
+  verMaisText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  // CARD DE PRODUTO - CONTEÚDO (IMAGEM + INFORMAÇÕES)
+  cardContent: {
+    flex: 0
+  },
+// CARD DE PRODUTO - INFORMAÇÕES (CATEGORIA, NOME, PREÇO)
+  cardImage: { 
+    width: '100%', 
+    height: 120, 
+    marginBottom: 8 
+  },
+  // CARD DE PRODUTO - INFORMAÇÕES (CATEGORIA, NOME, PREÇO) - CATEGORIA
+  cardCategoria: { 
+    color: '#666', 
+    fontSize: 10, 
+    fontWeight: '600' 
+  },
+  // CARD DE PRODUTO - INFORMAÇÕES (CATEGORIA, NOME, PREÇO) - NOME
+  cardNome: { 
+    color: '#fff', 
+    fontSize: 14, 
+    fontWeight: 'bold' 
+  },
+  // CARD DE PRODUTO - INFORMAÇÕES (CATEGORIA, NOME, PREÇO) - PREÇO
+  cardPreco: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '900',
+    marginTop: 4
+  },
+  // CARD DE PRODUTO - BOTÃO "VER MAIS"
+  verMaisBtn: {
+    backgroundColor: THEME.accent,
+    paddingVertical: 11,
+    paddingHorizontal: 19,
+    borderRadius: 26,
+    alignSelf: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  // CARD DE PRODUTO - BOTÃO "VER MAIS" - TEXTO
   verMaisText: {
     color: '#fff',
     fontSize: 14,

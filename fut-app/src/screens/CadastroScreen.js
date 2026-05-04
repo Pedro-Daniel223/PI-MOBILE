@@ -150,7 +150,7 @@ export default function CadastroScreen({ navigation }) {
                                 >
                                     {accepted && <Text style={styles.checkIconSmall}>✓</Text>}
                                 </TouchableOpacity>
-                                <Text style={styles.acceptText}>Aceito políticas e privacidade</Text>
+                                <Text style={styles.acceptText}>Aceito as políticas de privacidade</Text>
                             </View>
 
                             <View style={styles.buttonWrap}>
@@ -167,7 +167,7 @@ export default function CadastroScreen({ navigation }) {
                                 style={styles.footerTouchable}
                             >
                                 <Text style={styles.footerText}>
-                                    Já tem conta? <Text style={styles.link}>Entrar</Text>
+                                  Já possui uma conta? <Text style={styles.link}>Entrar</Text>
                                 </Text>
                             </TouchableOpacity>
                         </View>

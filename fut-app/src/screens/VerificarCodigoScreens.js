@@ -13,14 +13,19 @@ import {
 } from 'react-native';
 import CustomButton from '../components/CustomButton';
 
-// DEFINIÇÃO DAS CORES
 const colors = {
-  primary: '#8B3A3A',      // Vermelho Drakos
-  background: '#E8E8E8',   // Cinza do fundo
+  primary: '#880000',
+  background: '#E8E8E8',
   white: '#FFFFFF',
-  text: '#121212',         // Preto mais nítido
+  text: '#121212',
   mutedText: '#707070',
-  otpBackground: '#D1D1D1'
+  otpBackground: '#D1D1D1',
+  accent: '#B22222',
+  glassBorder: 'rgba(255, 255, 255, 0.7)',
+  glassBg: 'rgba(255, 255, 255, 0.3)',
+  shadowDark: 'rgba(0, 0, 0, 0.18)',
+  ringOuter: 'rgba(136, 0, 0, 0.08)',
+  ringInner: 'rgba(136, 0, 0, 0.12)'
 };
 
 export default function VerificarCodigo({ navigation }) {
@@ -134,13 +139,13 @@ export default function VerificarCodigo({ navigation }) {
             </View>
 
             {/* REENVIAR CÓDIGO */}
-            <TouchableOpacity 
-              disabled={timer > 0} 
-              onPress={() => setTimer(30)} 
+            <TouchableOpacity
+              disabled={timer > 0}
+              onPress={() => setTimer(30)}
               style={styles.resendButton}
             >
               <Text style={styles.resendText}>
-                Não recebeu o código? <Text style={styles.resendTextBold}>{timer > 0 ? `Aguarde ${timer}s` : 'Reenviar agora'}</Text>
+                Não recebeu o código? <Text style={styles.resendTextBold}>{timer > 0 ? `Aguarde ${timer}s` : 'Reenviar código'}</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -174,25 +179,30 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     paddingTop: 50,
   },
-  back: {
-    position: 'absolute',
-    left: 24,
-    top: 50,
-    width: 45,
-    height: 45,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.5)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  backText: {
-    fontSize: 24,
-    color: colors.text,
-    fontWeight: '300',
-  },
+   back: {
+     position: 'absolute',
+     left: 24,
+     top: 55,
+     width: 46,
+     height: 46,
+     borderRadius: 15,
+     backgroundColor: colors.glassBg,
+     borderWidth: 1.6,
+     borderColor: colors.glassBorder,
+     alignItems: 'center',
+     justifyContent: 'center',
+     zIndex: 10,
+     elevation: 3,
+     shadowColor: colors.shadowDark,
+     shadowOffset: { width: 0, height: 2 },
+     shadowOpacity: 0.2,
+     shadowRadius: 5,
+   },
+   backText: {
+     fontSize: 26,
+     color: colors.text,
+     fontWeight: '300',
+   },
   header: {
     alignItems: 'center',
     marginBottom: 40,
@@ -202,75 +212,83 @@ const styles = StyleSheet.create({
   iconWrap: {
     marginBottom: 30,
   },
-  iconRingOuter: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(139, 58, 58, 0.05)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconRingInner: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(139, 58, 58, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.primary, 
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 10,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-  },
-  iconEmoji: {
-    fontSize: 45,
-  },
-  headerTitle: {
-    fontSize: 31,
-    fontWeight: '800',
-    color: colors.text,
-    marginBottom: 12,
-    letterSpacing: 0.5,
-  },
-  headerSubtitle: {
-    fontSize: 17,
-    color: colors.mutedText,
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 20,
-  },
-  highlightText: {
-    color: colors.text,
-    fontWeight: '700',
-  },
-  otpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '85%',
-    maxWidth: 340,
-    marginBottom: 40,
-  },
-  otpInput: {
-    width: 58,
-    height: 75,
-    backgroundColor: colors.otpBackground,
-    borderRadius: 15,
-    textAlign: 'center',
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.text,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)',
-  },
+   iconRingOuter: {
+     width: 130,
+     height: 130,
+     borderRadius: 65,
+     backgroundColor: colors.ringOuter,
+     alignItems: 'center',
+     justifyContent: 'center',
+   },
+   iconRingInner: {
+     width: 110,
+     height: 110,
+     borderRadius: 55,
+     backgroundColor: colors.ringInner,
+     alignItems: 'center',
+     justifyContent: 'center',
+   },
+   iconCircle: {
+     width: 90,
+     height: 90,
+     borderRadius: 45,
+     backgroundColor: colors.primary,
+     alignItems: 'center',
+     justifyContent: 'center',
+     elevation: 7,
+     shadowColor: colors.primary,
+     shadowOffset: { width: 0, height: 5 },
+     shadowOpacity: 0.28,
+     shadowRadius: 8,
+   },
+   iconEmoji: {
+     fontSize: 40,
+   },
+   headerTitle: {
+     fontSize: 25,
+     fontWeight: '800',
+     color: colors.text,
+     marginBottom: 13,
+     letterSpacing: 0.3,
+     lineHeight: 30,
+   },
+   headerSubtitle: {
+     fontSize: 15,
+     color: colors.mutedText,
+     textAlign: 'center',
+     lineHeight: 22,
+     paddingHorizontal: 20,
+   },
+   highlightText: {
+     color: colors.primary,
+     fontWeight: '800',
+     fontSize: 17,
+   },
+   otpContainer: {
+     flexDirection: 'row',
+     justifyContent: 'space-between',
+     width: '84%',
+     maxWidth: 325,
+     marginBottom: 37,
+     alignSelf: 'center',
+   },
+   otpInput: {
+     width: 53,
+     height: 68,
+     backgroundColor: colors.otpBackground,
+     borderRadius: 13,
+     textAlign: 'center',
+     fontSize: 28,
+     fontWeight: '800',
+     color: colors.text,
+     borderWidth: 1.3,
+     borderColor: 'rgba(0,0,0,0.06)',
+     shadowColor: colors.shadowDark,
+     shadowOffset: { width: 0, height: 1.5 },
+     shadowOpacity: 0.12,
+     shadowRadius: 2.5,
+     elevation: 1.5,
+   },
   formContent: {
     width: '100%',
     maxWidth: 360,
@@ -280,37 +298,39 @@ const styles = StyleSheet.create({
   buttonWrap: {
     width: '100%',
   },
-  // --- MANTENDO PADRÃO GLASS ---
-  glassButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-    borderRadius: 30, 
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    elevation: 4,
-    shadowColor: '#FFFFFF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-  },
-  buttonTitle: {
-    color: '#181818', 
-    fontWeight: '700',
-    fontSize: 18,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-  },
-  resendButton: {
-    marginTop: 25,
-  },
-  resendText: {
-    color: '#707070',
-    fontSize: 14,
-  },
-  resendTextBold: {
-    fontWeight: '800',
-    color: colors.primary, 
-  }
+   glassButton: {
+     backgroundColor: colors.glassBg,
+     borderRadius: 31,
+     height: 63,
+     justifyContent: 'center',
+     alignItems: 'center',
+     borderWidth: 1.6,
+     borderColor: colors.glassBorder,
+     elevation: 5,
+     shadowColor: colors.shadowDark,
+     shadowOffset: { width: 0, height: 3.5 },
+     shadowOpacity: 0.22,
+     shadowRadius: 7,
+   },
+   buttonTitle: {
+     color: '#181818',
+     fontWeight: '700',
+     fontSize: 17,
+     letterSpacing: 1.3,
+     textTransform: 'uppercase',
+   },
+   resendButton: {
+     marginTop: 22,
+     paddingVertical: 8,
+   },
+   resendText: {
+     color: '#707070',
+     fontSize: 15,
+     textAlign: 'center',
+   },
+   resendTextBold: {
+     fontWeight: '800',
+     color: colors.primary,
+     letterSpacing: 0.3,
+   }
 });
