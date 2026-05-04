@@ -112,7 +112,12 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             style={styles.cartButton}
             activeOpacity={0.8}
             onPress={() => {
-              addToCart({ ...produto, id: produto.nome, tamanho: tamanhoSelecionado });
+              addToCart({ 
+                ...produto, 
+                id: produto.nome, 
+                tamanho: tamanhoSelecionado,
+                imagens: produto.imagens || (produto.imagem ? [produto.imagem] : [])
+              });
               Alert.alert('Sucesso', 'Produto adicionado ao carrinho!');
             }}
           >

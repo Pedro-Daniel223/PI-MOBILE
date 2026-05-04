@@ -86,7 +86,7 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.formTitle}>Login</Text>
 
             <View style={styles.formContent}>
-              <Text style={styles.label}>Seu Email/Cpf:</Text>
+              <Text style={styles.label}>Seu EMAIL/CPF:</Text>
               <CustomInput
                 placeholder="email@exemplo.com"
                 value={email}
