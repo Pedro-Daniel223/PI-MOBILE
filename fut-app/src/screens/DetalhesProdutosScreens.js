@@ -133,17 +133,6 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
 
           <Text style={styles.productName}>{produto.nome}</Text>
 
-          {/* Seção da Marca */}
-          <View style={styles.brandRow}>
-            <View style={styles.brandLogoCircle}>
-              <Image 
-                source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Puma-Logo.png/1200px-Puma-Logo.png' }} 
-                style={styles.brandLogo} 
-              />
-            </View>
-            <Text style={styles.brandNameText}>Puma</Text>
-          </View>
-
           {mostrarTamanhos && (
             <View style={styles.sizeGrid}>
               <Text style={styles.sizeLabelTitle}>Tamanho</Text>
@@ -328,38 +317,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12,
   },
-  productName: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
-  },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 25,
-  },
-  brandLogoCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#FFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    marginRight: 15,
-  },
-  brandLogo: {
-    width: 35,
-    height: 25,
-    resizeMode: 'contain',
-  },
-  brandNameText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#BBB',
-  },
+   productName: {
+     fontSize: 16,
+     color: '#666',
+     marginBottom: 20,
+   },
    sizeGrid: {
      flexDirection: 'row',
      flexWrap: 'wrap',

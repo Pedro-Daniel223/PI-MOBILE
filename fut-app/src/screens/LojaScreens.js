@@ -29,6 +29,11 @@ const THEME = {
   border: 'rgba(255, 255, 255, 0.15)'
 };
 
+// ==================== DADOS DOS PRODUTOS ====================
+// Array de objetos com informações completas dos produtos
+// Inclui: id, nome, preço, desconto, categoria, imagens e descrição
+// =============================================================
+
 // Dados de exemplo com informações completas para a tela de detalhes
 const PRODUTOS_EXEMPLO = [
   { 
@@ -123,6 +128,10 @@ function LojaContent({ navigation }) {
   const [search, setSearch] = useState('');
   const insets = useSafeAreaInsets();
 
+  // ==================== LISTHEADER (CABEÇALHO DA LISTA) ====================
+  // Componente de cabeçalho da FlatList com banner promocional
+  // =========================================================================
+
   const ListHeader = () => (
     <View style={styles.headerContent}>
       <Text style={styles.promoTitle}>
@@ -140,57 +149,13 @@ function LojaContent({ navigation }) {
           <View style={[styles.dot, styles.activeDot]} />
           <View style={styles.dot} />
           <View style={styles.dot} />
-        </View>
-      </View>
+         </View>
+       </View>
 
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionSubtitle}>Em destaque</Text>
-        <Text style={styles.sectionTitle}>Produtos</Text>
-      </View>
-    </View>
-  );
-
-  const renderProduto = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.cardContent}>
-        <Image source={item.imagem} style={styles.cardImage} resizeMode="contain" />
-        <View style={styles.cardInfo}>
-          <Text style={styles.cardCategoria}>{item.categoria}</Text>
-          <Text style={styles.cardNome} numberOfLines={2}>{item.nome}</Text>
-          <Text style={styles.cardPreco}>R$ {item.preco.toFixed(2)}</Text>
-        </View>
-      </View>
-      <TouchableOpacity
-        style={styles.verMaisBtn}
-        activeOpacity={0.8}
-        onPress={() => navigation.navigate('DetalhesProdutosScreens', { produto: item })}
-      >
-        <Text style={styles.verMaisText}>Ver Mais</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-      
-      {/* BARRA SUPERIOR */}
-      <View style={styles.topBar}>
-        <Image source={{uri: 'https://i.pravatar.cc/100'}} style={styles.avatar} />
-        <View style={styles.searchBar}>
-           <TextInput 
-              placeholder="pesquisar produtos" 
-              placeholderTextColor="#555" 
-              style={styles.searchTextInput}
-              value={search}
-              onChangeText={setSearch}
-           />
-           <Ionicons name="search" size={16} color="#888" />
-        </View>
-
-      </View>
-
-      <FlatList
+       // ==================== FLATLIST (LISTA DE PRODUTOS) ====================
+       // FlatList com dados dos produtos em grid de 2 colunas
+       // =====================================================================
+       <FlatList
         data={PRODUTOS_EXEMPLO}
         keyExtractor={(item) => item.id}
         renderItem={renderProduto}
@@ -199,14 +164,20 @@ function LojaContent({ navigation }) {
         ListHeaderComponent={ListHeader}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-      />
+       />
 
-      <NavbarGlass navigation={navigation} />
-    </View>
-  );
-}
+       // ==================== NAVBAR (RODAPÉ) ====================
+       // NavbarGlass fixa na parte inferior da tela
+       // =======================================================
+       <NavbarGlass navigation={navigation} />
+     </View>
+   );
+ }
 
-export default function LojaScreens(props) {
+ // ==================== WRAPPER COM SAFEAREAPROVIDER ====================
+ // Componente wrapper queenvolve LojaContent com SafeAreaProvider
+ // =====================================================================
+ export default function LojaScreens(props) {
   return (
     <SafeAreaProvider>
       <LojaContent {...props} />
@@ -215,11 +186,14 @@ export default function LojaScreens(props) {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#101010' 
+  // ==================== CONTAINER PRINCIPAL ====================
+  container: {
+    flex: 1,
+    backgroundColor: '#101010'
   },
-  // BARRA SUPERIOR
+
+  // ==================== BARRA SUPERIOR ====================
+  // Contém avatar e campo de busca
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -227,15 +201,17 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     justifyContent: 'space-between'
   },
-  // BARRA SUPERIOR - AVATAR E BUSCA
-  avatar: { 
-    width: 45, 
-    height: 45, 
-    borderRadius: 22, 
-    borderWidth: 1, 
-    borderColor: '#fff' 
+
+  // ==================== BARRA SUPERIOR - AVATAR ====================
+  avatar: {
+    width: 45,
+    height: 45,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#fff'
   },
-  // BARRA SUPERIOR - CAMPO DE BUSCA
+
+  // ==================== BARRA SUPERIOR - CAMPO DE BUSCA ====================
   searchBar: {
     flex: 1,
     height: 40,
