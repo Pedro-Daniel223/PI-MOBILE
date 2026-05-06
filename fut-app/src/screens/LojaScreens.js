@@ -43,7 +43,7 @@ const PRODUTOS_EXEMPLO = [
       require('../assets/img/Produtos/acessorios/objeto 1/cachecol_transparent (3).png'),
       require('../assets/img/Produtos/acessorios/objeto 1/cachecol_drakos (2).webp'),
     ],
-    imagem: require('../assets/img/Produtos/acessorios/objeto 1/cachecol_drakos (1).jpg'),
+     imagem: require('../assets/img/Produtos/acessorios/objeto 1/cachecol_transparent (3).png'),
     descricao: 'Cachecol oficial Drakos em material premium, 100% algodão. Design exclusivo com as cores do clube, acabamento reforçado e tamanho generoso. Perfeito para os dias mais frios, oferece conforto e estilo. Lavável à máquina sem perder a qualidade.'
   },
   { 
@@ -59,7 +59,7 @@ const PRODUTOS_EXEMPLO = [
       require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (3).jpg'),
       require('../assets/img/Produtos/acessorios/objeto 2/boneco_transparent (3).png'),
     ],
-    imagem: require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (1).jpg'),
+     imagem: require('../assets/img/Produtos/acessorios/objeto 2/boneco_transparent (3).png'),
     descricao: 'Boneco colecionável Drakos edição especial. Material de alta qualidade, detalhes pintados manualmente, uniforme oficial da temporada. Altura aproximada de 30cm. Acompanha base decorativa. Item perfeito para colecionadores e torcedores.'
   },
   { 
@@ -75,7 +75,7 @@ const PRODUTOS_EXEMPLO = [
       require('../assets/img/Produtos/acessorios/objeto 3/touca_transparent.png'),
       require('../assets/img/Produtos/acessorios/objeto 3/touca_Drakos (1).webp'),
     ],
-    imagem: require('../assets/img/Produtos/acessorios/objeto 3/touca_Drakos (1).jpg'),
+     imagem: require('../assets/img/Produtos/acessorios/objeto 3/touca_transparent.png'),
     descricao: 'Touca de inverno oficial Drakos, confeccionada em lã acrílica de alta qualidade. Interior felpudo para maior conforto térmico, ajuste perfeito e bordado do escudo. Disponível na cor tradicional. Ideal para dias frios e dias de jogo.'
   },
   { 
