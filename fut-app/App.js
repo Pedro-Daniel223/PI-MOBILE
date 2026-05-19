@@ -22,6 +22,9 @@ import LojaScreens from './src/screens/LojaScreens';
 import DetalhesProdutosScreens from './src/screens/DetalhesProdutosScreens';
 import CarrinhosScreen from './src/screens/CarrinhosScreen';
 
+// Tela de Sócios
+import SociosScreen from './src/screens/SociosScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -49,6 +52,9 @@ export default function App() {
 
           {/* Rota do Carrinho */}
           <Stack.Screen name="Carrinho" component={CarrinhosScreen} />
+
+          {/* Rota de Sócios */}
+          <Stack.Screen name="Socio" component={SociosScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </CartProvider>

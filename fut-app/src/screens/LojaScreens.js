@@ -128,9 +128,20 @@ function LojaContent({ navigation }) {
   const [search, setSearch] = useState('');
   const insets = useSafeAreaInsets();
 
-  // ==================== LISTHEADER (CABEÇALHO DA LISTA) ====================
-  // Componente de cabeçalho da FlatList com banner promocional
-  // =========================================================================
+  const renderProduto = ({ item }) => (
+    <View style={styles.card}>
+      <Image source={item.imagem} style={styles.cardImage} resizeMode="cover" />
+      <Text style={styles.cardCategoria}>{item.categoria}</Text>
+      <Text style={styles.cardNome}>{item.nome}</Text>
+      <Text style={styles.cardPreco}>{item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
+      <TouchableOpacity
+        style={styles.verMaisBtn}
+        onPress={() => navigation.navigate('DetalhesProdutosScreens', { product: item })}
+      >
+        <Text style={styles.verMaisText}>Ver Mais</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   const ListHeader = () => (
     <View style={styles.headerContent}>
@@ -138,24 +149,38 @@ function LojaContent({ navigation }) {
         NOVAS{"\n"}CAMISAS{"\n"}
         <Text style={styles.promoRed}>PREMIUM</Text>
       </Text>
-      <Text style={styles.promoSub}>Olhe para seu bolso antes</Text>
-
+      <Text style={styles.promoSub}>Olhe para o seu bolso antes de tudo, você pode economizar!</Text>
       <View style={styles.highlightBanner}>
-        <LinearGradient
-          colors={['rgba(255,255,255,0.1)', 'transparent']}
-          style={StyleSheet.absoluteFill}
-        />
+        <LinearGradient colors={['rgba(255,255,255,0.1)', 'transparent']} style={StyleSheet.absoluteFill} />
         <View style={styles.paginationDotContainer}>
           <View style={[styles.dot, styles.activeDot]} />
           <View style={styles.dot} />
           <View style={styles.dot} />
-         </View>
-       </View>
+        </View>
+      </View>
+    </View>
+  );
 
-       // ==================== FLATLIST (LISTA DE PRODUTOS) ====================
-       // FlatList com dados dos produtos em grid de 2 colunas
-       // =====================================================================
-       <FlatList
+  return (
+    <View style={[styles.container, { paddingTop: insets.top || 20 }]}> 
+      <StatusBar barStyle="light-content" />
+      <View style={styles.topBar}>
+        <View style={styles.avatar} />
+        <View style={styles.searchBar}>
+          <TextInput
+            placeholder="Buscar produtos"
+            placeholderTextColor="#888"
+            style={styles.searchTextInput}
+            value={search}
+            onChangeText={setSearch}
+          />
+        </View>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="close" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
         data={PRODUTOS_EXEMPLO}
         keyExtractor={(item) => item.id}
         renderItem={renderProduto}
@@ -164,20 +189,16 @@ function LojaContent({ navigation }) {
         ListHeaderComponent={ListHeader}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-       />
+      />
 
-       // ==================== NAVBAR (RODAPÉ) ====================
-       // NavbarGlass fixa na parte inferior da tela
-       // =======================================================
-       <NavbarGlass navigation={navigation} />
-     </View>
-   );
- }
+      <NavbarGlass navigation={navigation} />
+    </View>
+  );
+}
 
- // ==================== WRAPPER COM SAFEAREAPROVIDER ====================
- // Componente wrapper queenvolve LojaContent com SafeAreaProvider
- // =====================================================================
- export default function LojaScreens(props) {
+// ==================== WRAPPER COM SAFEAREAPROVIDER ====================
+// Componente wrapper que envolve LojaContent com SafeAreaProvider
+export default function LojaScreens(props) {
   return (
     <SafeAreaProvider>
       <LojaContent {...props} />
