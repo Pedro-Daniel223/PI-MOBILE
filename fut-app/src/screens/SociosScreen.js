@@ -74,6 +74,13 @@ export default function SociosScreen({ navigation }) {
       {/* Fundo cinza-claro */}
       <View style={styles.background} />
 
+      {/* Marca d'água Drakos */}
+      <Image 
+        source={escudoDrakos}
+        style={styles.drakosBackground}
+        resizeMode="contain"
+      />
+
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
@@ -115,9 +122,6 @@ export default function SociosScreen({ navigation }) {
             <Text style={styles.categoryText}>Descontos</Text>
           </View>
         </View>
-
-        {/* Título "Planos :" */}
-        <Text style={styles.plansSubtitle}>Planos :</Text>
 
         {/* Cards de Planos */}
         {plans.map((plan) => (
@@ -234,6 +238,17 @@ const styles = StyleSheet.create({
   background: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#f5f5f5',
+  },
+
+  drakosBackground: {
+    position: 'absolute',
+    width: 300,
+    height: 300,
+    opacity: 0.15,
+    right: -80,
+    top: -30,
+    transform: [{ rotate: '-15deg' }],
+    zIndex: 0,
   },
 
   content: {
