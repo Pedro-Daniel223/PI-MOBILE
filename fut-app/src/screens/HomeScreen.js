@@ -19,6 +19,7 @@ import CardSocioGlass from '../components/Cards_home/CardSocioGlass';
 import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCarousel';
 import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
 import { useNavigation } from "@react-navigation/native";
+import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
 
 const products = [
   {
@@ -122,7 +123,20 @@ export default function Home({ navigation }) {
       {/* NAVBAR */}
       <NavbarGlass navigation={navigation} />
 
+      <PremiumGlassCard 
+        image={item.image}
+        title={item.title}
+        price={item.price}
+      />
+
     </View>
+
+
+        
+
+
+           
+
   );
 }
 
