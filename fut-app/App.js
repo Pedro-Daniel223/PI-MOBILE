@@ -14,10 +14,11 @@ import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import CadastroScreen from './src/screens/CadastroScreen';
 import EsqueceuSenhaScreen from './src/screens/EsqueceuSenhaScreen';
-// O import está correto se o arquivo se chama VerificarCodigoScreens.js
+// O import estǭ correto se o arquivo se chama VerificarCodigoScreens.js
 import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens'; 
+import LojaScreen from './src/screens/LojaScreen';
 
-// Verifique se o nome físico do arquivo é NovaSenhaScreen.js ou NovaSenhaScreens.js
+// Verifique se o nome f��sico do arquivo Ǹ NovaSenhaScreen.js ou NovaSenhaScreens.js
 import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
 
 const Stack = createNativeStackNavigator();
@@ -67,6 +68,12 @@ export default function App() {
           component={NovaSenhaScreens}
         />
         
+        {/* Tela de Loja */}
+        <Stack.Screen
+        name="Loja"
+        component={LojaScreen}
+        />
+
         {/* Tela de Ingressos recem criada */}
         <Stack.Screen 
           name="Ingressos" 
