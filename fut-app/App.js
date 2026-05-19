@@ -16,7 +16,7 @@ import CadastroScreen from './src/screens/CadastroScreen';
 import EsqueceuSenhaScreen from './src/screens/EsqueceuSenhaScreen';
 // O import estǭ correto se o arquivo se chama VerificarCodigoScreens.js
 import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens'; 
-import LojaScreen from './src/screens/LojaScreen';
+// import LojaScreen from './src/screens/LojaScreen';
 
 // Verifique se o nome f��sico do arquivo Ǹ NovaSenhaScreen.js ou NovaSenhaScreens.js
 import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
@@ -69,10 +69,10 @@ export default function App() {
         />
         
         {/* Tela de Loja */}
-        <Stack.Screen
+        {/* <Stack.Screen
         name="Loja"
         component={LojaScreen}
-        />
+        /> */}
 
         {/* Tela de Ingressos recem criada */}
         <Stack.Screen 
