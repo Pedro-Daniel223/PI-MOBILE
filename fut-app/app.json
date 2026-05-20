@@ -1,5 +1,21 @@
 {
-  "plugins": [
-    "expo-font"
-  ]
+  "expo": {
+    "name": "fut-app",
+    "slug": "fut-app",
+    "version": "1.0.0",
+      "plugins": [
+        "expo-font",
+        "expo-local-authentication"
+      ],
+    "ios": {
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "O Covil dos Drakos utiliza biometria para garantir a segurança dos seus ingressos."
+      }
+    },
+    "android": {
+      "permissions": [
+        "USE_BIOMETRIC"
+      ]
+    }
+  }
 }

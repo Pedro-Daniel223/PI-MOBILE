@@ -139,8 +139,11 @@ export default function Home({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  
+  container: {
+    flex: 1,
+    paddingBottom: 110, // Espaço para a navbar
+  },
+
   content: {
     padding: 20,
     paddingBottom: 120,

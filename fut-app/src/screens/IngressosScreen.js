@@ -102,7 +102,7 @@ export default function IngressosScreen({navigation}) {
                         </View>
                     </View>
                 )}
-            />
+            /> {/* Final da FlatList */}
             <NavbarGlass navigation={navigation} />
         </View>
     );
@@ -111,9 +111,10 @@ export default function IngressosScreen({navigation}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f0f0f0',
         paddingTop: 30,
-        marginTop: 40,
+        paddingBottom: 110, // Espaço para a navbar
+        marginBottom: 10, // Para a navbar ficar sobreposta
     },
     titulo: {
         fontSize: 32,
@@ -183,7 +184,6 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 30,
         borderRadius: 20,
-        marginTop: 10,
     },
     textoBtn: {
         color: '#880000',

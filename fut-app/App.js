@@ -32,31 +32,81 @@ export default function App() {
     <CartProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Splash" component={SplashScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="CadastroScreen" component={CadastroScreen} />
-          <Stack.Screen name="EsqueceuSenhaScreen" component={EsqueceuSenhaScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="VerificarCodigo" component={VerificarCodigoScreens} />
-          <Stack.Screen name="NovaSenhaScreens" component={NovaSenhaScreens} />
-          <Stack.Screen name="Ingressos" component={IngressosScreen} />
-          <Stack.Screen name="BoasVindas" component={BoasVindasScreen} />
-          <Stack.Screen name="BoasVindas2" component={BoasVindas2Screen} />
-          <Stack.Screen name="BoasVindas3" component={BoasVindas3Screen} />
+          <Stack.Screen
+            name="Splash"
+            component={SplashScreen}
+          />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+          />
+          <Stack.Screen
+            name="CadastroScreen"
+            component={CadastroScreen}
+          />
 
           {/* Rota da Loja */}
-          <Stack.Screen name="Loja" component={LojaScreens} />
+          <Stack.Screen
+            name="Loja"
+            component={LojaScreens}
+          />
 
           {/* Rota de Detalhes do Produto */}
-          <Stack.Screen name="DetalhesProdutosScreens" component={DetalhesProdutosScreens} />
+          <Stack.Screen
+            name="DetalhesProdutosScreens"
+            component={DetalhesProdutosScreens}
+          />
 
           {/* Rota do Carrinho */}
-          <Stack.Screen name="Carrinho" component={CarrinhosScreen} />
+          <Stack.Screen
+            name="Carrinho"
+            component={CarrinhosScreen}
+          />
 
-          {/* Rota de Sócios */}
-          <Stack.Screen name="Socio" component={SociosScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </CartProvider>
-  );
-}
+        <Stack.Screen
+          name="EsqueceuSenhaScreen"
+          component={EsqueceuSenhaScreen}
+        />
+
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+        />
+
+        <Stack.Screen
+          name="VerificarCodigo"
+          component={VerificarCodigoScreens}
+        />
+
+        <Stack.Screen
+          name="NovaSenhaScreens"
+          component={NovaSenhaScreens}
+        />
+
+        {/* Tela de Ingressos recem criada */}
+        <Stack.Screen 
+          name="Ingressos" 
+          component={IngressosScreen} 
+        />
+
+        <Stack.Screen
+        name="BoasVindas"
+        component={BoasVindasScreen}
+        />
+        
+        <Stack.Screen
+        name="BoasVindas2"
+        component={BoasVindas2Screen}
+        />
+
+        <Stack.Screen
+        name="BoasVindas3"
+        component={BoasVindas3Screen}
+        />
+
+        {/* Rota de Sócios */}
+        <Stack.Screen name="Socio" component={SociosScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  </CartProvider>
+);}
