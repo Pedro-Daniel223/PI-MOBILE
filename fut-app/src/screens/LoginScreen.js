@@ -1,20 +1,9 @@
-import React, { useState, useLayoutEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Alert,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-  StatusBar
-} from 'react-native';
-
+import React, { useState, useLayoutEffect, useEffect } from 'react'; // Adicionado useEffect
+import { View, Text, StyleSheet, Alert, SafeAreaView, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Image, StatusBar } from 'react-native';
+import * as LocalAuthentication from 'expo-local-authentication'; // NOVO: Importação
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
+import { Ionicons } from '@expo/vector-icons';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
@@ -35,10 +24,19 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPass, setShowPass] = useState(false);
+  const [isBiometricSupported, setIsBiometricSupported] = useState(false); // NOVO: Estado para verificar suporte
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
+
+  // NOVO: Verifica se o dispositivo suporta biometria ao carregar a tela
+  useEffect(() => {
+    (async () => {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      setIsBiometricSupported(compatible);
+    })();
+  }, []);
 
   const emailValid = email.includes('@') && email.includes('.');
 
@@ -52,6 +50,28 @@ export default function LoginScreen({ navigation }) {
       return;
     }
     navigation.replace('Home');
+  };
+
+  // NOVO: Função de Autenticação Biométrica
+  const handleBiometricAuth = async () => {
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!isEnrolled) {
+      return Alert.alert(
+        'Biometria não configurada',
+        'Por favor, configure uma digital ou FaceID nas configurações do seu celular.'
+      );
+    }
+
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: 'Entrar no Covil dos Drakos',
+      fallbackLabel: 'Usar senha',
+      disableDeviceFallback: false,
+    });
+
+    if (result.success) {
+      navigation.replace('Home');
+    }
   };
 
   return (
@@ -111,11 +131,8 @@ export default function LoginScreen({ navigation }) {
                 secureTextEntry={!showPass}
                 style={styles.inputStyle}
                 rightComponent={
-                  <TouchableOpacity 
-                    onPress={() => setShowPass(!showPass)} 
-                    style={styles.iconContainer}
-                  >
-                    <Text style={styles.eyeIcon}>{showPass ? '🙈' : '👁'}</Text>
+                  <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.iconContainer}>
+                    <Text style={{ fontSize: 18 }}>{showPass ? <Ionicons name="eye-off" style={styles.iconEye} /> : <Ionicons name="eye" style={styles.iconEye} />}</Text>
                   </TouchableOpacity>
                 }
               />
@@ -137,6 +154,17 @@ export default function LoginScreen({ navigation }) {
                   style={styles.glassButton}
                   textStyle={styles.buttonTitle}
                 />
+
+                {/* NOVO: Botão de Biometria condicional */}
+                {isBiometricSupported && (
+                  <TouchableOpacity 
+                    onPress={handleBiometricAuth} 
+                    style={styles.biometricBtn}
+                  >
+                    <Ionicons name="finger-print" size={24} color={colors.primary} />
+                    <Text style={styles.biometricText}>Entrar com Biometria</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
 
@@ -308,5 +336,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.text,
     fontSize: 14,
+  },
+  iconEye: {
+    color: colors.primary,
+    fontSize: 18,
+  },
+  biometricBtn: {
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  biometricText: {
+    color: colors.primary,
+    fontWeight: 'bold',
+    marginLeft: 10,
   },
 });
