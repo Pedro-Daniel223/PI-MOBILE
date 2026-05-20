@@ -2,9 +2,9 @@ import React from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 
 // CustomInput supports a right component via `rightComponent` prop
-export default function CustomInput({ style, rightComponent, placeholderTextColor = '#9B9B9B', ...props }) {
+export default function CustomInput({ style, containerStyle, rightComponent, placeholderTextColor = '#9B9B9B', ...props }) {
   return (
-    <View style={[styles.wrapper, style && { marginBottom: 14 }] }>
+    <View style={[styles.wrapper, containerStyle]}>
       <TextInput
         style={[styles.input, style]}
         placeholderTextColor={placeholderTextColor}

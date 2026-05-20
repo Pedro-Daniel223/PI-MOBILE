@@ -1,10 +1,10 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-// import 'react-native-gesture-handler';
+import { CartProvider } from './src/contexts/CartContext';
 
 
-// Importando telas
+// Telas existentes
 import SplashScreen from './src/screens/SplashScreen';
 import IngressosScreen from './src/screens/IngressosScreen';
 import BoasVindasScreen from './src/screens/BoasVindasScreen';
@@ -14,81 +14,49 @@ import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import CadastroScreen from './src/screens/CadastroScreen';
 import EsqueceuSenhaScreen from './src/screens/EsqueceuSenhaScreen';
-// O import está correto se o arquivo se chama VerificarCodigoScreens.js
-import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens'; 
-
-// Verifique se o nome físico do arquivo é NovaSenhaScreen.js ou NovaSenhaScreens.js
+import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens';
 import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
+
+// Telas da loja
+import LojaScreens from './src/screens/LojaScreens';
+import DetalhesProdutosScreens from './src/screens/DetalhesProdutosScreens';
+import CarrinhosScreen from './src/screens/CarrinhosScreen';
+
+// Tela de Sócios
+import SociosScreen from './src/screens/SociosScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='Splash' screenOptions={{ headerShown: false }}>
-        <Stack.Screen 
-          name="Splash"
-          component={SplashScreen}
-          />
+    <CartProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Splash" component={SplashScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="CadastroScreen" component={CadastroScreen} />
+          <Stack.Screen name="EsqueceuSenhaScreen" component={EsqueceuSenhaScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="VerificarCodigo" component={VerificarCodigoScreens} />
+          <Stack.Screen name="NovaSenhaScreens" component={NovaSenhaScreens} />
+          <Stack.Screen name="Ingressos" component={IngressosScreen} />
+          <Stack.Screen name="BoasVindas" component={BoasVindasScreen} />
+          <Stack.Screen name="BoasVindas2" component={BoasVindas2Screen} />
+          <Stack.Screen name="BoasVindas3" component={BoasVindas3Screen} />
 
-        <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-        />
+          {/* Rota da Loja */}
+          <Stack.Screen name="Loja" component={LojaScreens} />
 
-        {/* <Stack.Screen name="Profile" component={ProfileScreen} /> */}
+          {/* Rota de Detalhes do Produto */}
+          <Stack.Screen name="DetalhesProdutosScreens" component={DetalhesProdutosScreens} />
 
-        <Stack.Screen
-          name="CadastroScreen"
-          component={CadastroScreen}
-        />
+          {/* Rota do Carrinho */}
+          <Stack.Screen name="Carrinho" component={CarrinhosScreen} />
 
-        <Stack.Screen
-          name="EsqueceuSenhaScreen"
-          component={EsqueceuSenhaScreen}
-        />
-
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-        />
-
-        {/* MUDEI O 'name' PARA 'VerificarCodigo'. 
-            O arquivo continua sendo VerificarCodigoScreens.js, 
-            mas o "apelido" da tela na navegação agora é o que o seu código espera.
-        */}
-        <Stack.Screen
-          name="VerificarCodigo"
-          component={VerificarCodigoScreens}
-        />
-
-        <Stack.Screen
-          name="NovaSenhaScreens"
-          component={NovaSenhaScreens}
-        />
-        
-        {/* Tela de Ingressos recem criada */}
-        <Stack.Screen 
-          name="Ingressos" 
-          component={IngressosScreen} 
-        />
-
-        <Stack.Screen
-        name="BoasVindas"
-        component={BoasVindasScreen}
-        />
-        
-        <Stack.Screen
-        name="BoasVindas2"
-        component={BoasVindas2Screen}
-        />
-
-        <Stack.Screen
-        name="BoasVindas3"
-        component={BoasVindas3Screen}
-        />
-
-      </Stack.Navigator>
-    </NavigationContainer>
+          {/* Rota de Sócios */}
+          <Stack.Screen name="Socio" component={SociosScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </CartProvider>
   );
 }
