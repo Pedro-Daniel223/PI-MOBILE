@@ -14,6 +14,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import CadastroScreen from './src/screens/CadastroScreen';
 import EsqueceuSenhaScreen from './src/screens/EsqueceuSenhaScreen';
+import PerfilScreen from './src/screens/PerfilScreen';
 // O import está correto se o arquivo se chama VerificarCodigoScreens.js
 import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens'; 
 
@@ -51,6 +52,11 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
+        />
+
+        <Stack.Screen
+          name="Perfil"
+          component={PerfilScreen}
         />
 
         {/* MUDEI O 'name' PARA 'VerificarCodigo'. 
