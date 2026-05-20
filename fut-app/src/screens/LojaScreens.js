@@ -134,12 +134,12 @@ function LojaContent({ navigation }) {
       <Text style={styles.cardCategoria}>{item.categoria}</Text>
       <Text style={styles.cardNome}>{item.nome}</Text>
       <Text style={styles.cardPreco}>{item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
-      <TouchableOpacity
-        style={styles.verMaisBtn}
-        onPress={() => navigation.navigate('DetalhesProdutosScreens', { product: item })}
-      >
-        <Text style={styles.verMaisText}>Ver Mais</Text>
-      </TouchableOpacity>
+       <TouchableOpacity
+         style={styles.verMaisBtn}
+         onPress={() => navigation.navigate('DetalhesProdutosScreens', { produto: item })}
+       >
+         <Text style={styles.verMaisText}>Ver Mais</Text>
+       </TouchableOpacity>
     </View>
   );
 
