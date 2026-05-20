@@ -102,25 +102,25 @@ const PremiumGlassCard = ({
   }, [enableShimmer, shimmerDelay]);
 
   // ── Glow de respiro ──────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!enableBreathing) return;
-    const anim = loop(
-      sequence([
-        timing(breatheAnim, {
-          toValue: 1,
-          duration: 3200,
-          useNativeDriver: true,
-        }),
-        timing(breatheAnim, {
-          toValue: 0,
-          duration: 3200,
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    anim.start();
-    return () => anim.stop();
-  }, [enableBreathing]);
+  // useEffect(() => {
+  //   if (!enableBreathing) return;
+  //   const anim = loop(
+  //     sequence([
+  //       timing(breatheAnim, {
+  //         toValue: 1,
+  //         duration: 3200,
+  //         useNativeDriver: true,
+  //       }),
+  //       timing(breatheAnim, {
+  //         toValue: 0,
+  //         duration: 3200,
+  //         useNativeDriver: true,
+  //       }),
+  //     ])
+  //   );
+  //   anim.start();
+  //   return () => anim.stop();
+  // }, [enableBreathing]);
 
   // ── Flutuação vertical ───────────────────────────────────────────────────
   useEffect(() => {
@@ -328,6 +328,7 @@ const PremiumGlassCard = ({
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
+            opacity={0.9}
           />
 
           {/* 2d. Reflexo ambiental superior-esquerdo
@@ -350,9 +351,9 @@ const PremiumGlassCard = ({
           <LinearGradient
             colors={[
               'transparent',
-              'rgba(255, 255, 255, 0.06)',
-              'rgba(255, 255, 255, 0.10)',
-              'rgba(255, 255, 255, 0.06)',
+              // 'rgba(255, 255, 255, 0.06)',
+              // 'rgba(255, 255, 255, 0.10)',
+              // 'rgba(255, 255, 255, 0.06)',
               'transparent',
             ]}
             style={[
@@ -400,7 +401,7 @@ const PremiumGlassCard = ({
                   'transparent',
                   'rgba(255, 255, 255, 0.05)',
                   'rgba(255, 255, 255, 0.16)',
-                  'rgba(255, 255, 255, 0.22)',
+                  'rgba(251, 251, 251, 0.22)',
                   'rgba(255, 255, 255, 0.16)',
                   'rgba(255, 255, 255, 0.05)',
                   'transparent',

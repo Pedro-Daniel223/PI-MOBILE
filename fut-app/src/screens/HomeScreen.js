@@ -116,6 +116,9 @@ export default function Home({ navigation }) {
         />
       </View>
 
+      <PremiumGlassCard 
+        Text="Seja um membro Premium e tenha acesso a benefícios exclusivos!"
+      />
       </ScrollView>
 
 
@@ -123,11 +126,6 @@ export default function Home({ navigation }) {
       {/* NAVBAR */}
       <NavbarGlass navigation={navigation} />
 
-      <PremiumGlassCard 
-        image={item.image}
-        title={item.title}
-        price={item.price}
-      />
 
     </View>
 
