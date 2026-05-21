@@ -136,7 +136,7 @@ function LojaContent({ navigation }) {
       <Text style={styles.cardPreco}>{item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
        <TouchableOpacity
          style={styles.verMaisBtn}
-         onPress={() => navigation.navigate('DetalhesProdutosScreens', { produto: item })}
+         onPress={() => navigation.navigate('DetalhesProdutos', { produto: item })}
        >
          <Text style={styles.verMaisText}>Ver Mais</Text>
        </TouchableOpacity>

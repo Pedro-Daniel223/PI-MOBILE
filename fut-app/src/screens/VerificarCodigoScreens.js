@@ -66,7 +66,7 @@ export default function VerificarCodigo({ navigation }) {
     }
     
     Alert.alert('Sucesso', 'Código verificado com sucesso!', [
-      { text: 'OK', onPress: () => navigation.navigate('NovaSenhaScreens') } 
+      { text: 'OK', onPress: () => navigation.navigate('NovaSenha') } 
     ]);
   };
 

@@ -1,3 +1,13 @@
-import { useNavigation as nav } from "@react-navigation/native";
+import React from 'react';
 
-const navigation = nav()
+import { NavigationContainer } from '@react-navigation/native';
+
+import MainStack from './stacks/MainStack';
+
+export default function Routes() {
+  return (
+    <NavigationContainer>
+      <MainStack />
+    </NavigationContainer>
+  );
+}
