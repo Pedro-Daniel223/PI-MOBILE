@@ -15,49 +15,36 @@ import NavbarGlass from '../components/NavbarGlass';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
+const plans = [
+  {
+    id: '1',
+    title: 'Plano GOLD',
+    description: 'Acesso total aos jogos do time B anual e encontros exclusivos com atletas.',
+    price: 'R$ 99,90/mês',
+  },
+  {
+    id: '2',
+    title: 'Plano PRATA',
+    description: 'Acesso a todos os jogos do time principal e prioridade para treinos e encontros.',
+    price: 'R$ 79,90/mês',
+  },
+];
+
+const beneficios = [
+  'Acesso a todos os jogos do time principal',
+  'Prioridade na compra de ingressos',
+  'Encontros exclusivos com atletas',
+  'Treinos abertos exclusivos',
+  'Descontos na loja oficial',
+  'Certificado de sócio oficial Drakos',
+  'Experiências VIP em dias de jogo',
+  'Conteúdo exclusivo da temporada',
+];
+
 export default function SociosScreen({ navigation }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-
-  const plans = [
-    {
-      id: '1',
-      title: 'PRATA',
-      description: 'Tenha ótimos benefícios de acordo com seu plano de torcedor fiel',
-      price: 'R$ 49,99 Mensal',
-      vagas: 'Limitado a 500 vagas',
-      cardColor: '#e0e0e0',
-    },
-    {
-      id: '2',
-      title: 'OURO',
-      description: 'Benefícios premium para você viver a melhor experiência Drakos',
-      price: 'R$ 99,99 Mensal',
-      vagas: 'Limitado a 300 vagas',
-      cardColor: '#e0e0e0',
-    },
-    {
-      id: '3',
-      title: 'DIAMANTE',
-      description: 'O plano mais completo com acesso total e vantagens exclusivas',
-      price: 'R$ 199,99 Mensal',
-      vagas: 'Limitado a 150 vagas',
-      cardColor: '#e0e0e0',
-    },
-  ];
-
-  const beneficios = [
-    'Limitado a 350 vagas',
-    'Plano anual',
-    'Acesso livre aos jogos*',
-    'App oficial Sócio Águia',
-    'Plano adicional para dependentes',
-    '10% de desconto em produtos oficiais',
-    'Clube parceiro de Vantagens',
-    'Participação em ações exclusivas',
-    'Central de atendimento',
-    'Carteirinha Digital',
-  ];
+  const [assinarModalVisible, setAssinarModalVisible] = useState(false);
 
   const openModal = (plan) => {
     setSelectedPlan(plan);
@@ -67,6 +54,15 @@ export default function SociosScreen({ navigation }) {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedPlan(null);
+  };
+
+  const openAssinarModal = (plan) => {
+    setSelectedPlan(plan);
+    setAssinarModalVisible(true);
+  };
+
+  const closeAssinarModal = () => {
+    setAssinarModalVisible(false);
   };
 
   return (
@@ -215,10 +211,85 @@ export default function SociosScreen({ navigation }) {
                   <Text style={styles.fecharButtonText}>Fechar</Text>
                 </TouchableOpacity>
                 
-                <TouchableOpacity style={styles.assinarButton}>
+<TouchableOpacity 
+                  style={styles.assinarButton}
+                  onPress={() => {
+                    closeModal();
+                    openAssinarModal(selectedPlan);
+                  }}
+                >
                   <Text style={styles.assinarButtonText}>Assinar</Text>
                 </TouchableOpacity>
               </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL DE ASSINATURA */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={assinarModalVisible}
+        onRequestClose={closeAssinarModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.assinarModalContainer}>
+            <TouchableOpacity style={styles.backButton} onPress={closeAssinarModal}>
+              <Ionicons name="arrow-back" size={20} color="#000" />
+            </TouchableOpacity>
+
+            <Text style={styles.assinarTitle}>Assinar Plano</Text>
+            <Text style={styles.assinarPlanName}>{selectedPlan?.title || 'OURO'}</Text>
+
+            <View style={styles.formCard}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Nome Completo</Text>
+                <View style={styles.input}>
+                  <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
+                  <Text style={styles.inputText}>João Silva</Text>
+                </View>
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Email</Text>
+                <View style={styles.input}>
+                  <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
+                  <Text style={styles.inputText}>joao@email.com</Text>
+                </View>
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Forma de Pagamento</Text>
+                <View style={styles.paymentOptions}>
+                  <TouchableOpacity style={styles.paymentOption}>
+                    <Ionicons name="card" size={24} color="#b30000" />
+                    <Text style={styles.paymentText}>Cartão de Crédito</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.paymentOption}>
+                    <Ionicons name="wallet-outline" size={24} color="#666" />
+                    <Text style={styles.paymentText}>Pix</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.summaryCard}>
+                <Text style={styles.summaryTitle}>Resumo do Pedido</Text>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Plano {selectedPlan?.title || 'OURO'}</Text>
+                  <Text style={styles.summaryValue}>{selectedPlan?.price || 'R$ 99,99'}</Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Total</Text>
+                  <Text style={styles.summaryTotal}>{selectedPlan?.price || 'R$ 99,99'}</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.modalFooter}>
+              <TouchableOpacity style={styles.confirmButton}>
+                <Text style={styles.confirmButtonText}>Confirmar Assinatura</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -626,6 +697,142 @@ const styles = StyleSheet.create({
   },
 
   assinarButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+
+  assinarModalContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 100,
+  },
+
+  assinarTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 8,
+  },
+
+  assinarPlanName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#b30000',
+    marginBottom: 30,
+  },
+
+  formCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  inputContainer: {
+    marginBottom: 20,
+  },
+
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+
+  input: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 0.5,
+    borderColor: '#e0e0e0',
+  },
+
+  inputIcon: {
+    marginRight: 12,
+  },
+
+  inputText: {
+    fontSize: 16,
+    color: '#333',
+  },
+
+  paymentOptions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+
+  paymentOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+
+  paymentText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#333',
+  },
+
+  summaryCard: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 10,
+  },
+
+  summaryTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 12,
+  },
+
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+
+  summaryLabel: {
+    fontSize: 14,
+    color: '#555',
+  },
+
+  summaryValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
+
+  summaryTotal: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#b30000',
+  },
+
+  confirmButton: {
+    backgroundColor: '#b30000',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+
+  confirmButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
