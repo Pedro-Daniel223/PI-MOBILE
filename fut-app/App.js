@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CartProvider } from './src/contexts/CartContext';
+import { SubscriptionProvider } from './src/contexts/SubscriptionContext';
 
 
 // Telas existentes
@@ -34,8 +35,9 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <CartProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <SubscriptionProvider>
+        <NavigationContainer>
+      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
           <Stack.Screen
             name="Splash"
             component={SplashScreen}
@@ -120,6 +122,7 @@ export default function App() {
         {/* Rota de Sócios */}
         <Stack.Screen name="Socio" component={SociosScreen} />
       </Stack.Navigator>
-    </NavigationContainer>
-  </CartProvider>
+        </NavigationContainer>
+      </SubscriptionProvider>
+    </CartProvider>
 );}

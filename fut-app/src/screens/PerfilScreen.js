@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 
 import NavbarGlass from '../components/NavbarGlass';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
@@ -26,6 +27,7 @@ const user = {
 
 export default function PerfilScreen({ navigation }) {
   const [editingField, setEditingField] = useState(null);
+  const { subscription, subscriptionHistory } = useSubscription();
 
   return (
     <View style={styles.container}>
@@ -77,17 +79,46 @@ export default function PerfilScreen({ navigation }) {
             Olá, {user.name}{'\n'}Explore o app e aproveite!
           </Text>
 
-          <View style={styles.welcomeActions}>
-            <TouchableOpacity style={styles.badgeBtn}>
-              <BlurView intensity={30} tint="dark" style={styles.badgeBlur}>
-                <Ionicons name="mail-outline" size={15} color="#fff" />
-                <Text style={styles.badgeText}>54 mensagens</Text>
-                <View style={styles.badgeNumber}>
-                  <Text style={styles.badgeNumberText}>8</Text>
-                </View>
+          {/* ── ASSINATURA ATIVA ── */}
+          {subscription && (
+            <View style={styles.subBadge}>
+              <BlurView intensity={30} tint="dark" style={styles.subBadgeBlur}>
+                <Ionicons name="star" size={15} color="#ffd700" />
+                <Text style={styles.subBadgeText}>
+                  {subscription.title} ativo
+                </Text>
+                <Text style={styles.subBadgePrice}>{subscription.price}</Text>
               </BlurView>
-            </TouchableOpacity>
-          </View>
+            </View>
+          )}
+
+          {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS ── */}
+          {subscriptionHistory.length > 0 && (
+            <View style={styles.historySection}>
+              <Text style={styles.historyTitle}>Histórico de Compras e Assinaturas</Text>
+              <BlurView intensity={30} tint="dark" style={styles.historyCard}>
+                {subscriptionHistory.map((item, idx) => (
+                  <React.Fragment key={item.id}>
+                    <View style={styles.historyRow}>
+                      <Ionicons name="pricetag-outline" size={18} color="#ff2b2b" />
+                      <View style={styles.historyInfo}>
+                        <Text style={styles.historyPlan}>{item.planTitle}</Text>
+                        <Text style={styles.historyDate}>
+                          {new Date(item.date).toLocaleDateString('pt-BR', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </Text>
+                      </View>
+                      <Text style={styles.historyPrice}>{item.price}</Text>
+                    </View>
+                    {idx < subscriptionHistory.length - 1 && <View style={styles.historyDivider} />}
+                  </React.Fragment>
+                ))}
+              </BlurView>
+            </View>
+          )}
         </View>
 
         {/* ── AÇÕES RÁPIDAS ── */}
@@ -370,42 +401,81 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 16,
   },
-  welcomeActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  badgeBtn: {
+
+  /* ── ASSINATURA ATIVA ── */
+  subBadge: {
     borderRadius: 30,
     overflow: 'hidden',
+    marginBottom: 14,
   },
-  badgeBlur: {
+  subBadgeBlur: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(255,215,0,0.25)',
+    backgroundColor: 'rgba(255,215,0,0.08)',
+    gap: 8,
   },
-  badgeText: {
-    color: '#fff',
+  subBadgeText: {
+    color: '#ffd700',
     fontSize: 13,
-    marginLeft: 6,
-    fontWeight: '500',
-  },
-  badgeNumber: {
-    backgroundColor: '#880000',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginLeft: 6,
-  },
-  badgeNumberText: {
-    color: '#fff',
-    fontSize: 11,
     fontWeight: '700',
+  },
+  subBadgePrice: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+
+  /* ── HISTÓRICO DE COMPRAS E ASSINATURAS ── */
+  historySection: {
+    marginTop: 4,
+  },
+  historyTitle: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 10,
+    letterSpacing: 0.5,
+  },
+  historyCard: {
+    borderRadius: 18,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  historyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+  },
+  historyInfo: {
+    flex: 1,
+  },
+  historyPlan: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  historyDate: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  historyPrice: {
+    color: '#ff2b2b',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  historyDivider: {
+    height: 1,
+    marginHorizontal: 16,
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
 
   /* ── AÇÕES RÁPIDAS ── */

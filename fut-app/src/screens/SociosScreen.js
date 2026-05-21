@@ -12,21 +12,28 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 import NavbarGlass from '../components/NavbarGlass';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
 const plans = [
   {
     id: '1',
-    title: 'Plano GOLD',
-    description: 'Acesso total aos jogos do time B anual e encontros exclusivos com atletas.',
+    title: 'Plano OURO',
+    description: 'Acesso completo aos jogos do time B, encontros exclusivos com atletas e experiências VIP em dias de jogo.',
     price: 'R$ 99,90/mês',
   },
   {
     id: '2',
     title: 'Plano PRATA',
-    description: 'Acesso a todos os jogos do time principal e prioridade para treinos e encontros.',
+    description: 'Acesso prioritário aos jogos do time principal, descontos na loja oficial e conteúdo exclusivo da temporada.',
     price: 'R$ 79,90/mês',
+  },
+  {
+    id: '3',
+    title: 'Plano DIAMANTE',
+    description: 'Acesso VIP total a todos os jogos, encontros exclusivos, experiências premium, camarote aberto e atendimento personalizado.',
+    price: 'R$ 199,90/mês',
   },
 ];
 
@@ -39,12 +46,16 @@ const beneficios = [
   'Certificado de sócio oficial Drakos',
   'Experiências VIP em dias de jogo',
   'Conteúdo exclusivo da temporada',
+  'Acesso VIP ao camarote',
+  'Atendimento personalizado e suporte preferencial',
+  'Convivência com o elenco do time principal',
 ];
 
 export default function SociosScreen({ navigation }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [assinarModalVisible, setAssinarModalVisible] = useState(false);
+  const { confirmSubscription } = useSubscription();
 
   const openModal = (plan) => {
     setSelectedPlan(plan);
@@ -63,6 +74,13 @@ export default function SociosScreen({ navigation }) {
 
   const closeAssinarModal = () => {
     setAssinarModalVisible(false);
+  };
+
+  const handleConfirmarAssinatura = () => {
+    if (selectedPlan) {
+      confirmSubscription(selectedPlan);
+    }
+    closeAssinarModal();
   };
 
   return (
@@ -126,12 +144,6 @@ export default function SociosScreen({ navigation }) {
             <View style={styles.cardLeft}>
               <Text style={styles.planTitle}>{plan.title}</Text>
               <Text style={styles.planDescription}>{plan.description}</Text>
-              <TouchableOpacity 
-                style={styles.verMaisButton} 
-                onPress={() => openModal(plan)}
-              >
-                <Text style={styles.verMaisText}>VER MAIS</Text>
-              </TouchableOpacity>
             </View>
 
             {/* Lado Direito - Ilustração do Cartão */}
@@ -154,7 +166,7 @@ export default function SociosScreen({ navigation }) {
         {/* Rodapé informativo */}
         <View style={styles.footerNote}>
           <Text style={styles.footerText}>
-            Torcer é mais que acompanhar um jogo. É fazer parte de uma torcida apaixonada.
+            Planos PRATA, GOLD e DIAMANTE — escolha o seu e faça parte do time Drakos.
           </Text>
         </View>
       </ScrollView>
@@ -169,14 +181,10 @@ export default function SociosScreen({ navigation }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             {/* Título do plano */}
-            <Text style={styles.modalPlanTitle}>{selectedPlan?.title}</Text>
+          <Text style={styles.modalPlanTitle}>{selectedPlan?.title}</Text>
             <Text style={styles.modalPlanDescription}>
-              Tenha ótimos benefícios de acordo com seu preço econômico de pobre
+              Escolha seu plano — PRATA, GOLD ou DIAMANTE — e tenha acesso a benefícios exclusivos, descontos e experiências que só o torcedor de verdade merece.
             </Text>
-
-            <TouchableOpacity style={styles.modalVerMais}>
-              <Text style={styles.modalVerMaisText}>VER MAIS</Text>
-            </TouchableOpacity>
 
             {/* Cartão ilustrativo */}
             <View style={styles.modalCardMock}>
@@ -287,7 +295,7 @@ export default function SociosScreen({ navigation }) {
             </View>
 
             <View style={styles.modalFooter}>
-              <TouchableOpacity style={styles.confirmButton}>
+              <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmarAssinatura}>
                 <Text style={styles.confirmButtonText}>Confirmar Assinatura</Text>
               </TouchableOpacity>
             </View>
