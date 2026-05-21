@@ -1,10 +1,10 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-// import 'react-native-gesture-handler';
+import { CartProvider } from './src/contexts/CartContext';
 
 
-// Importando telas
+// Telas existentes
 import SplashScreen from './src/screens/SplashScreen';
 import IngressosScreen from './src/screens/IngressosScreen';
 import BoasVindasScreen from './src/screens/BoasVindasScreen';
@@ -21,28 +21,51 @@ import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens';
 // Verifique se o nome físico do arquivo é NovaSenhaScreen.js ou NovaSenhaScreens.js
 import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
 
+// Telas da loja
+import LojaScreens from './src/screens/LojaScreens';
+import DetalhesProdutosScreens from './src/screens/DetalhesProdutosScreens';
+import CarrinhosScreen from './src/screens/CarrinhosScreen';
+
+// Tela de Sócios
+import SociosScreen from './src/screens/SociosScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='Splash' screenOptions={{ headerShown: false }}>
-        <Stack.Screen 
-          name="Splash"
-          component={SplashScreen}
+    <CartProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="Splash"
+            component={SplashScreen}
+          />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+          />
+          <Stack.Screen
+            name="CadastroScreen"
+            component={CadastroScreen}
           />
 
-        <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-        />
+          {/* Rota da Loja */}
+          <Stack.Screen
+            name="Loja"
+            component={LojaScreens}
+          />
 
-        {/* <Stack.Screen name="Profile" component={ProfileScreen} /> */}
+          {/* Rota de Detalhes do Produto */}
+          <Stack.Screen
+            name="DetalhesProdutosScreens"
+            component={DetalhesProdutosScreens}
+          />
 
-        <Stack.Screen
-          name="CadastroScreen"
-          component={CadastroScreen}
-        />
+          {/* Rota do Carrinho */}
+          <Stack.Screen
+            name="Carrinho"
+            component={CarrinhosScreen}
+          />
 
         <Stack.Screen
           name="EsqueceuSenhaScreen"
@@ -72,7 +95,7 @@ export default function App() {
           name="NovaSenhaScreens"
           component={NovaSenhaScreens}
         />
-        
+
         {/* Tela de Ingressos recem criada */}
         <Stack.Screen 
           name="Ingressos" 
@@ -94,7 +117,9 @@ export default function App() {
         component={BoasVindas3Screen}
         />
 
+        {/* Rota de Sócios */}
+        <Stack.Screen name="Socio" component={SociosScreen} />
       </Stack.Navigator>
     </NavigationContainer>
-  );
-}
+  </CartProvider>
+);}

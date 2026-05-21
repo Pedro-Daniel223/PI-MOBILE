@@ -13,21 +13,24 @@ import {
 } from 'react-native';
 import CustomButton from '../components/CustomButton';
 
-// DEFINIÇÃO DAS CORES (Padronizadas com as outras telas)
 const colors = {
-  primary: '#8B3A3A',      // Vermelho Drakos
-  background: '#E8E8E8',   // Cinza do fundo
+  primary: '#880000',
+  background: '#E8E8E8',
   white: '#FFFFFF',
-  text: '#000000',
-  mutedText: '#888',
-  otpBackground: '#D1D1D1'
+  text: '#121212',
+  mutedText: '#707070',
+  otpBackground: '#D1D1D1',
+  accent: '#B22222',
+  glassBorder: 'rgba(255, 255, 255, 0.7)',
+  glassBg: 'rgba(255, 255, 255, 0.3)',
+  shadowDark: 'rgba(0, 0, 0, 0.18)',
+  ringOuter: 'rgba(136, 0, 0, 0.08)',
+  ringInner: 'rgba(136, 0, 0, 0.12)'
 };
 
 export default function VerificarCodigo({ navigation }) {
   const [code, setCode] = useState(['', '', '', '', '']);
   const [timer, setTimer] = useState(13);
-  
-  // Referências para focar automaticamente no próximo campo
   const inputs = useRef([]);
 
   // Lógica do cronômetro de reenvio
@@ -39,20 +42,17 @@ export default function VerificarCodigo({ navigation }) {
   }, []);
 
   const handleInputChange = (text, index) => {
-    // Garante que apenas números sejam digitados
     const numericText = text.replace(/[^0-9]/g, '');
     const newCode = [...code];
     newCode[index] = numericText;
     setCode(newCode);
 
-    // Se digitou um número, pula para o próximo input
     if (numericText.length !== 0 && index < 4) {
       inputs.current[index + 1].focus();
     }
   };
 
   const handleKeyPress = (e, index) => {
-    // Se apertar "Backspace" em um campo vazio, volta para o anterior
     if (e.nativeEvent.key === 'Backspace' && code[index] === '' && index > 0) {
       inputs.current[index - 1].focus();
     }
@@ -65,17 +65,16 @@ export default function VerificarCodigo({ navigation }) {
       return;
     }
     
-    // Verificação bem-sucedida
     Alert.alert('Sucesso', 'Código verificado com sucesso!', [
-      { 
-        text: 'OK', 
-        onPress: () => navigation.navigate('NovaSenhaScreens') 
-      } 
+      { text: 'OK', onPress: () => navigation.navigate('NovaSenhaScreens') } 
     ]);
   };
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Elemento de fundo para profundidade */}
+      <View style={styles.bgCircle} />
+
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={{ flex: 1 }}
@@ -86,20 +85,26 @@ export default function VerificarCodigo({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           
-          {/* BOTÃO VOLTAR PADRONIZADO */}
+          {/* BOTÃO VOLTAR GLASS SUTIL */}
           <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
             <Text style={styles.backText}>←</Text>
           </TouchableOpacity>
 
-          {/* HEADER */}
+          {/* HEADER REESTILIZADO */}
           <View style={styles.header}>
-            <View style={styles.iconCircle}>
-              <Text style={styles.iconEmoji}>✉️</Text>
+            <View style={styles.iconWrap}>
+              <View style={styles.iconRingOuter}>
+                <View style={styles.iconRingInner}>
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>✉️</Text>
+                  </View>
+                </View>
+              </View>
             </View>
             
-            <Text style={styles.headerTitle}>Verifique seu email</Text>
+            <Text style={styles.headerTitle}>Verifique seu e-mail</Text>
             <Text style={styles.headerSubtitle}>
-              Insira o código de 5 dígitos enviado para seu email
+              Acabamos de enviar um código de <Text style={styles.highlightText}>5 dígitos</Text> para você.
             </Text>
           </View>
 
@@ -116,27 +121,31 @@ export default function VerificarCodigo({ navigation }) {
                 onKeyPress={(e) => handleKeyPress(e, index)}
                 value={digit}
                 ref={(ref) => (inputs.current[index] = ref)}
+                placeholder="0"
+                placeholderTextColor="rgba(0,0,0,0.2)"
               />
             ))}
           </View>
 
-          {/* BOTÃO VERIFICAR */}
+          {/* ÁREA DO BOTÃO COM EFEITO GLASS */}
           <View style={styles.formContent}>
-            <CustomButton 
-              title="Verificar" 
-              onPress={handleVerify} 
-              style={styles.verifyButton} 
-              textStyle={styles.verifyButtonText}
-            />
+            <View style={styles.buttonWrap}>
+              <CustomButton 
+                title="Verificar Código" 
+                onPress={handleVerify} 
+                style={styles.glassButton} 
+                textStyle={styles.buttonTitle}
+              />
+            </View>
 
             {/* REENVIAR CÓDIGO */}
-            <TouchableOpacity 
-              disabled={timer > 0} 
-              onPress={() => setTimer(30)} 
+            <TouchableOpacity
+              disabled={timer > 0}
+              onPress={() => setTimer(30)}
               style={styles.resendButton}
             >
               <Text style={styles.resendText}>
-                Não recebeu código? <Text style={styles.resendTextBold}>reenviar({timer}s)</Text>
+                Não recebeu o código? <Text style={styles.resendTextBold}>{timer > 0 ? `Aguarde ${timer}s` : 'Reenviar código'}</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -151,117 +160,177 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
+    overflow: 'hidden',
+  },
+  bgCircle: {
+    position: 'absolute',
+    bottom: -50,
+    left: -50,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    zIndex: -1,
   },
   scrollGrow: {
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center', 
     paddingBottom: 40,
+    paddingTop: 50,
   },
-  back: {
-    position: 'absolute',
-    left: 20,
-    top: 50,
-    width: 42,
-    height: 42,
-    borderRadius: 12, // Padronizado com as outras telas
-    backgroundColor: 'rgba(255,255,255,0.4)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.6)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  backText: {
-    fontSize: 22,
-    color: colors.text,
-    fontWeight: 'bold',
-  },
+   back: {
+     position: 'absolute',
+     left: 24,
+     top: 55,
+     width: 46,
+     height: 46,
+     borderRadius: 15,
+     backgroundColor: colors.glassBg,
+     borderWidth: 1.6,
+     borderColor: colors.glassBorder,
+     alignItems: 'center',
+     justifyContent: 'center',
+     zIndex: 10,
+     elevation: 3,
+     shadowColor: colors.shadowDark,
+     shadowOffset: { width: 0, height: 2 },
+     shadowOpacity: 0.2,
+     shadowRadius: 5,
+   },
+   backText: {
+     fontSize: 26,
+     color: colors.text,
+     fontWeight: '300',
+   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
-    width: '100%',
-  },
-  iconCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: colors.primary, 
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    borderWidth: 10,
-    borderColor: 'rgba(139, 58, 58, 0.15)',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  iconEmoji: {
-    fontSize: 45,
-  },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 10,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: colors.mutedText,
-    textAlign: 'center',
-    paddingHorizontal: 50,
-    lineHeight: 20,
-  },
-  otpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '85%',
-    maxWidth: 320,
     marginBottom: 40,
+    width: '100%',
+    paddingHorizontal: 30,
   },
-  otpInput: {
-    width: 55,
-    height: 80, // Ajustado levemente para melhor proporção
-    backgroundColor: colors.otpBackground,
-    borderRadius: 12, // Combinando com os outros inputs do app
-    textAlign: 'center',
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: colors.text,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+  iconWrap: {
+    marginBottom: 30,
   },
+   iconRingOuter: {
+     width: 130,
+     height: 130,
+     borderRadius: 65,
+     backgroundColor: colors.ringOuter,
+     alignItems: 'center',
+     justifyContent: 'center',
+   },
+   iconRingInner: {
+     width: 110,
+     height: 110,
+     borderRadius: 55,
+     backgroundColor: colors.ringInner,
+     alignItems: 'center',
+     justifyContent: 'center',
+   },
+   iconCircle: {
+     width: 90,
+     height: 90,
+     borderRadius: 45,
+     backgroundColor: colors.primary,
+     alignItems: 'center',
+     justifyContent: 'center',
+     elevation: 7,
+     shadowColor: colors.primary,
+     shadowOffset: { width: 0, height: 5 },
+     shadowOpacity: 0.28,
+     shadowRadius: 8,
+   },
+   iconEmoji: {
+     fontSize: 40,
+   },
+   headerTitle: {
+     fontSize: 25,
+     fontWeight: '800',
+     color: colors.text,
+     marginBottom: 13,
+     letterSpacing: 0.3,
+     lineHeight: 30,
+   },
+   headerSubtitle: {
+     fontSize: 15,
+     color: colors.mutedText,
+     textAlign: 'center',
+     lineHeight: 22,
+     paddingHorizontal: 20,
+   },
+   highlightText: {
+     color: colors.primary,
+     fontWeight: '800',
+     fontSize: 17,
+   },
+   otpContainer: {
+     flexDirection: 'row',
+     justifyContent: 'space-between',
+     width: '84%',
+     maxWidth: 325,
+     marginBottom: 37,
+     alignSelf: 'center',
+   },
+   otpInput: {
+     width: 53,
+     height: 68,
+     backgroundColor: colors.otpBackground,
+     borderRadius: 13,
+     textAlign: 'center',
+     fontSize: 28,
+     fontWeight: '800',
+     color: colors.text,
+     borderWidth: 1.3,
+     borderColor: 'rgba(0,0,0,0.06)',
+     shadowColor: colors.shadowDark,
+     shadowOffset: { width: 0, height: 1.5 },
+     shadowOpacity: 0.12,
+     shadowRadius: 2.5,
+     elevation: 1.5,
+   },
   formContent: {
     width: '100%',
     maxWidth: 360,
     paddingHorizontal: 30,
     alignItems: 'center',
   },
-  verifyButton: {
-    backgroundColor: '#F5F5F5',
+  buttonWrap: {
     width: '100%',
-    borderRadius: 12, // Padronizado com o resto do app
-    height: 60,
-    elevation: 3,
   },
-  verifyButtonText: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  resendButton: {
-    marginTop: 25,
-  },
-  resendText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  resendTextBold: {
-    fontWeight: 'bold',
-    color: colors.primary, 
-  }
+   glassButton: {
+     backgroundColor: colors.glassBg,
+     borderRadius: 31,
+     height: 63,
+     justifyContent: 'center',
+     alignItems: 'center',
+     borderWidth: 1.6,
+     borderColor: colors.glassBorder,
+     elevation: 5,
+     shadowColor: colors.shadowDark,
+     shadowOffset: { width: 0, height: 3.5 },
+     shadowOpacity: 0.22,
+     shadowRadius: 7,
+   },
+   buttonTitle: {
+     color: '#181818',
+     fontWeight: '700',
+     fontSize: 17,
+     letterSpacing: 1.3,
+     textTransform: 'uppercase',
+   },
+   resendButton: {
+     marginTop: 22,
+     paddingVertical: 8,
+   },
+   resendText: {
+     color: '#707070',
+     fontSize: 15,
+     textAlign: 'center',
+   },
+   resendTextBold: {
+     fontWeight: '800',
+     color: colors.primary,
+     letterSpacing: 0.3,
+   }
 });

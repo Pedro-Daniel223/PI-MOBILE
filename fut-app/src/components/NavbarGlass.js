@@ -38,13 +38,6 @@ export default function NavbarGlass({ navigation }) {
 
 
 
-
-
-
-
-
-
-
 const panResponder = useRef(
   PanResponder.create({
     onStartShouldSetPanResponder: () => true,
