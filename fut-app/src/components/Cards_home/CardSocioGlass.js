@@ -111,7 +111,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
       
           {/* IMAGEM */}
           <Animated.Image
-            source={require('../../assets/img/card_branco.png')}
+            source={require('../../assets/img/socios/card_branco.png')}
             style={[
               styles.image,
               {

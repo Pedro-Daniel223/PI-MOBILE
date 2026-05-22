@@ -10,54 +10,14 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
 import NavbarGlass from '../components/NavbarGlass';
+import { dadosPlano } from '../data/dataSocios';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
 export default function SociosScreen({ navigation }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-
-  const plans = [
-    {
-      id: '1',
-      title: 'PRATA',
-      description: 'Tenha ótimos benefícios de acordo com seu plano de torcedor fiel',
-      price: 'R$ 49,99 Mensal',
-      vagas: 'Limitado a 500 vagas',
-      cardColor: '#e0e0e0',
-    },
-    {
-      id: '2',
-      title: 'OURO',
-      description: 'Benefícios premium para você viver a melhor experiência Drakos',
-      price: 'R$ 99,99 Mensal',
-      vagas: 'Limitado a 300 vagas',
-      cardColor: '#e0e0e0',
-    },
-    {
-      id: '3',
-      title: 'DIAMANTE',
-      description: 'O plano mais completo com acesso total e vantagens exclusivas',
-      price: 'R$ 199,99 Mensal',
-      vagas: 'Limitado a 150 vagas',
-      cardColor: '#e0e0e0',
-    },
-  ];
-
-  const beneficios = [
-    'Limitado a 350 vagas',
-    'Plano anual',
-    'Acesso livre aos jogos*',
-    'App oficial Sócio Águia',
-    'Plano adicional para dependentes',
-    '10% de desconto em produtos oficiais',
-    'Clube parceiro de Vantagens',
-    'Participação em ações exclusivas',
-    'Central de atendimento',
-    'Carteirinha Digital',
-  ];
 
   const openModal = (plan) => {
     setSelectedPlan(plan);
@@ -71,26 +31,26 @@ export default function SociosScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Fundo cinza-claro */}
+      {/* Fundo cinza claro */}
       <View style={styles.background} />
 
-      {/* Marca d'água Drakos */}
-      <Image 
+      {/* Marca d'água do escudo Drakos */}
+      <Image
         source={escudoDrakos}
         style={styles.drakosBackground}
         resizeMode="contain"
       />
 
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {/* Botão Voltar com sombra */}
+        {/* Botão voltar */}
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={20} color="#000" />
         </TouchableOpacity>
 
-        {/* Título Principal */}
+        {/* Título "PLANOS sócio-Torcedor" */}
         <View style={styles.titleContainer}>
           <Text style={styles.titleLine1}>PLANOS</Text>
           <View style={styles.titleLine2}>
@@ -99,7 +59,7 @@ export default function SociosScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Barra de Categorias Preta com Ícones */}
+        {/* Barra de categorias: Ingressos / Produtos / Descontos */}
         <View style={styles.categoryBar}>
           <View style={styles.categoryItem}>
             <View style={styles.categoryIcon}>
@@ -123,37 +83,38 @@ export default function SociosScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Cards de Planos */}
-        {plans.map((plan) => (
-          <View key={plan.id} style={styles.planCard}>
-            {/* Lado Esquerdo - Texto */}
-            <View style={styles.cardLeft}>
-              <Text style={styles.planTitle}>{plan.title}</Text>
-              <Text style={styles.planDescription}>{plan.description}</Text>
-              <TouchableOpacity 
-                style={styles.verMaisButton} 
-                onPress={() => openModal(plan)}
-              >
-                <Text style={styles.verMaisText}>VER MAIS</Text>
-              </TouchableOpacity>
+      {/* ─────────── Lista de cards de planos ─────────── */}
+      {dadosPlano.map((plan) => (
+        <View key={plan.id} style={[styles.planCard, { backgroundColor: plan.cardColor }]}>
+          
+          {/* ── Lado esquerdo do card: título, badge de vagas, descrição e botão VER MAIS ── */}
+          <View style={styles.cardLeft}>
+            <Text style={[styles.planTitle, { color: plan.textColor }]}>{plan.title}</Text>
+            <View style={styles.cardBadge}>
+              <Text style={[styles.cardBadgeText, { color: plan.textColor }]}>{plan.vagas}</Text>
             </View>
-
-            {/* Lado Direito - Ilustração do Cartão */}
-            <View style={styles.cardRight}>
-              <View style={styles.cardIllustration}>
-                <View style={styles.cardMock}>
-                  <View style={styles.cardLogo}>
-                    <View style={styles.cardLogoRed} />
-                  </View>
-                  <Text style={styles.cardText}>CRN CARD</Text>
-                  <View style={styles.dragonIcon}>
-                    <Ionicons name="flame-outline" size={28} color="#b30000" />
-                  </View>
-                </View>
-              </View>
-            </View>
+            <Text style={[styles.planDescription, { color: plan.textColor }]}>{plan.description}</Text>
+            <TouchableOpacity
+              style={styles.verMaisButton}
+              onPress={() => openModal(plan)}
+            >
+              <Text style={styles.verMaisText}>VER MAIS</Text>
+            </TouchableOpacity>
           </View>
-        ))}
+      
+          {/* ── Lado direito do card: cartão do plano ── */}
+          <View style={styles.cardRight}>
+            <Image
+              source={plan.cardImage}
+              style={styles.cardPlanImage}
+              resizeMode="contain"
+            />
+          </View>
+      
+        </View>
+      ))}
+
+        {/* ─────────────────────────────────────────────── */}
 
         {/* Rodapé informativo */}
         <View style={styles.footerNote}>
@@ -163,26 +124,31 @@ export default function SociosScreen({ navigation }) {
         </View>
       </ScrollView>
 
-      {/* MODAL DE DETALHES DO PLANO */}
+      {/* ═══════════ MODAL DE DETALHES DO PLANO ═══════════ */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={closeModal}
       >
+        {/* Overlay escuro do modal */}
         <View style={styles.modalOverlay}>
+          {/* Container branco do modal */}
           <View style={styles.modalContainer}>
             {/* Título do plano */}
             <Text style={styles.modalPlanTitle}>{selectedPlan?.title}</Text>
+
+            {/* Descrição do plano */}
             <Text style={styles.modalPlanDescription}>
-              Tenha ótimos benefícios de acordo com seu preço econômico de pobre
+              {selectedPlan?.description}
             </Text>
 
+            {/* Link "VER MAIS" do modal */}
             <TouchableOpacity style={styles.modalVerMais}>
               <Text style={styles.modalVerMaisText}>VER MAIS</Text>
             </TouchableOpacity>
 
-            {/* Cartão ilustrativo */}
+            {/* Cartão ilustrativo dentro do modal */}
             <View style={styles.modalCardMock}>
               <View style={styles.modalCardLogo}>
                 <View style={styles.modalCardLogoRed} />
@@ -193,12 +159,12 @@ export default function SociosScreen({ navigation }) {
               </View>
             </View>
 
-            {/* Título Benefícios */}
+            {/* Título da lista de benefícios */}
             <Text style={styles.beneficiosTitle}>Benefícios</Text>
 
-            {/* Lista de Benefícios */}
+            {/* Lista de benefícios com scroll */}
             <ScrollView style={styles.beneficiosList} showsVerticalScrollIndicator={false}>
-              {beneficios.map((beneficio, index) => (
+              {selectedPlan?.beneficios.map((beneficio, index) => (
                 <View key={index} style={styles.beneficioItem}>
                   <Text style={styles.bulletPoint}>•</Text>
                   <Text style={styles.beneficioText}>{beneficio}</Text>
@@ -206,15 +172,17 @@ export default function SociosScreen({ navigation }) {
               ))}
             </ScrollView>
 
-            {/* Preço e Botões */}
+            {/* Rodapé do modal: preço + botões */}
             <View style={styles.modalFooter}>
               <Text style={styles.modalPrice}>{selectedPlan?.price}</Text>
-              
+
               <View style={styles.modalButtons}>
+                {/* Botão Fechar */}
                 <TouchableOpacity style={styles.fecharButton} onPress={closeModal}>
                   <Text style={styles.fecharButtonText}>Fechar</Text>
                 </TouchableOpacity>
-                
+
+                {/* Botão Assinar */}
                 <TouchableOpacity style={styles.assinarButton}>
                   <Text style={styles.assinarButtonText}>Assinar</Text>
                 </TouchableOpacity>
@@ -223,6 +191,7 @@ export default function SociosScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+      {/* ═══════════════════════════════════════════════════════ */}
 
       <NavbarGlass navigation={navigation} />
     </View>
@@ -230,6 +199,7 @@ export default function SociosScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  // ─────── Layout principal ───────
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -258,6 +228,7 @@ const styles = StyleSheet.create({
     paddingBottom: 140,
   },
 
+  // ─────── Botão voltar ───────
   backButton: {
     width: 40,
     height: 40,
@@ -273,6 +244,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 
+  // ─────── Título "PLANOS sócio-Torcedor" ───────
   titleContainer: {
     marginBottom: 30,
   },
@@ -305,6 +277,7 @@ const styles = StyleSheet.create({
     color: '#8b0000',
   },
 
+  // ─────── Barra de categorias (Ingressos / Produtos / Descontos) ───────
   categoryBar: {
     flexDirection: 'row',
     backgroundColor: '#1a1a1a',
@@ -348,9 +321,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
+  // ─────── Card de plano ───────
   planCard: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 16,
     marginBottom: 16,
@@ -372,12 +345,28 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 8,
+    marginBottom: 4,
+  },
+
+  // Badge "Limitado a X vagas" dentro do card
+  cardBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+
+  cardBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#000',
+    letterSpacing: 0.3,
   },
 
   planDescription: {
-    fontSize: 12,
-    color: '#555',
+    fontSize: 12,   
     lineHeight: 16,
     marginBottom: 16,
   },
@@ -404,58 +393,22 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
+  // ─────── Lado direito do card: ilustração do cartão ───────
+  // ─────── Lado direito do card: imagem do cartão ───────
   cardRight: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  cardIllustration: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  // Imagem do cartão de plano (mesma medida do mock antigo: ~90×140)
+  cardPlanImage: {
+    width: 100,
+    height: 150,
+    transform: [{ rotate: '90deg' }],
   },
 
-  cardMock: {
-    width: 90,
-    height: 140,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 10,
-    transform: [{ rotate: '8deg' }],
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 5,
-    borderWidth: 0.5,
-    borderColor: '#ddd',
-    alignItems: 'center',
-  },
-
-  cardLogo: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-
-  cardLogoRed: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#b30000',
-  },
-
-  cardText: {
-    fontSize: 8,
-    fontWeight: 'bold',
-    color: '#333',
-    marginVertical: 4,
-  },
-
-  dragonIcon: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-
+  // ─────── Rodapé informativo da tela ───────
   footerNote: {
     marginTop: 20,
     paddingTop: 16,
@@ -470,13 +423,15 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  // Modal Styles
+  // ═══════════ Estilos do Modal ═══════════
+  // Overlay escuro semi-transparente
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
 
+  // Container branco com bordas arredondadas no topo
   modalContainer: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 30,
@@ -485,6 +440,7 @@ const styles = StyleSheet.create({
     maxHeight: '85%',
   },
 
+  // Título do plano dentro do modal
   modalPlanTitle: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -492,6 +448,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
+  // Descrição do plano dentro do modal
   modalPlanDescription: {
     fontSize: 13,
     color: '#555',
@@ -499,6 +456,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
+  // Link "VER MAIS" do modal
   modalVerMais: {
     alignSelf: 'flex-start',
     marginBottom: 20,
@@ -510,6 +468,7 @@ const styles = StyleSheet.create({
     color: '#b30000',
   },
 
+  // Cartão ilustrativo do modal
   modalCardMock: {
     width: '100%',
     height: 160,
@@ -551,6 +510,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
 
+  // Título "Benefícios"
   beneficiosTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -558,11 +518,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
+  // Lista de benefícios com scroll
   beneficiosList: {
     maxHeight: 280,
     marginBottom: 24,
   },
 
+  // Item individual da lista de benefícios
   beneficioItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -570,6 +532,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
 
+  // Bullet point "•"
   bulletPoint: {
     fontSize: 16,
     color: '#b30000',
@@ -584,6 +547,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
+  // Rodapé do modal: preço + botões
   modalFooter: {
     borderTopWidth: 0.5,
     borderTopColor: '#ddd',
@@ -603,6 +567,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
 
+  // Botão "Fechar" do modal
   fecharButton: {
     flex: 1,
     backgroundColor: '#f0f0f0',
@@ -617,6 +582,7 @@ const styles = StyleSheet.create({
     color: '#555',
   },
 
+  // Botão "Assinar" do modal
   assinarButton: {
     flex: 1,
     backgroundColor: '#b30000',
