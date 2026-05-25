@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CartProvider } from './src/contexts/CartContext';
+import { SubscriptionProvider } from './src/contexts/SubscriptionContext';
 
 
 // Telas existentes
@@ -14,7 +15,11 @@ import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import CadastroScreen from './src/screens/CadastroScreen';
 import EsqueceuSenhaScreen from './src/screens/EsqueceuSenhaScreen';
-import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens';
+import PerfilScreen from './src/screens/PerfilScreen';
+// O import está correto se o arquivo se chama VerificarCodigoScreens.js
+import VerificarCodigoScreens from './src/screens/VerificarCodigoScreens'; 
+
+// Verifique se o nome físico do arquivo é NovaSenhaScreen.js ou NovaSenhaScreens.js
 import NovaSenhaScreens from './src/screens/NovaSenhaScreen';
 
 // Telas da loja
@@ -30,8 +35,9 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <CartProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <SubscriptionProvider>
+        <NavigationContainer>
+      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
           <Stack.Screen
             name="Splash"
             component={SplashScreen}
@@ -74,6 +80,15 @@ export default function App() {
         />
 
         <Stack.Screen
+          name="Perfil"
+          component={PerfilScreen}
+        />
+
+        {/* MUDEI O 'name' PARA 'VerificarCodigo'. 
+            O arquivo continua sendo VerificarCodigoScreens.js, 
+            mas o "apelido" da tela na navegação agora é o que o seu código espera.
+        */}
+        <Stack.Screen
           name="VerificarCodigo"
           component={VerificarCodigoScreens}
         />
@@ -107,6 +122,7 @@ export default function App() {
         {/* Rota de Sócios */}
         <Stack.Screen name="Socio" component={SociosScreen} />
       </Stack.Navigator>
-    </NavigationContainer>
-  </CartProvider>
+        </NavigationContainer>
+      </SubscriptionProvider>
+    </CartProvider>
 );}
