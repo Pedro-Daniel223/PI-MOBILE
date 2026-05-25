@@ -1,6 +1,6 @@
 import { StyleSheet, View, TouchableOpacity, Text, Image, ImageBackground } from "react-native";
 import { useNavigation as nav} from "@react-navigation/native";
-import { estilos} from "../styles/styles";
+import { estilos} from "../styles/styleBoasVindas/styles";
 
 export default function BoasVindas2Screen(){
     const navegation = nav()
