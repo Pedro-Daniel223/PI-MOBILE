@@ -27,7 +27,7 @@ const user = {
 
 export default function PerfilScreen({ navigation }) {
   const [editingField, setEditingField] = useState(null);
-  const { subscription, subscriptionHistory } = useSubscription();
+  const { subscription, purchaseHistory } = useSubscription();
 
   return (
     <View style={styles.container}>
@@ -93,16 +93,22 @@ export default function PerfilScreen({ navigation }) {
           )}
 
           {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS ── */}
-          {subscriptionHistory.length > 0 && (
-            <View style={styles.historySection}>
-              <Text style={styles.historyTitle}>Histórico de Compras e Assinaturas</Text>
-              <BlurView intensity={30} tint="dark" style={styles.historyCard}>
-                {subscriptionHistory.map((item, idx) => (
+          <View style={styles.historySection}>
+            <Text style={styles.historyTitle}>Histórico de Compras e Assinaturas</Text>
+            <BlurView intensity={30} tint="dark" style={styles.historyCard}>
+              {purchaseHistory && purchaseHistory.length > 0 ? (
+                purchaseHistory.map((item, idx) => (
                   <React.Fragment key={item.id}>
                     <View style={styles.historyRow}>
-                      <Ionicons name="pricetag-outline" size={18} color="#ff2b2b" />
+                      <Ionicons
+                        name={item.type === 'subscription' ? 'star-outline' : 'bag-outline'}
+                        size={18}
+                        color={item.type === 'subscription' ? '#ffd700' : '#ff2b2b'}
+                      />
                       <View style={styles.historyInfo}>
-                        <Text style={styles.historyPlan}>{item.planTitle}</Text>
+                        <Text style={styles.historyPlan}>
+                          {item.type === 'subscription' ? item.planTitle : item.title}
+                        </Text>
                         <Text style={styles.historyDate}>
                           {new Date(item.date).toLocaleDateString('pt-BR', {
                             day: '2-digit',
@@ -113,12 +119,17 @@ export default function PerfilScreen({ navigation }) {
                       </View>
                       <Text style={styles.historyPrice}>{item.price}</Text>
                     </View>
-                    {idx < subscriptionHistory.length - 1 && <View style={styles.historyDivider} />}
+                    {idx < purchaseHistory.length - 1 && <View style={styles.historyDivider} />}
                   </React.Fragment>
-                ))}
-              </BlurView>
-            </View>
-          )}
+                ))
+              ) : (
+                <View style={styles.emptyHistory}>
+                  <Ionicons name="document-text-outline" size={32} color="rgba(255,255,255,0.3)" />
+                  <Text style={styles.emptyHistoryText}>Nenhuma compra ou assinatura encontrada</Text>
+                </View>
+              )}
+            </BlurView>
+          </View>
         </View>
 
         {/* ── AÇÕES RÁPIDAS ── */}
@@ -307,7 +318,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
     opacity: 0.12,
-    right: -60,
+    right: -30, // Ajustado de -65 para -30 (mais para a direita)
     top: -30,
     transform: [{ rotate: '-12deg' }],
   },
@@ -476,6 +487,17 @@ const styles = StyleSheet.create({
     height: 1,
     marginHorizontal: 16,
     backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  emptyHistory: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 32,
+    gap: 12,
+  },
+  emptyHistoryText: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 13,
+    textAlign: 'center',
   },
 
   /* ── AÇÕES RÁPIDAS ── */

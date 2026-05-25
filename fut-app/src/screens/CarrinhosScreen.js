@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart } from '../contexts/CartContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 const theme = {
   background: '#F2F2F7',
@@ -151,6 +152,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
 export default function CarrinhosScreen({ navigation }) {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const { addToPurchaseHistory } = useSubscription();
   const total = getCartTotal();
   const hasItems = cartItems.length > 0;
 
@@ -167,6 +169,7 @@ export default function CarrinhosScreen({ navigation }) {
         {
           text: 'Confirmar',
           onPress: () => {
+            addToPurchaseHistory(cartItems, total);
             clearCart();
             Alert.alert('Sucesso!', 'Pedido enviado com sucesso.');
             navigation.goBack();
