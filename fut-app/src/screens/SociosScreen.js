@@ -61,30 +61,6 @@ export default function SociosScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Barra de categorias: Ingressos / Produtos / Descontos */}
-        <View style={stylesSocio.categoryBar}>
-          <View style={stylesSocio.categoryItem}>
-            <View style={stylesSocio.categoryIcon}>
-              <Ionicons name="ticket-outline" size={22} color="#666" />
-            </View>
-            <Text style={stylesSocio.categoryText}>Ingressos</Text>
-          </View>
-
-          <View style={stylesSocio.categoryItem}>
-            <View style={stylesSocio.categoryIcon}>
-              <Ionicons name="bag-outline" size={22} color="#666" />
-            </View>
-            <Text style={stylesSocio.categoryText}>Produtos</Text>
-          </View>
-
-          <View style={stylesSocio.categoryItem}>
-            <View style={stylesSocio.categoryIcon}>
-              <Ionicons name="pricetag-outline" size={22} color="#666" />
-            </View>
-            <Text style={stylesSocio.categoryText}>Descontos</Text>
-          </View>
-        </View>
-
       {/* ─────────── Lista de cards de planos ─────────── */}
       {dadosPlano.map((plan) => (
         <View key={plan.id} style={[stylesSocio.planCard, { backgroundColor: plan.cardColor }]}>

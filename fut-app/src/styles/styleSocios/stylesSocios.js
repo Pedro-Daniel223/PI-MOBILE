@@ -201,12 +201,14 @@ import { StyleSheet } from "react-native";
     alignItems: 'center',
     justifyContent: 'center',
   },
-
+  
   // Imagem do cartão de plano)
   cardPlanImage: {
     width: 100,
-    height: 150,
-    transform: [{ rotate: '90deg' }],
+    height: 69,
+    borderWidth: 1,
+    borderColor: 'rgb(255, 255, 255)',
+    borderRadius: 8,
   },
 
   // ─────── Rodapé informativo da tela ───────

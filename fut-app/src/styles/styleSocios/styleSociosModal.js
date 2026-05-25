@@ -51,6 +51,9 @@ import { StyleSheet } from "react-native";
     width: '80%',
     margin: 'auto',
     marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#b30000',
+    borderRadius: 12,
   },
 
   // Título "Benefícios"
