@@ -143,21 +143,8 @@ export default function SociosScreen({ navigation }) {
               {selectedPlan?.description}
             </Text>
 
-            {/* Link "VER MAIS" do modal */}
-            <TouchableOpacity style={styles.modalVerMais}>
-              <Text style={styles.modalVerMaisText}>VER MAIS</Text>
-            </TouchableOpacity>
-
             {/* Cartão ilustrativo dentro do modal */}
-            <View style={styles.modalCardMock}>
-              <View style={styles.modalCardLogo}>
-                <View style={styles.modalCardLogoRed} />
-              </View>
-              <Text style={styles.modalCardText}>CRN CARD</Text>
-              <View style={styles.modalDragonIcon}>
-                <Ionicons name="flame-outline" size={32} color="#b30000" />
-              </View>
-            </View>
+            <Image source={selectedPlan?.cardImage} style={styles.modalCardImage} />
 
             {/* Título da lista de benefícios */}
             <Text style={styles.beneficiosTitle}>Benefícios</Text>
@@ -469,45 +456,10 @@ const styles = StyleSheet.create({
   },
 
   // Cartão ilustrativo do modal
-  modalCardMock: {
-    width: '100%',
-    height: 160,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: '#ddd',
-  },
-
-  modalCardLogo: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-
-  modalCardLogoRed: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#b30000',
-  },
-
-  modalCardText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#333',
-    marginVertical: 8,
-  },
-
-  modalDragonIcon: {
-    marginTop: 16,
+  modalCardImage: {
+    width: '80%',
+    margin: 'auto',
+    marginBottom: 20,
   },
 
   // Título "Benefícios"
