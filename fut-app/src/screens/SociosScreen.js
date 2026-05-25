@@ -79,6 +79,7 @@ export default function SociosScreen({ navigation }) {
   const handleConfirmarAssinatura = () => {
     if (selectedPlan) {
       confirmSubscription(selectedPlan);
+      navigation.navigate('Perfil');
     }
     closeAssinarModal();
   };
@@ -139,7 +140,12 @@ export default function SociosScreen({ navigation }) {
 
         {/* Cards de Planos */}
         {plans.map((plan) => (
-          <View key={plan.id} style={styles.planCard}>
+          <TouchableOpacity 
+            key={plan.id} 
+            style={styles.planCard}
+            onPress={() => openModal(plan)}
+            activeOpacity={0.85}
+          >
             {/* Lado Esquerdo - Texto */}
             <View style={styles.cardLeft}>
               <Text style={styles.planTitle}>{plan.title}</Text>
@@ -160,7 +166,7 @@ export default function SociosScreen({ navigation }) {
                 </View>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
 
         {/* Rodapé informativo */}
@@ -219,11 +225,14 @@ export default function SociosScreen({ navigation }) {
                   <Text style={styles.fecharButtonText}>Fechar</Text>
                 </TouchableOpacity>
                 
-<TouchableOpacity 
+                <TouchableOpacity 
                   style={styles.assinarButton}
                   onPress={() => {
+                    const planToSubscribe = selectedPlan;
                     closeModal();
-                    openAssinarModal(selectedPlan);
+                    if (planToSubscribe) {
+                      openAssinarModal(planToSubscribe);
+                    }
                   }}
                 >
                   <Text style={styles.assinarButtonText}>Assinar</Text>

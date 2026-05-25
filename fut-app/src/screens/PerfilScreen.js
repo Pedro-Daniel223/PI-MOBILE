@@ -27,6 +27,7 @@ const user = {
 
 export default function PerfilScreen({ navigation }) {
   const [editingField, setEditingField] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
   const { subscription, purchaseHistory } = useSubscription();
 
   return (
@@ -36,6 +37,17 @@ export default function PerfilScreen({ navigation }) {
         colors={['#b30000', '#5a0000', '#1a0000']}
         style={StyleSheet.absoluteFill}
       />
+
+      {/* ENGRENAGEM - Canto superior direito (perto da foto de perfil) */}
+      <TouchableOpacity 
+        style={styles.settingsGear}
+        onPress={() => navigation.navigate('Settings')}
+        activeOpacity={0.8}
+      >
+        <BlurView intensity={60} tint="dark" style={styles.gearBlur}>
+          <Ionicons name="settings-outline" size={24} color="#fff" />
+        </BlurView>
+      </TouchableOpacity>
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -91,45 +103,6 @@ export default function PerfilScreen({ navigation }) {
               </BlurView>
             </View>
           )}
-
-          {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS ── */}
-          <View style={styles.historySection}>
-            <Text style={styles.historyTitle}>Histórico de Compras e Assinaturas</Text>
-            <BlurView intensity={30} tint="dark" style={styles.historyCard}>
-              {purchaseHistory && purchaseHistory.length > 0 ? (
-                purchaseHistory.map((item, idx) => (
-                  <React.Fragment key={item.id}>
-                    <View style={styles.historyRow}>
-                      <Ionicons
-                        name={item.type === 'subscription' ? 'star-outline' : 'bag-outline'}
-                        size={18}
-                        color={item.type === 'subscription' ? '#ffd700' : '#ff2b2b'}
-                      />
-                      <View style={styles.historyInfo}>
-                        <Text style={styles.historyPlan}>
-                          {item.type === 'subscription' ? item.planTitle : item.title}
-                        </Text>
-                        <Text style={styles.historyDate}>
-                          {new Date(item.date).toLocaleDateString('pt-BR', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </Text>
-                      </View>
-                      <Text style={styles.historyPrice}>{item.price}</Text>
-                    </View>
-                    {idx < purchaseHistory.length - 1 && <View style={styles.historyDivider} />}
-                  </React.Fragment>
-                ))
-              ) : (
-                <View style={styles.emptyHistory}>
-                  <Ionicons name="document-text-outline" size={32} color="rgba(255,255,255,0.3)" />
-                  <Text style={styles.emptyHistoryText}>Nenhuma compra ou assinatura encontrada</Text>
-                </View>
-              )}
-            </BlurView>
-          </View>
         </View>
 
         {/* ── AÇÕES RÁPIDAS ── */}
@@ -149,7 +122,10 @@ export default function PerfilScreen({ navigation }) {
             <Text style={styles.actionLabel}>Meu Cartão</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionCard}>
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => setShowHistory(prev => !prev)}
+          >
             <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFill} />
             <LinearGradient
               colors={['rgba(255,255,255,0.07)', 'transparent']}
@@ -160,11 +136,14 @@ export default function PerfilScreen({ navigation }) {
               style={StyleSheet.absoluteFill}
             />
             <View style={styles.innerBorder} />
-            <Ionicons name="settings-outline" size={28} color="#fff" />
-            <Text style={styles.actionLabel}>Preferências</Text>
+            <Ionicons name="receipt-outline" size={28} color="#fff" />
+            <Text style={styles.actionLabel}>Minhas Compras</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionCard}>
+           <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('Socio')}
+          >
             <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFill} />
             <LinearGradient
               colors={['rgba(255,255,255,0.07)', 'transparent']}
@@ -179,6 +158,74 @@ export default function PerfilScreen({ navigation }) {
             <Text style={styles.actionLabel}>Sócio</Text>
           </TouchableOpacity>
         </View>
+
+        {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS (aparece ao clicar no botão "Minhas Compras") ── */}
+        {showHistory && (
+          <View style={styles.historySection}>
+            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.01)', 'transparent']}
+              style={StyleSheet.absoluteFill}
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.15)']}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={styles.innerBorder} />
+
+            <View style={styles.historyHeader}>
+              <Text style={styles.historyTitle}>Minhas Compras e Assinaturas</Text>
+              <TouchableOpacity onPress={() => setShowHistory(false)} activeOpacity={0.7}>
+                <Ionicons name="close" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            {subscription && (
+              <View style={styles.historySubBadge}>
+                <Ionicons name="star" size={15} color="#ffd700" />
+                <Text style={styles.historySubText}>
+                  Assinatura ativa: {subscription.title}
+                </Text>
+                <Text style={styles.historySubPrice}>{subscription.price}</Text>
+              </View>
+            )}
+
+            <Text style={styles.historyListTitle}>Histórico</Text>
+
+            {purchaseHistory && purchaseHistory.length > 0 ? (
+              purchaseHistory.map((item, idx) => (
+                <React.Fragment key={item.id}>
+                  <View style={styles.historyRow}>
+                    <Ionicons
+                      name={item.type === 'subscription' ? 'star-outline' : 'bag-outline'}
+                      size={18}
+                      color={item.type === 'subscription' ? '#ffd700' : '#ff2b2b'}
+                    />
+                    <View style={styles.historyInfo}>
+                      <Text style={styles.historyPlan}>
+                        {item.type === 'subscription' ? item.planTitle : item.title}
+                      </Text>
+                      <Text style={styles.historyDate}>
+                        {new Date(item.date).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </Text>
+                    </View>
+                    <Text style={styles.historyPrice}>{item.price}</Text>
+                  </View>
+                  {idx < purchaseHistory.length - 1 && <View style={styles.historyDivider} />}
+                </React.Fragment>
+              ))
+            ) : (
+              <View style={styles.historyEmpty}>
+                <Ionicons name="document-text-outline" size={36} color="rgba(255,255,255,0.3)" />
+                <Text style={styles.historyEmptyText}>Nenhuma compra ou assinatura ainda</Text>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* ── DIVISOR ── */}
         <View style={styles.sectionHeader}>
@@ -305,6 +352,25 @@ const styles = StyleSheet.create({
     gap: 20,
   },
 
+  /* ── ENGRENAGEM (Canto superior direito) ── */
+  settingsGear: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+  },
+  gearBlur: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+
   /* ── HEADER ── */
   header: {
     alignItems: 'center',
@@ -318,7 +384,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
     opacity: 0.12,
-    right: -30, // Ajustado de -65 para -30 (mais para a direita)
+    right: -30,
     top: -30,
     transform: [{ rotate: '-12deg' }],
   },
@@ -439,65 +505,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     fontSize: 11,
     fontWeight: '600',
-  },
-
-  /* ── HISTÓRICO DE COMPRAS E ASSINATURAS ── */
-  historySection: {
-    marginTop: 4,
-  },
-  historyTitle: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 10,
-    letterSpacing: 0.5,
-  },
-  historyCard: {
-    borderRadius: 18,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  historyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
-  },
-  historyInfo: {
-    flex: 1,
-  },
-  historyPlan: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  historyDate: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  historyPrice: {
-    color: '#ff2b2b',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  historyDivider: {
-    height: 1,
-    marginHorizontal: 16,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-  emptyHistory: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 32,
-    gap: 12,
-  },
-  emptyHistoryText: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 13,
-    textAlign: 'center',
   },
 
   /* ── AÇÕES RÁPIDAS ── */
@@ -621,5 +628,100 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+
+  /* ── HISTORY SECTION (inline, no popup) ── */
+  historySection: {
+    borderRadius: 22,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    marginTop: 8,
+    marginBottom: 12,
+    shadowColor: '#ff2b2b',
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 10,
+    padding: 16,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  historyTitle: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  historySubBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,215,0,0.12)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.25)',
+    marginBottom: 14,
+    gap: 8,
+  },
+  historySubText: {
+    color: '#ffd700',
+    fontSize: 13,
+    fontWeight: '600',
+    flex: 1,
+  },
+  historySubPrice: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  historyListTitle: {
+    color: 'rgba(255,255,255,0.65)',
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 8,
+    letterSpacing: 0.4,
+  },
+  historyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    gap: 10,
+  },
+  historyInfo: {
+    flex: 1,
+  },
+  historyPlan: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  historyDate: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 11,
+    marginTop: 1,
+  },
+  historyPrice: {
+    color: '#880000',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  historyDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginVertical: 2,
+  },
+  historyEmpty: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    gap: 8,
+  },
+  historyEmptyText: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 13,
+    textAlign: 'center',
   },
 });
