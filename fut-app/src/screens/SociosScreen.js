@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 20,
     paddingTop: 60,
-    paddingBottom: 140,
+
   },
 
   // ─────── Botão voltar ───────
@@ -268,10 +268,10 @@ const styles = StyleSheet.create({
   categoryBar: {
     flexDirection: 'row',
     backgroundColor: '#1a1a1a',
-    borderRadius: 50,
+    borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 20,
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     marginBottom: 30,
   },
 
@@ -380,7 +380,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  // ─────── Lado direito do card: ilustração do cartão ───────
   // ─────── Lado direito do card: imagem do cartão ───────
   cardRight: {
     flex: 1,
@@ -388,7 +387,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // Imagem do cartão de plano (mesma medida do mock antigo: ~90×140)
+  // Imagem do cartão de plano)
   cardPlanImage: {
     width: 100,
     height: 150,
@@ -455,7 +454,7 @@ const styles = StyleSheet.create({
     color: '#b30000',
   },
 
-  // Cartão ilustrativo do modal
+  // Cartão imagem dentro do modal
   modalCardImage: {
     width: '80%',
     margin: 'auto',
