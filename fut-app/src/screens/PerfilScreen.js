@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import {View, Text, StyleSheet, Image,TouchableOpacity, ScrollView,} from 'react-native';
+import {View, Text, StyleSheet, Image,TouchableOpacity, ScrollView, Modal, TextInput,} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { styleSocioModal } from '../styles/styleSocios/styleSociosModal';
 // import styles from '../styles/stylePerfil/stylePerfil';
 
 import NavbarGlass from '../components/NavbarGlass';
@@ -22,6 +23,8 @@ const user = {
 export default function PerfilScreen({ navigation }) {
   const [editingField, setEditingField] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editedUser, setEditedUser] = useState({ ...user });
   const { subscription, purchaseHistory } = useSubscription();
 
   return (
@@ -222,9 +225,11 @@ export default function PerfilScreen({ navigation }) {
         )}
 
         {/* ── DIVISOR ── */}
-        <View style={styles.sectionHeader}>
+        <View style={styles.sectionHeaderCustom}>
           <Text style={styles.sectionTitle}>Dados pessoais</Text>
-          <View style={styles.sectionLine} />
+          <TouchableOpacity style={styles.sectionEditBtn} onPress={() => setEditModalVisible(true)} activeOpacity={0.7}>
+            <Ionicons name="pencil-outline" size={20} color="#fff" />
+          </TouchableOpacity>
         </View>
 
         {/* ── DADOS PESSOAIS ── */}
@@ -249,13 +254,6 @@ export default function PerfilScreen({ navigation }) {
                 <Text style={styles.infoValue}>{user.name}</Text>
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.editRowBtn}
-              onPress={() => setEditingField(editingField === 'name' ? null : 'name')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="pencil-outline" size={16} color="rgba(255,255,255,0.6)" />
-            </TouchableOpacity>
           </View>
 
           <View style={styles.infoDivider} />
@@ -269,13 +267,6 @@ export default function PerfilScreen({ navigation }) {
                 <Text style={styles.infoValue}>{user.email}</Text>
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.editRowBtn}
-              onPress={() => setEditingField(editingField === 'email' ? null : 'email')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="pencil-outline" size={16} color="rgba(255,255,255,0.6)" />
-            </TouchableOpacity>
           </View>
 
           <View style={styles.infoDivider} />
@@ -289,13 +280,6 @@ export default function PerfilScreen({ navigation }) {
                 <Text style={styles.infoValue}>{user.phone}</Text>
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.editRowBtn}
-              onPress={() => setEditingField(editingField === 'phone' ? null : 'phone')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="pencil-outline" size={16} color="rgba(255,255,255,0.6)" />
-            </TouchableOpacity>
           </View>
 
           <View style={styles.infoDivider} />
@@ -309,13 +293,6 @@ export default function PerfilScreen({ navigation }) {
                 <Text style={styles.infoValue}>{user.cpf}</Text>
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.editRowBtn}
-              onPress={() => setEditingField(editingField === 'cpf' ? null : 'cpf')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="pencil-outline" size={16} color="rgba(255,255,255,0.6)" />
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -327,6 +304,85 @@ export default function PerfilScreen({ navigation }) {
 
         <View style={{ height: 20 }} />
       </ScrollView>
+
+      {/* ── MODAL EDITAR DADOS PESSOAIS ── */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={editModalVisible}
+        onRequestClose={() => setEditModalVisible(false)}
+      >
+        <View style={styleSocioModal.modalOverlay}>
+          <View style={styleSocioModal.modalContainer}>
+            <Text style={styles.modalTitle}>Editar Dados Pessoais</Text>
+
+            <View style={styles.modalField}>
+              <Text style={styles.modalLabel}>Nome completo</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={editedUser.name}
+                onChangeText={(text) => setEditedUser({ ...editedUser, name: text })}
+                placeholder="Digite seu nome"
+                placeholderTextColor="rgba(0,0,0,0.4)"
+              />
+            </View>
+
+            <View style={styles.modalField}>
+              <Text style={styles.modalLabel}>Email</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={editedUser.email}
+                onChangeText={(text) => setEditedUser({ ...editedUser, email: text })}
+                placeholder="Digite seu email"
+                placeholderTextColor="rgba(0,0,0,0.4)"
+                keyboardType="email-address"
+              />
+            </View>
+
+            <View style={styles.modalField}>
+              <Text style={styles.modalLabel}>Telefone</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={editedUser.phone}
+                onChangeText={(text) => setEditedUser({ ...editedUser, phone: text })}
+                placeholder="Digite seu telefone"
+                placeholderTextColor="rgba(0,0,0,0.4)"
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            <View style={styles.modalField}>
+              <Text style={styles.modalLabel}>CPF</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={editedUser.cpf}
+                onChangeText={(text) => setEditedUser({ ...editedUser, cpf: text })}
+                placeholder="Digite seu CPF"
+                placeholderTextColor="rgba(0,0,0,0.4)"
+                keyboardType="numeric"
+              />
+            </View>
+
+            <View style={styleSocioModal.modalButtons}>
+              <TouchableOpacity
+                style={styleSocioModal.fecharButton}
+                onPress={() => setEditModalVisible(false)}
+              >
+                <Text style={styleSocioModal.fecharButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styleSocioModal.assinarButton}
+                onPress={() => {
+                  setEditModalVisible(false);
+                }}
+              >
+                <Text style={styleSocioModal.assinarButtonText}>Salvar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* NAVBAR */}
       <NavbarGlass navigation={navigation} />
@@ -534,6 +590,15 @@ const styles = StyleSheet.create({
   sectionHeader: {
     marginBottom: 4,
     marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sectionHeaderCustom: {
+    marginBottom: 4,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   sectionTitle: {
     color: '#fff',
@@ -541,8 +606,12 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.3,
   },
+  sectionEditBtn: {
+    padding: 6,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
   sectionLine: {
-    marginTop: 6,
     width: 36,
     height: 3,
     borderRadius: 2,
@@ -551,6 +620,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 6,
     elevation: 6,
+    marginTop: 6,
   },
 
   /* ── INFO CARD ── */
@@ -717,5 +787,33 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.4)',
     fontSize: 13,
     textAlign: 'center',
+  },
+
+  /* ── MODAL EDITAR DADOS PESSOAIS ── */
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalField: {
+    marginBottom: 16,
+  },
+  modalLabel: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 6,
+    fontWeight: '600',
+  },
+  modalInput: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#000',
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
 });
