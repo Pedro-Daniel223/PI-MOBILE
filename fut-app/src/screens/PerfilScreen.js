@@ -281,19 +281,6 @@ export default function PerfilScreen({ navigation }) {
               </View>
             </View>
           </View>
-
-          <View style={styles.infoDivider} />
-
-          {/* CPF */}
-          <View style={styles.infoRow}>
-            <View style={styles.infoLeft}>
-              <Ionicons name="card-outline" size={20} color="#ff2b2b" />
-              <View style={styles.infoTextGroup}>
-                <Text style={styles.infoLabel}>CPF</Text>
-                <Text style={styles.infoValue}>{user.cpf}</Text>
-              </View>
-            </View>
-          </View>
         </View>
 
         {/* ── BOTÃO SAIR ── */}
@@ -348,18 +335,6 @@ export default function PerfilScreen({ navigation }) {
                 placeholder="Digite seu telefone"
                 placeholderTextColor="rgba(0,0,0,0.4)"
                 keyboardType="phone-pad"
-              />
-            </View>
-
-            <View style={styles.modalField}>
-              <Text style={styles.modalLabel}>CPF</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editedUser.cpf}
-                onChangeText={(text) => setEditedUser({ ...editedUser, cpf: text })}
-                placeholder="Digite seu CPF"
-                placeholderTextColor="rgba(0,0,0,0.4)"
-                keyboardType="numeric"
               />
             </View>
 
@@ -482,7 +457,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.03)',
     marginTop: 4,
     shadowColor: '#ff2b2b',
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
     elevation: 12,
@@ -573,7 +548,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     minHeight: 105,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 8,
@@ -629,7 +604,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.03)',
     shadowColor: '#000',
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
     elevation: 12,
