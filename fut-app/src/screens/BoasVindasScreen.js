@@ -1,7 +1,7 @@
 import { Image, View, Text, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation as nav} from '@react-navigation/native';
-import { estilos } from "../styles/styles";
+import { estilos } from "../styles/styleBoasVindas/styles";
 
 export default function BoasVindasScreen() {
     const navigation = nav()
