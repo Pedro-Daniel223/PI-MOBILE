@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import NavbarGlass from '../components/NavbarGlass';
+import { useSubscription } from '../contexts/SubscriptionContext';
 import { dadosPlano } from '../data/dataSocios';
 import { stylesSocio } from '../styles/styleSocios/stylesSocios';
 import { styleSocioModal } from '../styles/styleSocios/styleSociosModal';

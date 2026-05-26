@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, Image,TouchableOpacity, ScrollView,} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+// import styles from '../styles/stylePerfil/stylePerfil';
 
 import NavbarGlass from '../components/NavbarGlass';
 import { useSubscription } from '../contexts/SubscriptionContext';
@@ -88,7 +82,7 @@ export default function PerfilScreen({ navigation }) {
           </View>
 
           <Text style={styles.welcomeBody}>
-            Olá, {user.name}{'\n'}Explore o app e aproveite!
+            Olá, {user.name}{'\n'}Explore as novidades, confira seus dados e aproveite ao máximo sua experiência com a gente!
           </Text>
 
           {/* ── ASSINATURA ATIVA ── */}
@@ -203,7 +197,7 @@ export default function PerfilScreen({ navigation }) {
                     />
                     <View style={styles.historyInfo}>
                       <Text style={styles.historyPlan}>
-                        {item.type === 'subscription' ? item.planTitle : item.title}
+                        {item.type === 'subscription' ? item.planTitle : (item.items?.length > 1 ? `${item.items.length} produtos: ${item.items.join(', ')}` : item.items?.[0])}
                       </Text>
                       <Text style={styles.historyDate}>
                         {new Date(item.date).toLocaleDateString('pt-BR', {
@@ -705,7 +699,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   historyPrice: {
-    color: '#880000',
+    color: '#fff',
     fontSize: 14,
     fontWeight: '700',
   },
