@@ -34,18 +34,6 @@ import { StyleSheet } from "react-native";
     lineHeight: 18,
   },
 
-  // Link "VER MAIS" do modal
-  modalVerMais: {
-    alignSelf: 'flex-start',
-    marginBottom: 20,
-  },
-
-  modalVerMaisText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#b30000',
-  },
-
   // Cartão imagem dentro do modal
   modalCardImage: {
     width: '80%',
