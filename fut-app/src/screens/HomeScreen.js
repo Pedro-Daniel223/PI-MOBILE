@@ -90,7 +90,7 @@ export default function Home({ navigation }) {
 
 
         {/* CARD GRANDE */}
-          <GlassCarousel />
+        <GlassCarousel />
               {/* CARROSEL DE PRODUTOS */}
       <View style={{ marginTop: 25 }}>
 

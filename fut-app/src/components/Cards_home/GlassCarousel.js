@@ -55,6 +55,9 @@ const CARD_WIDTH = width - 40;
 const CARD_HEIGHT = 170;
 const CARD_RADIUS = 28;
 
+const CARD_GAP = 18;
+const FULL_CARD_WIDTH = CARD_WIDTH + CARD_GAP;
+
 // ─── Shimmer animation helper ─────────────────────────────────────────────────
 const { Value, timing, loop, sequence, delay } = Animated;
 
@@ -66,7 +69,12 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
   });
 
   return (
-    <View style={{ width: CARD_WIDTH }}>
+          <View
+        style={{
+          width: CARD_WIDTH,
+          marginRight: CARD_GAP,
+        }}
+      >
 
       {/* ══════════════════════════════════════════════════════════════════
           SHADOW SYSTEM — S1 + S2 + S3
@@ -541,7 +549,11 @@ export default function GlassCarousel() {
   ];
 
   const handleScroll = (e) => {
-    const index = Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH);
+   const FULL_CARD_WIDTH = CARD_WIDTH + 18;
+
+    const index = Math.round(
+      e.nativeEvent.contentOffset.x / FULL_CARD_WIDTH
+    );
     setActiveIndex(index);
   };
 
@@ -552,7 +564,7 @@ export default function GlassCarousel() {
         let nextIndex = prev + 1;
         if (nextIndex >= data.length) nextIndex = 0;
         scrollRef.current?.scrollTo({
-          x: nextIndex * CARD_WIDTH,
+          x: nextIndex * FULL_CARD_WIDTH,
           animated: true,
         });
         return nextIndex;
