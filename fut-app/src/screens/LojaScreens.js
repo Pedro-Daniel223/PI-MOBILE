@@ -191,7 +191,6 @@ function LojaContent({ navigation }) {
         showsVerticalScrollIndicator={false}
       />
 
-      <NavbarGlass navigation={navigation} />
     </View>
   );
 }

@@ -141,8 +141,8 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
   const wobY = useRef(new Animated.Value(1)).current;
   const icoS = useRef(new Animated.Value(1)).current;
   const lblY = useRef(new Animated.Value(0)).current;
-  const barS = useRef(new Animated.Value(1)).current;
   const glwP = useRef(new Animated.Value(0)).current;
+  const barS = useRef(new Animated.Value(1)).current;
 
   // cX: posição comprometida da bolha (tab atual).
   // Atualizado a cada snap/press/sync — usado como âncora no drag.
@@ -407,7 +407,7 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
 
           {/* ── L4: Reflexo ambiental superior esquerdo ── */}
           <LinearGradient
-            colors={['rgba(255,255,255,0.11)', 'transparent']}
+            colors={['rgba(255, 255, 255, 0)', 'transparent']}
             style={[StyleSheet.absoluteFill, { bottom: '52%' }]}
             start={{ x: 0.15, y: 0 }}
             end={{ x: 0.85, y: 1 }}
@@ -467,7 +467,7 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
 
               {/* Fade de profundidade inferior da bolha */}
               <LinearGradient
-                colors={['transparent', 'rgba(0,8,24,0.08)']}
+                colors={['transparent', 'rgba(250, 0, 0, 0.19)']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0.5, y: 0.45 }}
                 end={{ x: 0.5, y: 1 }}
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
     left:         0,
     top:         '16%',
     width:        1,
-    height:      '55%',
+    height:      '%',
     borderRadius: 1,
     overflow:    'hidden',
   },

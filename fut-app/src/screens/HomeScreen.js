@@ -124,7 +124,7 @@ export default function Home({ navigation }) {
 
 
       {/* NAVBAR */}
-      <NavbarGlass navigation={navigation} />
+      {/* <NavbarGlass navigation={navigation} /> */}
 
 
     </View>
