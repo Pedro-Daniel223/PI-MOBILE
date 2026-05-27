@@ -101,9 +101,15 @@ export default function PerfilScreen({ navigation }) {
           )}
         </View>
 
-        {/* ── AÇÕES RÁPIDAS (FORMATO QUADRADO, SEM BACKGROUND) ── */}
+        {/* ── AÇÕES RÁPIDAS COM BACKGROUND SUAVE ── */}
         <View style={styles.actionsRow}>
           <TouchableOpacity style={styles.actionCard}>
+            <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={styles.actionBorder} />
             <View style={styles.actionContent}>
               <Ionicons name="card-outline" size={28} color="#fff" />
               <Text style={styles.actionLabel}>Meu Cartão</Text>
@@ -114,6 +120,12 @@ export default function PerfilScreen({ navigation }) {
             style={styles.actionCard}
             onPress={() => setShowHistory(prev => !prev)}
           >
+            <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={styles.actionBorder} />
             <View style={styles.actionContent}>
               <Ionicons name="receipt-outline" size={28} color="#fff" />
               <Text style={styles.actionLabel}>Minhas Compras</Text>
@@ -124,6 +136,12 @@ export default function PerfilScreen({ navigation }) {
             style={styles.actionCard}
             onPress={() => navigation.navigate('Socio')}
           >
+            <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={styles.actionBorder} />
             <View style={styles.actionContent}>
               <Ionicons name="people-outline" size={28} color="#fff" />
               <Text style={styles.actionLabel}>Sócio</Text>
@@ -131,9 +149,14 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS (SEM BACKGROUND) ── */}
+        {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS COM BACKGROUND SUAVE ── */}
         {showHistory && (
           <View style={styles.historySection}>
+            <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']}
+              style={StyleSheet.absoluteFill}
+            />
             <View style={styles.historyBorder} />
             
             <View style={styles.historyHeader}>
@@ -521,7 +544,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  /* ── AÇÕES RÁPIDAS (FORMATO QUADRADO, SEM BACKGROUND) ── */
+  /* ── AÇÕES RÁPIDAS COM BACKGROUND SUAVE ── */
   actionsRow: {
     flexDirection: 'row',
     gap: 12,
@@ -529,14 +552,21 @@ const styles = StyleSheet.create({
   actionCard: {
     flex: 1,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-    backgroundColor: 'transparent',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     paddingVertical: 16,
     paddingHorizontal: 8,
     minHeight: 90,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  actionBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   actionContent: {
     alignItems: 'center',
@@ -633,21 +663,22 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  /* ── HISTÓRICO SEM BACKGROUND ── */
+  /* ── HISTÓRICO COM BACKGROUND SUAVE ── */
   historySection: {
     borderRadius: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-    backgroundColor: 'transparent',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.04)',
     marginTop: 8,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
     padding: 16,
   },
   historyBorder: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   historyHeader: {
     flexDirection: 'row',
@@ -673,13 +704,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   historySubText: {
-    color: '#800000',
+    color: '#ffd700',
     fontSize: 13,
     fontWeight: '600',
     flex: 1,
   },
   historySubPrice: {
-    color: '#800000',
+    color: '#ffd700',
     fontSize: 13,
     fontWeight: '700',
   },
