@@ -64,13 +64,9 @@ export default function PerfilScreen({ navigation }) {
 
         {/* ── CARD DE BOAS-VINDAS ── */}
         <View style={styles.welcomeCard}>
-          <BlurView intensity={90} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           <LinearGradient
-            colors={['rgba(255,255,255,0.12)', 'rgba(255,255,255,0.04)', 'transparent']}
-            style={StyleSheet.absoluteFill}
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.25)']}
+            colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']}
             style={StyleSheet.absoluteFill}
           />
           <View style={styles.welcomeBorder} />
@@ -106,7 +102,7 @@ export default function PerfilScreen({ navigation }) {
           <TouchableOpacity style={styles.actionCard}>
             <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
             <LinearGradient
-              colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+              colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']}
               style={StyleSheet.absoluteFill}
             />
             <View style={styles.actionBorder} />
@@ -122,7 +118,7 @@ export default function PerfilScreen({ navigation }) {
           >
             <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
             <LinearGradient
-              colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+              colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']}
               style={StyleSheet.absoluteFill}
             />
             <View style={styles.actionBorder} />
@@ -138,7 +134,7 @@ export default function PerfilScreen({ navigation }) {
           >
             <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
             <LinearGradient
-              colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+              colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']}
               style={StyleSheet.absoluteFill}
             />
             <View style={styles.actionBorder} />
@@ -223,16 +219,12 @@ export default function PerfilScreen({ navigation }) {
 
         {/* ── CARD DADOS PESSOAIS ── */}
         <View style={styles.infoCard}>
-          <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           <LinearGradient
-            colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.01)', 'transparent']}
+            colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']}
             style={StyleSheet.absoluteFill}
           />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.15)']}
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={styles.innerBorder} />
+          <View style={styles.infoBorder} />
 
           <View style={styles.infoRow}>
             <View style={styles.infoLeft}>
@@ -459,28 +451,18 @@ const styles = StyleSheet.create({
   },
 
   welcomeCard: {
-    borderRadius: 28,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    marginTop: 4,
-    shadowColor: '#ff0000',
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 14,
-    padding: 20,
-  },
-  innerBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   welcomeBorder: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 28,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   welcomeHeader: {
     flexDirection: 'row',
@@ -490,8 +472,9 @@ const styles = StyleSheet.create({
   },
   welcomeTitle: {
     color: '#fff',
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 22,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   notifBadge: {
     position: 'relative',
@@ -514,13 +497,13 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.75)',
     fontSize: 14,
     lineHeight: 22,
-    marginBottom: 16,
+    marginBottom: 12,
   },
 
   subBadge: {
     borderRadius: 30,
     overflow: 'hidden',
-    marginBottom: 14,
+    marginBottom: 0,
   },
   subBadgeBlur: {
     flexDirection: 'row',
@@ -599,15 +582,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
 
+  /* ── DADOS PESSOAIS COM MESMO ESTILO ── */
   infoCard: {
-    borderRadius: 22,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  infoBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   infoRow: {
     flexDirection: 'row',
@@ -640,7 +627,7 @@ const styles = StyleSheet.create({
   },
   infoDivider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     marginHorizontal: 18,
   },
 
@@ -665,9 +652,9 @@ const styles = StyleSheet.create({
 
   /* ── HISTÓRICO COM BACKGROUND SUAVE ── */
   historySection: {
-    borderRadius: 22,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     marginTop: 8,
     marginBottom: 12,
     borderWidth: 1,
@@ -676,9 +663,9 @@ const styles = StyleSheet.create({
   },
   historyBorder: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 22,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   historyHeader: {
     flexDirection: 'row',
