@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import {View, Text, StyleSheet, Image,TouchableOpacity, ScrollView, Modal, TextInput,} from 'react-native';
+import {View, Text, StyleSheet, Image,TouchableOpacity, ScrollView, Modal, TextInput} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { styleSocioModal } from '../styles/styleSocios/styleSociosModal';
-// import styles from '../styles/stylePerfil/stylePerfil';
 
 import NavbarGlass from '../components/NavbarGlass';
 import { useSubscription } from '../contexts/SubscriptionContext';
@@ -35,7 +34,7 @@ export default function PerfilScreen({ navigation }) {
         style={StyleSheet.absoluteFill}
       />
 
-      {/* ENGRENAGEM - Canto superior direito (perto da foto de perfil) */}
+      {/* ENGRENAGEM - Canto superior direito */}
       <TouchableOpacity 
         style={styles.settingsGear}
         onPress={() => navigation.navigate('Settings')}
@@ -65,16 +64,16 @@ export default function PerfilScreen({ navigation }) {
 
         {/* ── CARD DE BOAS-VINDAS ── */}
         <View style={styles.welcomeCard}>
-          <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={90} tint="dark" style={StyleSheet.absoluteFill} />
           <LinearGradient
-            colors={['rgba(255,255,255,0.07)', 'rgba(255,255,255,0.01)', 'transparent']}
+            colors={['rgba(255,255,255,0.12)', 'rgba(255,255,255,0.04)', 'transparent']}
             style={StyleSheet.absoluteFill}
           />
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.2)']}
+            colors={['transparent', 'rgba(0,0,0,0.25)']}
             style={StyleSheet.absoluteFill}
           />
-          <View style={styles.innerBorder} />
+          <View style={styles.welcomeBorder} />
 
           <View style={styles.welcomeHeader}>
             <Text style={styles.welcomeTitle}>Seja bem-vindo</Text>
@@ -91,7 +90,7 @@ export default function PerfilScreen({ navigation }) {
           {/* ── ASSINATURA ATIVA ── */}
           {subscription && (
             <View style={styles.subBadge}>
-              <BlurView intensity={30} tint="dark" style={styles.subBadgeBlur}>
+              <BlurView intensity={40} tint="dark" style={styles.subBadgeBlur}>
                 <Ionicons name="star" size={15} color="#ffd700" />
                 <Text style={styles.subBadgeText}>
                   {subscription.title} ativo
@@ -102,74 +101,41 @@ export default function PerfilScreen({ navigation }) {
           )}
         </View>
 
-        {/* ── AÇÕES RÁPIDAS ── */}
+        {/* ── AÇÕES RÁPIDAS (FORMATO QUADRADO, SEM BACKGROUND) ── */}
         <View style={styles.actionsRow}>
           <TouchableOpacity style={styles.actionCard}>
-            <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFill} />
-            <LinearGradient
-              colors={['rgba(255,255,255,0.07)', 'transparent']}
-              style={StyleSheet.absoluteFill}
-            />
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.2)']}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={styles.innerBorder} />
-            <Ionicons name="card-outline" size={28} color="#fff" />
-            <Text style={styles.actionLabel}>Meu Cartão</Text>
+            <View style={styles.actionContent}>
+              <Ionicons name="card-outline" size={28} color="#fff" />
+              <Text style={styles.actionLabel}>Meu Cartão</Text>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.actionCard}
             onPress={() => setShowHistory(prev => !prev)}
           >
-            <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFill} />
-            <LinearGradient
-              colors={['rgba(255,255,255,0.07)', 'transparent']}
-              style={StyleSheet.absoluteFill}
-            />
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.2)']}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={styles.innerBorder} />
-            <Ionicons name="receipt-outline" size={28} color="#fff" />
-            <Text style={styles.actionLabel}>Minhas Compras</Text>
+            <View style={styles.actionContent}>
+              <Ionicons name="receipt-outline" size={28} color="#fff" />
+              <Text style={styles.actionLabel}>Minhas Compras</Text>
+            </View>
           </TouchableOpacity>
 
            <TouchableOpacity 
             style={styles.actionCard}
             onPress={() => navigation.navigate('Socio')}
           >
-            <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFill} />
-            <LinearGradient
-              colors={['rgba(255,255,255,0.07)', 'transparent']}
-              style={StyleSheet.absoluteFill}
-            />
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.2)']}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={styles.innerBorder} />
-            <Ionicons name="people-outline" size={28} color="#fff" />
-            <Text style={styles.actionLabel}>Sócio</Text>
+            <View style={styles.actionContent}>
+              <Ionicons name="people-outline" size={28} color="#fff" />
+              <Text style={styles.actionLabel}>Sócio</Text>
+            </View>
           </TouchableOpacity>
         </View>
 
-        {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS (aparece ao clicar no botão "Minhas Compras") ── */}
+        {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS (SEM BACKGROUND) ── */}
         {showHistory && (
           <View style={styles.historySection}>
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
-            <LinearGradient
-              colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.01)', 'transparent']}
-              style={StyleSheet.absoluteFill}
-            />
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.15)']}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={styles.innerBorder} />
-
+            <View style={styles.historyBorder} />
+            
             <View style={styles.historyHeader}>
               <Text style={styles.historyTitle}>Minhas Compras e Assinaturas</Text>
               <TouchableOpacity onPress={() => setShowHistory(false)} activeOpacity={0.7}>
@@ -224,7 +190,7 @@ export default function PerfilScreen({ navigation }) {
           </View>
         )}
 
-        {/* ── DIVISOR ── */}
+        {/* ── DIVISOR DADOS PESSOAIS ── */}
         <View style={styles.sectionHeaderCustom}>
           <Text style={styles.sectionTitle}>Dados pessoais</Text>
           <TouchableOpacity style={styles.sectionEditBtn} onPress={() => setEditModalVisible(true)} activeOpacity={0.7}>
@@ -232,7 +198,7 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* ── DADOS PESSOAIS ── */}
+        {/* ── CARD DADOS PESSOAIS ── */}
         <View style={styles.infoCard}>
           <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
           <LinearGradient
@@ -245,10 +211,9 @@ export default function PerfilScreen({ navigation }) {
           />
           <View style={styles.innerBorder} />
 
-          {/* Nome completo */}
           <View style={styles.infoRow}>
             <View style={styles.infoLeft}>
-              <Ionicons name="person-outline" size={20} color="#ff2b2b" />
+              <Ionicons name="person-outline" size={20} color="#ffffff" />
               <View style={styles.infoTextGroup}>
                 <Text style={styles.infoLabel}>Nome completo</Text>
                 <Text style={styles.infoValue}>{user.name}</Text>
@@ -258,10 +223,9 @@ export default function PerfilScreen({ navigation }) {
 
           <View style={styles.infoDivider} />
 
-          {/* Email */}
           <View style={styles.infoRow}>
             <View style={styles.infoLeft}>
-              <Ionicons name="mail-outline" size={20} color="#ff2b2b" />
+              <Ionicons name="mail-outline" size={20} color="#ffffff" />
               <View style={styles.infoTextGroup}>
                 <Text style={styles.infoLabel}>Email</Text>
                 <Text style={styles.infoValue}>{user.email}</Text>
@@ -271,19 +235,30 @@ export default function PerfilScreen({ navigation }) {
 
           <View style={styles.infoDivider} />
 
-          {/* Telefone */}
           <View style={styles.infoRow}>
             <View style={styles.infoLeft}>
-              <Ionicons name="call-outline" size={20} color="#ff2b2b" />
+              <Ionicons name="call-outline" size={20} color="#ffffff" />
               <View style={styles.infoTextGroup}>
                 <Text style={styles.infoLabel}>Telefone</Text>
                 <Text style={styles.infoValue}>{user.phone}</Text>
               </View>
             </View>
           </View>
+
+          <View style={styles.infoDivider} />
+
+          <View style={styles.infoRow}>
+            <View style={styles.infoLeft}>
+              <Ionicons name="document-text-outline" size={20} color="#ffffff" />
+              <View style={styles.infoTextGroup}>
+                <Text style={styles.infoLabel}>CPF</Text>
+                <Text style={styles.infoValue}>{user.cpf}</Text>
+              </View>
+            </View>
+          </View>
         </View>
 
-        {/* ── BOTÃO SAIR ── */}
+        {/* BOTÃO SAIR */}
         <TouchableOpacity style={styles.logoutBtn} activeOpacity={0.8}>
           <Ionicons name="log-out-outline" size={20} color="#fff" />
           <Text style={styles.logoutText}>Sair</Text>
@@ -292,7 +267,7 @@ export default function PerfilScreen({ navigation }) {
         <View style={{ height: 20 }} />
       </ScrollView>
 
-      {/* ── MODAL EDITAR DADOS PESSOAIS ── */}
+      {/* MODAL EDITAR DADOS PESSOAIS */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -338,6 +313,18 @@ export default function PerfilScreen({ navigation }) {
               />
             </View>
 
+            <View style={styles.modalField}>
+              <Text style={styles.modalLabel}>CPF</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={editedUser.cpf}
+                onChangeText={(text) => setEditedUser({ ...editedUser, cpf: text })}
+                placeholder="Digite seu CPF"
+                placeholderTextColor="rgba(0,0,0,0.4)"
+                keyboardType="numeric"
+              />
+            </View>
+
             <View style={styleSocioModal.modalButtons}>
               <TouchableOpacity
                 style={styleSocioModal.fecharButton}
@@ -377,7 +364,6 @@ const styles = StyleSheet.create({
     gap: 20,
   },
 
-  /* ── ENGRENAGEM (Canto superior direito) ── */
   settingsGear: {
     position: 'absolute',
     top: 50,
@@ -396,7 +382,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.2)',
   },
 
-  /* ── HEADER ── */
   header: {
     alignItems: 'center',
     paddingVertical: 24,
@@ -450,24 +435,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  /* ── WELCOME CARD ── */
   welcomeCard: {
-    borderRadius: 22,
+    borderRadius: 28,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
     marginTop: 4,
-    shadowColor: '#ff2b2b',
-    shadowOpacity: 0.15,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 12,
+    shadowColor: '#ff0000',
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 14,
     padding: 20,
   },
   innerBorder: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  welcomeBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
   },
   welcomeHeader: {
     flexDirection: 'row',
@@ -504,7 +494,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  /* ── ASSINATURA ATIVA ── */
   subBadge: {
     borderRadius: 30,
     overflow: 'hidden',
@@ -522,7 +511,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   subBadgeText: {
-    color: '#ffd700',
+    color: '#800000',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -532,42 +521,35 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  /* ── AÇÕES RÁPIDAS ── */
+  /* ── AÇÕES RÁPIDAS (FORMATO QUADRADO, SEM BACKGROUND) ── */
   actionsRow: {
     flexDirection: 'row',
     gap: 12,
   },
   actionCard: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    borderRadius: 22,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    paddingVertical: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'transparent',
+    paddingVertical: 16,
     paddingHorizontal: 8,
-    minHeight: 105,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    minHeight: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   actionLabel: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: '600',
-    marginTop: 8,
+    fontWeight: '500',
     textAlign: 'center',
   },
 
-  /* ── SECTION HEADER ── */
-  sectionHeader: {
-    marginBottom: 4,
-    marginTop: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   sectionHeaderCustom: {
     marginBottom: 4,
     marginTop: 8,
@@ -577,28 +559,16 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '800',
     letterSpacing: 0.3,
   },
   sectionEditBtn: {
-    padding: 6,
+    padding: 8,
     borderRadius: 10,
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
-  sectionLine: {
-    width: 36,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#ff2b2b',
-    shadowColor: '#ff2b2b',
-    shadowOpacity: 0.8,
-    shadowRadius: 6,
-    elevation: 6,
-    marginTop: 6,
-  },
 
-  /* ── INFO CARD ── */
   infoCard: {
     borderRadius: 22,
     overflow: 'hidden',
@@ -614,7 +584,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 16,
   },
   infoLeft: {
     flexDirection: 'row',
@@ -622,34 +592,28 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   infoTextGroup: {
-    marginLeft: 12,
+    marginLeft: 14,
     flex: 1,
   },
   infoLabel: {
     color: 'rgba(255,255,255,0.5)',
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '500',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    marginBottom: 4,
   },
   infoValue: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
-    marginTop: 2,
   },
   infoDivider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.07)',
     marginHorizontal: 18,
   },
-  editRowBtn: {
-    padding: 8,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
 
-  /* ── LOGOUT ── */
   logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -669,19 +633,21 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  /* ── HISTORY SECTION (inline, no popup) ── */
+  /* ── HISTÓRICO SEM BACKGROUND ── */
   historySection: {
     borderRadius: 22,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'transparent',
     marginTop: 8,
     marginBottom: 12,
-    shadowColor: '#ff2b2b',
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 10,
     padding: 16,
+  },
+  historyBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
   },
   historyHeader: {
     flexDirection: 'row',
@@ -707,13 +673,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   historySubText: {
-    color: '#ffd700',
+    color: '#800000',
     fontSize: 13,
     fontWeight: '600',
     flex: 1,
   },
   historySubPrice: {
-    color: '#fff',
+    color: '#800000',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -750,7 +716,7 @@ const styles = StyleSheet.create({
   },
   historyDivider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     marginVertical: 2,
   },
   historyEmpty: {
@@ -764,7 +730,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  /* ── MODAL EDITAR DADOS PESSOAIS ── */
   modalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
