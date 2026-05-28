@@ -1,4 +1,4 @@
-import React, { useState, useEffect,  useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     borderRadius: 35,
   },
 
-  // ✨ Camada de Refração (Distorção fake)
+// ✨ Camada de Refração (Distorção fake)
   distortionLayer: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 35,
@@ -509,35 +509,18 @@ const styles = StyleSheet.create({
   // 💥 A BOLHA LÍQUIDA
   bubble: {
     position: 'absolute',
-    // Usamos altura fixa ou top/bottom simétricos para a escala vertical (Gelatina) 
-    // não deslocar a bolha para fora do centro.
-    top: '15%', 
-    height: '130%', 
+    top: '15%',
+    height: '130%',
     borderRadius: 30,
-    backgroundColor: 'rgba(73, 73, 73, 0.18)', // Um pouco mais de brilho
+    backgroundColor: 'rgba(73, 73, 73, 0.18)',
     borderColor: 'rgba(255, 255, 255, 0.4)',
     overflow: 'hidden',
-    
-    // Profundidade e Glow
-    shadowColor: "#c0c0c0", // Glow branco combina melhor com vidro
+    shadowColor: "#c0c0c0",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 5,
-    
   },
-
-  fakeDistortion: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    transform: [
-      { scale: 1.4 },
-      { translateX: -15 },
-      { translateY: 10 },
-    ],
-  },
-
-
 
   bubbleSpecular: {
       position: 'absolute',

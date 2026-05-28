@@ -23,7 +23,11 @@ export default function PerfilScreen({ navigation }) {
   const [editingField, setEditingField] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editedUser, setEditedUser] = useState({ ...user });
+  const [editedUser, setEditedUser] = useState({ 
+    name: user.name,
+    email: user.email,
+    phone: user.phone
+  });
   const { subscription, purchaseHistory } = useSubscription();
 
   return (
@@ -178,14 +182,24 @@ export default function PerfilScreen({ navigation }) {
               purchaseHistory.map((item, idx) => (
                 <React.Fragment key={item.id}>
                   <View style={styles.historyRow}>
-                    <Ionicons
-                      name={item.type === 'subscription' ? 'star-outline' : 'bag-outline'}
-                      size={18}
-                      color={item.type === 'subscription' ? '#ffd700' : '#ff2b2b'}
-                    />
+                    {item.type === 'subscription' ? (
+                      <Ionicons
+                        name="star-outline"
+                        size={22}
+                        color="#ffd700"
+                      />
+                    ) : item.itemImages && item.itemImages[0] ? (
+                      <Image source={item.itemImages[0]} style={styles.historyProductImage} />
+                    ) : (
+                      <Ionicons
+                        name="bag-outline"
+                        size={18}
+                        color="#ff2b2b"
+                      />
+                    )}
                     <View style={styles.historyInfo}>
                       <Text style={styles.historyPlan}>
-                        {item.type === 'subscription' ? item.planTitle : (item.items?.length > 1 ? `${item.items.length} produtos: ${item.items.join(', ')}` : item.items?.[0])}
+                        {item.type === 'subscription' ? item.planTitle : (item.items?.length > 1 ? `${item.items.length} produtos` : item.items?.[0])}
                       </Text>
                       <Text style={styles.historyDate}>
                         {new Date(item.date).toLocaleDateString('pt-BR', {
@@ -259,24 +273,21 @@ export default function PerfilScreen({ navigation }) {
               </View>
             </View>
           </View>
-
-          <View style={styles.infoDivider} />
-
-          <View style={styles.infoRow}>
-            <View style={styles.infoLeft}>
-              <Ionicons name="document-text-outline" size={20} color="#ffffff" />
-              <View style={styles.infoTextGroup}>
-                <Text style={styles.infoLabel}>CPF</Text>
-                <Text style={styles.infoValue}>{user.cpf}</Text>
-              </View>
-            </View>
-          </View>
         </View>
 
         {/* BOTÃO SAIR */}
         <TouchableOpacity style={styles.logoutBtn} activeOpacity={0.8}>
-          <Ionicons name="log-out-outline" size={20} color="#fff" />
-          <Text style={styles.logoutText}>Sair</Text>
+          <LinearGradient
+            colors={['rgba(255,0,0,0.2)', 'rgba(255,0,0,0.1)']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+          <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
+          <View style={styles.logoutBorder} />
+          <Ionicons name="log-out-outline" size={22} color="#ff6b6b" />
+          <Text style={styles.logoutText}>Sair da conta</Text>
+          <Ionicons name="chevron-forward-outline" size={18} color="#ff6b6b" />
         </TouchableOpacity>
 
         <View style={{ height: 20 }} />
@@ -325,18 +336,6 @@ export default function PerfilScreen({ navigation }) {
                 placeholder="Digite seu telefone"
                 placeholderTextColor="rgba(0,0,0,0.4)"
                 keyboardType="phone-pad"
-              />
-            </View>
-
-            <View style={styles.modalField}>
-              <Text style={styles.modalLabel}>CPF</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editedUser.cpf}
-                onChangeText={(text) => setEditedUser({ ...editedUser, cpf: text })}
-                placeholder="Digite seu CPF"
-                placeholderTextColor="rgba(0,0,0,0.4)"
-                keyboardType="numeric"
               />
             </View>
 
@@ -631,22 +630,29 @@ const styles = StyleSheet.create({
     marginHorizontal: 18,
   },
 
+  /* ── BOTÃO SAIR MELHORADO ── */
   logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,0,0,0.15)',
     borderRadius: 16,
-    paddingVertical: 14,
-    marginTop: 6,
+    paddingVertical: 16,
+    marginTop: 12,
+    gap: 12,
+    overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,0,0,0.25)',
-    gap: 8,
+    borderColor: 'rgba(255,100,100,0.3)',
+  },
+  logoutBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,100,100,0.2)',
   },
   logoutText: {
-    color: '#ff2b2b',
+    color: '#ff6b6b',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
     letterSpacing: 0.5,
   },
 
@@ -712,10 +718,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
-    gap: 10,
   },
   historyInfo: {
     flex: 1,
+    marginLeft: 10,
   },
   historyPlan: {
     color: '#fff',
@@ -736,6 +742,12 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.08)',
     marginVertical: 2,
+  },
+  historyProductImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    marginRight: 8,
   },
   historyEmpty: {
     alignItems: 'center',

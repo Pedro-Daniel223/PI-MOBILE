@@ -26,6 +26,13 @@ export function SubscriptionProvider({ children }) {
       type: 'purchase',
       title: items.length > 1 ? `${items.length} produtos` : '1 produto',
       items: items.map(item => item.nome || 'Produto'),
+      itemImages: items.map(item => {
+        if (Array.isArray(item.imagens) && item.imagens.length > 0) return item.imagens[0];
+        if (item.imagem) return item.imagem;
+        if (item.image) return item.image;
+        if (item.imageUrl) return item.imageUrl;
+        return null;
+      }),
       price: total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
       date: now.toISOString(),
     };
