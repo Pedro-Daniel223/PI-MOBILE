@@ -11,7 +11,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 
-import NavbarGlass from '../components/NavbarGlass';
 import { useSubscription } from '../contexts/SubscriptionContext';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
@@ -334,8 +333,7 @@ export default function PerfilScreen({ navigation }) {
         <View style={{ height: 20 }} />
       </ScrollView>
 
-      {/* NAVBAR */}
-      <NavbarGlass navigation={navigation} />
+      {/* NAVBAR é renderizado pelo Tab.Navigator (MainTabs) via `tabBar` */}
     </View>
   );
 }

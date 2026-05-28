@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { dadosIngresso } from '../data/dataIngresso';
 import { stylesIngresso } from '../styles/styleIngresso/styleIngresso';
 import Svg, { Path } from 'react-native-svg';
-import NavbarGlass from '../components/NavbarGlass';
 
 // default é a exportação padrão do módulo, ou seja, quando importamos esse arquivo em outro lugar,
 // ele vai importar essa função por padrão. Isso é útil para exportar um componente principal de um arquivo, como é o caso do IngressosScreen aqui.

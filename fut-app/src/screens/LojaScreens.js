@@ -38,8 +38,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import NavbarGlass from '../components/NavbarGlass';
 import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
 
 // ─── Dimensões ────────────────────────────────────────────────────────────────

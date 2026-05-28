@@ -10,8 +10,6 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-
-import NavbarGlass from '../components/NavbarGlass';
 import GlassCarousel from '../components/Cards_home/GlassCarousel';
 import CardProfileWelcome from '../components/Cards_home/CardProfileWelcome';
 import CardActionGlass from '../components/Cards_home/cardActionGlass';

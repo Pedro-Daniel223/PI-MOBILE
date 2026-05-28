@@ -5,7 +5,6 @@ import { useSubscription } from '../contexts/SubscriptionContext';
 import { dadosPlano } from '../data/dataSocios';
 import { stylesSocio } from '../styles/styleSocios/stylesSocios';
 import { styleSocioModal } from '../styles/styleSocios/styleSociosModal';
-import NavbarGlass from '../components/NavbarGlass';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
@@ -150,7 +149,6 @@ export default function SociosScreen({ navigation }) {
       </Modal>
       {/* ═══════════════════════════════════════════════════════ */}
 
-      <NavbarGlass navigation={navigation} />
     </View>
   );
 }
