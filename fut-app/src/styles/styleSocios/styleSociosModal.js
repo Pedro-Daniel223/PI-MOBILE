@@ -2,6 +2,10 @@ import { StyleSheet } from "react-native";
 
  export const styleSocioModal = StyleSheet.create({
   // ═══════════ Estilos do Modal ═══════════
+  modal:{
+
+  },
+  
   // Overlay escuro semi-transparente
   modalOverlay: {
     flex: 1,

@@ -120,7 +120,10 @@ export default function App() {
         />
 
         {/* Rota de Sócios */}
-        <Stack.Screen name="Socio" component={SociosScreen} />
+        <Stack.Screen
+        name="Socio"
+        component={SociosScreen}
+        />
       </Stack.Navigator>
         </NavigationContainer>
       </SubscriptionProvider>
