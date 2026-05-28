@@ -151,7 +151,7 @@ export default function SociosScreen({ navigation }) {
       </Modal>
       {/* ═══════════════════════════════════════════════════════ */}
 
-      <NavbarGlass navigation={navigation} />
+      {/* <NavbarGlass navigation={navigation} /> */}
     </View>
   );
 }

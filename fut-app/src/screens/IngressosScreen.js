@@ -103,7 +103,7 @@ export default function IngressosScreen({navigation}) {
                     </View>
                 )}
             /> {/* Final da FlatList */}
-            <NavbarGlass navigation={navigation} />
+  
         </View>
     );
 }
