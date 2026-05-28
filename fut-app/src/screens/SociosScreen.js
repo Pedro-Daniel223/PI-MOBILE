@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, TouchableWithoutFeedback, } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, TouchableWithoutFeedback,} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import NavbarGlass from '../components/NavbarGlass';
+import { useSubscription } from '../contexts/SubscriptionContext';
 import { dadosPlano } from '../data/dataSocios';
 import { stylesSocio } from '../styles/styleSocios/stylesSocios';
 import { styleSocioModal } from '../styles/styleSocios/styleSociosModal';
-import { btnBack } from '../components/buttons/buttonBack';
+import NavbarGlass from '../components/NavbarGlass';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 
@@ -116,7 +116,6 @@ export default function SociosScreen({ navigation }) {
             {/* Cartão ilustrativo dentro do modal */}
             <Image source={selectedPlan?.cardImage} style={styleSocioModal.modalCardImage} />
 
-
             {/* Título da lista de benefícios */}
             <Text style={styleSocioModal.beneficiosTitle}>Benefícios</Text>
 
@@ -151,7 +150,7 @@ export default function SociosScreen({ navigation }) {
       </Modal>
       {/* ═══════════════════════════════════════════════════════ */}
 
-      {/* <NavbarGlass navigation={navigation} /> */}
+      <NavbarGlass navigation={navigation} />
     </View>
   );
 }
