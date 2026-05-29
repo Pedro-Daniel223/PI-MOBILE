@@ -47,6 +47,7 @@ import { heroStyles } from '../styles/styleLoja/styleHero';
 import { catStyles } from '../styles/styleLoja/styleCategory';
 import { campStyles } from '../styles/styleLoja/styleCampBanner';
 import { cardStyles } from '../styles/styleLoja/styleCards';
+import { gridStyles } from '../styles/styleLoja/styleGrid';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: HeroCarousel
@@ -408,19 +409,6 @@ const ProdutosGrid = memo(({ produtos, navigation }) => (
     </View>
   </View>
 ));
-
-const gridStyles = StyleSheet.create({
-  container: {
-    paddingHorizontal: DS.spacing.lg,
-    marginTop: 24,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-});
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: EditorialAdBanner
