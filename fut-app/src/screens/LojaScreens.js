@@ -29,7 +29,6 @@ import {
   TouchableOpacity,
   StatusBar,
   TextInput,
-  Dimensions,
   ScrollView,
   Animated,
   Easing,
@@ -39,163 +38,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
-
-// ─── Dimensões ────────────────────────────────────────────────────────────────
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-// ─── Design System ────────────────────────────────────────────────────────────
-const DS = {
-  // Paleta cinematográfica escura
-  bg:             '#070707',
-  bgLayer:        '#0e0e0e',
-  bgElevated:     '#131313',
-
-  // Acento — vermelho marca (escuro e saturado)
-  accent:         '#c0000a',
-  accentBright:   '#e8000f',
-  accentGlow:     'rgba(180, 0, 10, 0.18)',
-  accentGlowSoft: 'rgba(140, 0, 8, 0.09)',
-
-  // Texto
-  text:           '#f2f2f2',
-  textDim:        'rgba(242,242,242,0.55)',
-  textFaint:      'rgba(242,242,242,0.28)',
-
-  // Vidro
-  glass:          'rgba(255,255,255,0.055)',
-  glassBorder:    'rgba(255,255,255,0.10)',
-  glassBorderSub: 'rgba(255,255,255,0.055)',
-
-  // Sombra
-  shadow:         '#000000',
-
-  // Raios
-  radius:         { sm: 14, md: 20, lg: 28, xl: 36 },
-  spacing:        { xs: 8, sm: 12, md: 16, lg: 20, xl: 24 },
-};
-
-// ─── Dados dos produtos ───────────────────────────────────────────────────────
-const PRODUTOS_EXEMPLO = [
-  {
-    id: '1',
-    nome: 'Cachecol Drakos - Premium',
-    preco: 89.99,
-    precoAntigo: 149.00,
-    desconto: '40%',
-    categoria: 'Acessório',
-    imagens: [
-      require('../assets/img/Produtos/acessorios/objeto 1/cachecol_drakos (1).jpg'),
-      require('../assets/img/Produtos/acessorios/objeto 1/cachecol_transparent (3).png'),
-      require('../assets/img/Produtos/acessorios/objeto 1/cachecol_drakos (2).webp'),
-    ],
-    imagem: require('../assets/img/Produtos/acessorios/objeto 1/cachecol_transparent (3).png'),
-    descricao: 'Cachecol oficial Drakos em material premium, 100% algodão. Design exclusivo com as cores do clube, acabamento reforçado e tamanho generoso.',
-  },
-  {
-    id: '2',
-    nome: 'Boneco Drakos - Edição Especial',
-    preco: 129.99,
-    precoAntigo: 220.00,
-    desconto: '41%',
-    categoria: 'Colecionável',
-    imagens: [
-      require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (1).jpg'),
-      require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (2).jpg'),
-      require('../assets/img/Produtos/acessorios/objeto 2/boneco_drakos (3).jpg'),
-      require('../assets/img/Produtos/acessorios/objeto 2/boneco_transparent (3).png'),
-    ],
-    imagem: require('../assets/img/Produtos/acessorios/objeto 2/boneco_transparent (3).png'),
-    descricao: 'Boneco colecionável edição especial. Material de alta qualidade, detalhes pintados manualmente, uniforme oficial.',
-  },
-  {
-    id: '3',
-    nome: 'Touca Drakos - Inverno',
-    preco: 59.99,
-    precoAntigo: 89.00,
-    desconto: '33%',
-    categoria: 'Acessório',
-    imagens: [
-      require('../assets/img/Produtos/acessorios/objeto 3/touca_Drakos (1).jpg'),
-      require('../assets/img/Produtos/acessorios/objeto 3/touca_Drakos (2).jpg'),
-      require('../assets/img/Produtos/acessorios/objeto 3/touca_transparent.png'),
-    ],
-    imagem: require('../assets/img/Produtos/acessorios/objeto 3/touca_transparent.png'),
-    descricao: 'Touca de inverno oficial Drakos, confeccionada em lã acrílica de alta qualidade com bordado do escudo.',
-  },
-  {
-    id: '4',
-    nome: 'Drakos Temp 24/25 — Oficial',
-    preco: 169.99,
-    precoAntigo: 285.00,
-    desconto: '40%',
-    categoria: 'Camisa',
-    imagens: [ require('../assets/img/img_home/milan_r2006(2).png') ],
-    imagem:   require('../assets/img/img_home/milan_r2006(2).png'),
-    descricao: 'Camisa oficial da temporada 24/25. Dry-fit performance, corte ergonômico, detalhes em vermelho.',
-  },
-  {
-    id: '5',
-    nome: 'Drakos 24/25 — Ed. Limitada',
-    preco: 189.99,
-    precoAntigo: 320.00,
-    desconto: '41%',
-    categoria: 'Camisa',
-    imagens: [ require('../assets/img/img_home/milan_r2006(2).png') ],
-    imagem:   require('../assets/img/img_home/milan_r2006(2).png'),
-    descricao: 'Versão limitada da temporada 24/25, comemorativa aos 20 anos do clube. Escudo bordado, numeração especial.',
-  },
-  {
-    id: '6',
-    nome: 'Drakos 24/25 — Torcedor',
-    preco: 149.99,
-    precoAntigo: 210.00,
-    desconto: '29%',
-    categoria: 'Camisa',
-    imagens: [ require('../assets/img/img_home/milan_r2006(2).png') ],
-    imagem:   require('../assets/img/img_home/milan_r2006(2).png'),
-    descricao: 'Versão torcedor, algodão e poliéster. Equilíbrio entre respirabilidade e resistência.',
-  },
-];
-
-// ─── Dados do carrossel hero ──────────────────────────────────────────────────
-const HERO_SLIDES = [
-  {
-    id: 'h1',
-    tag:      'NOVA COLEÇÃO',
-    title:    'DRAKOS\n24/25',
-    sub:      'Desempenho que\nvira lenda.',
-    cta:      'Explorar',
-    accent:   DS.accentBright,
-    gradient: ['#1a0000', '#0a0000', '#070707'],
-  },
-  {
-    id: 'h2',
-    tag:      'EDIÇÃO LIMITADA',
-    title:    'APENAS\n500',
-    sub:      'Cada peça conta\numa história.',
-    cta:      'Ver agora',
-    accent:   '#8a2be2',
-    gradient: ['#0d0020', '#060010', '#070707'],
-  },
-  {
-    id: 'h3',
-    tag:      'ESPECIAL 20 ANOS',
-    title:    'DOIS\nDÉCADAS',
-    sub:      'O legado vive\nem cada fio.',
-    cta:      'Descobrir',
-    accent:   '#00aaff',
-    gradient: ['#001520', '#000a12', '#070707'],
-  },
-];
-
-// ─── Categorias ───────────────────────────────────────────────────────────────
-const CATEGORIAS = ['Todos', 'Camisas', 'Acessórios', 'Colecionáveis', 'Limitados'];
+import { DS } from '../styles/styleLoja/root';
+import { HERO_SLIDES } from '../data/dataLoja/dataHeroSlide';
+import { PRODUTOS_EXEMPLO } from '../data/dataLoja/dataProdutos';
+import { CATEGORIAS } from '../data/dataLoja/dataCategory';
+import { SCREEN_WIDTH, SCREEN_HEIGHT, CAMPAIGN_WIDTH, CAMPAIGN_HEIGHT, CARD_WIDTH, CARD_HEIGHT, HERO_HEIGHT } from '../styles/styleLoja/dimensoes';
+import { heroStyles } from '../styles/styleLoja/styleHero';
+import { catStyles } from '../styles/styleLoja/styleCategory';
+import { campStyles } from '../styles/styleLoja/styleCampBanner';
+import { cardStyles } from '../styles/styleLoja/styleCards';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: HeroCarousel
 // Auto-scroll com parallax e indicadores minimalistas
-// ═══════════════════════════════════════════════════════════════════════════════
-const HERO_HEIGHT = SCREEN_WIDTH * 1.08;
 
 const HeroCarousel = memo(() => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -357,130 +212,6 @@ const HeroSlide = memo(({ slide }) => {
   );
 });
 
-const heroStyles = StyleSheet.create({
-  container: {
-    width: SCREEN_WIDTH,
-    height: HERO_HEIGHT,
-    overflow: 'hidden',
-  },
-  slide: {
-    height: HERO_HEIGHT,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-  },
-  accentGlow: {
-    position: 'absolute',
-    top: -80,
-    left: SCREEN_WIDTH * 0.3,
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    opacity: 0.12,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 80,
-  },
-  decorLines: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  decorLine: {
-    position: 'absolute',
-    top: 60,
-    bottom: 140,
-    width: 0.5,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  textContainer: {
-    paddingHorizontal: DS.spacing.xl,
-    paddingBottom: 80,
-  },
-  tag: {
-    alignSelf: 'flex-start',
-    borderWidth: 0.75,
-    borderRadius: DS.radius.sm,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    marginBottom: 20,
-  },
-  tagText: {
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 2.5,
-  },
-  title: {
-    fontSize: 68,
-    fontWeight: '900',
-    color: DS.text,
-    lineHeight: 64,
-    letterSpacing: -2,
-    textTransform: 'uppercase',
-  },
-  titleDivider: {
-    width: 32,
-    height: 2,
-    marginTop: 18,
-    marginBottom: 16,
-    borderRadius: 1,
-  },
-  subtitle: {
-    fontSize: 15,
-    fontWeight: '300',
-    color: DS.textDim,
-    lineHeight: 22,
-    letterSpacing: 0.3,
-    marginBottom: 28,
-  },
-  cta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    borderWidth: 0.75,
-    borderRadius: DS.radius.xl,
-    paddingHorizontal: 22,
-    paddingVertical: 11,
-  },
-  ctaText: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-  },
-  bgNumber: {
-    position: 'absolute',
-    right: -12,
-    bottom: 60,
-    fontSize: 200,
-    fontWeight: '900',
-    color: 'rgba(255,255,255,0.025)',
-    lineHeight: 190,
-    letterSpacing: -8,
-  },
-  indicators: {
-    position: 'absolute',
-    bottom: 28,
-    right: DS.spacing.xl,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  dot: {
-    width: 20,
-    height: 2.5,
-    borderRadius: 2,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-  },
-  dotActive: {
-    width: 32,
-  },
-  bottomFade: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-  },
-});
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: CategoriasStrip
 // Filtros horizontais com visual de pílulas premium
@@ -519,42 +250,12 @@ const CategoriasStrip = memo(({ selected, onSelect }) => (
   </ScrollView>
 ));
 
-const catStyles = StyleSheet.create({
-  strip: { marginTop: 28 },
-  stripContent: {
-    paddingHorizontal: DS.spacing.lg,
-    gap: 8,
-  },
-  pill: {
-    paddingHorizontal: 18,
-    paddingVertical: 9,
-    borderRadius: DS.radius.xl,
-    borderWidth: 0.75,
-    borderColor: DS.glassBorder,
-    backgroundColor: DS.glass,
-    overflow: 'hidden',
-  },
-  pillActive: {
-    borderColor: DS.accent,
-  },
-  pillText: {
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-    color: DS.textDim,
-  },
-  pillTextActive: {
-    color: DS.text,
-    fontWeight: '700',
-  },
-});
+
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: CampaignBanner
 // PremiumGlassCard usado como hero de campanha premium
 // ═══════════════════════════════════════════════════════════════════════════════
-const CAMPAIGN_WIDTH  = SCREEN_WIDTH - DS.spacing.lg * 2;
-const CAMPAIGN_HEIGHT = 160;
 
 const CampaignBanner = memo(() => (
   <View style={campStyles.outer}>
@@ -600,81 +301,11 @@ const CampaignBanner = memo(() => (
   </View>
 ));
 
-const campStyles = StyleSheet.create({
-  outer: {
-    marginHorizontal: DS.spacing.lg,
-    marginTop: 28,
-    marginBottom: 8,
-  },
-  glowLayer: {
-    position: 'absolute',
-    top: 10,
-    left: 20,
-    right: 20,
-    height: CAMPAIGN_HEIGHT,
-    borderRadius: DS.radius.lg,
-    backgroundColor: DS.accent,
-    opacity: 0.12,
-    shadowColor: DS.accent,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
-    shadowRadius: 24,
-  },
-  content: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: DS.spacing.xl,
-  },
-  campaignTag: {
-    fontSize: 8,
-    fontWeight: '700',
-    letterSpacing: 2.2,
-    color: DS.accent,
-    marginBottom: 8,
-  },
-  campaignTitle: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: DS.text,
-    lineHeight: 38,
-    letterSpacing: -1.5,
-  },
-  campaignSub: {
-    fontSize: 10,
-    color: DS.textDim,
-    letterSpacing: 0.5,
-    marginTop: 8,
-    fontWeight: '400',
-  },
-  campaignCta: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 0.75,
-    borderColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-  bgMark: {
-    position: 'absolute',
-    right: -8,
-    bottom: -18,
-    fontSize: 88,
-    fontWeight: '900',
-    color: 'rgba(255,255,255,0.04)',
-    letterSpacing: -3,
-  },
-});
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: ProductCard
 // Card premium minimalista com física de toque e profundidade visual
 // ═══════════════════════════════════════════════════════════════════════════════
-const CARD_WIDTH = (SCREEN_WIDTH - DS.spacing.lg * 2 - 12) / 2;
-const CARD_HEIGHT = CARD_WIDTH * 1.52;
 
 const ProductCard = memo(({ item, onPress }) => {
   const pressAnim = useRef(new Animated.Value(0)).current;
@@ -758,102 +389,6 @@ const ProductCard = memo(({ item, onPress }) => {
       </TouchableOpacity>
     </Animated.View>
   );
-});
-
-const cardStyles = StyleSheet.create({
-  wrapper: {
-    marginBottom: 14,
-  },
-  card: {
-    borderRadius: DS.radius.lg,
-    backgroundColor: DS.bgElevated,
-    overflow: 'hidden',
-  },
-  borderLayer: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: DS.radius.lg,
-    borderWidth: 0.75,
-    borderColor: DS.glassBorder,
-    zIndex: 10,
-  },
-  imageContainer: {
-    flex: 1,
-    backgroundColor: '#111',
-    overflow: 'hidden',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  imageVignette: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-  },
-  badge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: DS.accent,
-    borderRadius: DS.radius.sm,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: DS.text,
-    letterSpacing: 0.5,
-  },
-  info: {
-    paddingHorizontal: 12,
-    paddingTop: 12,
-    paddingBottom: 14,
-    gap: 4,
-  },
-  categoria: {
-    fontSize: 8,
-    fontWeight: '700',
-    color: DS.accent,
-    letterSpacing: 1.8,
-  },
-  nome: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: DS.text,
-    lineHeight: 16,
-    letterSpacing: 0.1,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 6,
-    marginTop: 2,
-  },
-  preco: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: DS.text,
-    letterSpacing: -0.3,
-  },
-  precoAntigo: {
-    fontSize: 10,
-    color: DS.textFaint,
-    textDecorationLine: 'line-through',
-    fontWeight: '400',
-  },
-  accentLine: {
-    position: 'absolute',
-    bottom: 0,
-    left: 20,
-    right: 20,
-    height: 1.5,
-    backgroundColor: DS.accent,
-    opacity: 0.5,
-    borderRadius: 1,
-  },
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1245,6 +780,7 @@ const mainStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: DS.bg,
+    paddingBottom: 100,
   },
   bg: {
     ...StyleSheet.absoluteFillObject,
