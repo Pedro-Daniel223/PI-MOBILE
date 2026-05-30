@@ -51,7 +51,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const { Value, timing, loop, sequence, delay } = Animated;
 
-export default function CardProfileWelcome() {
+
+  export default function CardProfileWelcome({
+    isDarkMode,
+    setIsDarkMode,
+  }) {
+  // const [isDarkMode, setIsDarkMode] = useState(true);
 
   // ── Lógica original — intacta ─────────────────────────────────────────────
   const fullText = [
@@ -179,6 +184,19 @@ export default function CardProfileWelcome() {
           </BlurView>
         </TouchableOpacity>
 
+                <TouchableOpacity
+          style={styles.themeButton}
+          onPress={() => setIsDarkMode(!isDarkMode)}
+        >
+          <BlurView intensity={5} tint="dark" style={styles.editBlur}>
+            <Ionicons
+              name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
+              size={16}
+              color="#fff"
+            />
+          </BlurView>
+        </TouchableOpacity>
+
         {/* G1: BlurView primário — base fosca principal */}
         <BlurView
           intensity={90}
@@ -251,8 +269,8 @@ export default function CardProfileWelcome() {
         <LinearGradient
           colors={[
             'transparent',
-            'rgba(255, 28, 28, 0.035)',
-            'rgba(255, 28, 28, 0.07)',
+            // 'rgba(255, 28, 28, 0.035)',
+            // 'rgba(255, 28, 28, 0.07)',
           ]}
           style={StyleSheet.absoluteFill}
           start={{ x: 1, y: 0 }}
@@ -597,7 +615,7 @@ const styles = StyleSheet.create({
     right:           0,
     bottom:          0,
     borderRadius:    28,
-    backgroundColor: 'rgba(255, 0, 0, 0.06)',
+    backgroundColor: 'transparent',
   },
 
   // Botão de settings — preservado
@@ -607,6 +625,13 @@ const styles = StyleSheet.create({
     right:    16,
     zIndex:   10,
   },
+
+    themeButton: {
+      position: 'absolute',
+      top: 16,
+      right: 62,
+      zIndex: 10,
+    },
 
   editBlur: {
     padding:     10,

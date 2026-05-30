@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -46,6 +46,7 @@ const products = [
 
 
 export default function Home({ navigation }) {
+  const [isDarkMode, setIsDarkMode] = useState(true);
   return (
     <View style={styles.container}>
 
@@ -53,14 +54,33 @@ export default function Home({ navigation }) {
 
       {/* BACKGROUND */}
       <LinearGradient
-        colors={['#b30000', '#5a0000', '#1a0000']}
+      colors={[
+        '#080808',
+        '#1a0000',
+      ]}
+
+      // Alternativas
+      //  colors={[
+      //   '#050505',
+      //   '#1a0000',
+      //   '#050505',
+      // ]}
+
+      // colors={[
+      //   '#050505',
+      //   '#2b0000',
+      //   '#050505',
+      //   ]}
         style={StyleSheet.absoluteFill}
       />
 
       <ScrollView contentContainerStyle={styles.content}>
 
 
-        <CardProfileWelcome />
+        <CardProfileWelcome
+          isDarkMode={isDarkMode}
+          setIsDarkMode={setIsDarkMode}
+        />
 
 
         <View style={{
