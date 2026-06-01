@@ -54,25 +54,26 @@ export default function Home({ navigation }) {
 
       {/* BACKGROUND */}
       <LinearGradient
-      colors={[
-        '#080808',
-        '#1a0000',
-      ]}
+        colors={
+          isDarkMode
+            ? ['#080808', '#1a0000'] // Tema escuro vermelho
+            : ['#050505', '#7b0000'] // Tema claro
+        }
+        style={StyleSheet.absoluteFill}
+      />
 
       // Alternativas
-      //  colors={[
+      {/* //  colors={[ */}
+      //   '#050505',
       //   '#050505',
       //   '#1a0000',
-      //   '#050505',
-      // ]}
+      {/* // ]} */}
 
-      // colors={[
+      {/* // colors={[ */}
       //   '#050505',
       //   '#2b0000',
       //   '#050505',
-      //   ]}
-        style={StyleSheet.absoluteFill}
-      />
+      {/* //   ]} */}
 
       <ScrollView contentContainerStyle={styles.content}>
 
