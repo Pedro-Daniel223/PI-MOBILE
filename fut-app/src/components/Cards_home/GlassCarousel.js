@@ -282,8 +282,9 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
               <View style={styles.buttonGlass} />
               <LinearGradient
                 colors={[
-                  'rgba(255,255,255,0.14)',
-                  'rgba(255,255,255,0.06)',
+                  // 'rgba(255,255,255,0.14)',
+                  // 'rgba(255,255,255,0.06)',
+                  'transparent',
                 ]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
@@ -579,14 +580,16 @@ export default function GlassCarousel() {
       <Animated.ScrollView
         ref={scrollRef}
         horizontal
-        pagingEnabled
+        snapToInterval={FULL_CARD_WIDTH}
+        decelerationRate="fast"
+        snapToAlignment="start"
         showsHorizontalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: true }
         )}
         onMomentumScrollEnd={handleScroll}
-        contentContainerStyle={{ paddingHorizontal: 10 }}
+        contentContainerStyle={{ paddingHorizontal: 0 }}
       >
         {data.map((item, index) => (
           <PremiumMatchCard
