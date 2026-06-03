@@ -266,16 +266,15 @@ const { Value, timing, loop, sequence, delay } = Animated;
         />
 
         {/* G7: Tint vermelho sutil — identidade da marca no material */}
-        <LinearGradient
-          colors={[
-            'transparent',
-            // 'rgba(255, 28, 28, 0.035)',
-            // 'rgba(255, 28, 28, 0.07)',
-          ]}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0, y: 1 }}
-        />
+          <LinearGradient
+            colors={[
+              'transparent',
+              'transparent',
+            ]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 1 }}
+          />
 
         {/* G8: Shimmer diagonal
             Faixa de luz percorrendo o card — reflexo de luz ambiente */}

@@ -282,8 +282,7 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
               <View style={styles.buttonGlass} />
               <LinearGradient
                 colors={[
-                  // 'rgba(255,255,255,0.14)',
-                  // 'rgba(255,255,255,0.06)',
+                  'transparent',
                   'transparent',
                 ]}
                 style={StyleSheet.absoluteFill}

@@ -296,8 +296,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
 
               <LinearGradient
                 colors={[
-                  // 'rgba(255, 255, 255, 0.28)',
-                  // 'rgba(255, 255, 255, 0.10)',
+                  'transparent',
                   'transparent',
                 ]}
                 style={StyleSheet.absoluteFill}

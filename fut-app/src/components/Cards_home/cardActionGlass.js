@@ -302,6 +302,7 @@ export default function CardActionGlass({
               <LinearGradient
                 colors={[
                   'transparent',
+                  'transparent',
                 ]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0.5, y: 0 }}
