@@ -38,18 +38,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
-import { DS } from '../styles/styleLoja/root';
-import { HERO_SLIDES } from '../data/dataLoja/dataHeroSlide';
-import { PRODUTOS_EXEMPLO } from '../data/dataLoja/dataProdutos';
-import { CATEGORIAS } from '../data/dataLoja/dataCategory';
-import { SCREEN_WIDTH, SCREEN_HEIGHT, CAMPAIGN_WIDTH, CAMPAIGN_HEIGHT, CARD_WIDTH, CARD_HEIGHT, HERO_HEIGHT } from '../styles/styleLoja/dimensoes';
-import { heroStyles } from '../styles/styleLoja/styleHero';
-import { catStyles } from '../styles/styleLoja/styleCategory';
-import { campStyles } from '../styles/styleLoja/styleCampBanner';
-import { cardStyles } from '../styles/styleLoja/styleCards';
-import { gridStyles } from '../styles/styleLoja/styleGrid';
-
-// ═══════════════════════════════════════════════════════════════════════════════
+import { HERO_SLIDES, CATEGORIAS, PRODUTOS_EXEMPLO } from '../data/dataLoja/dataAll';
+import {
+  DS, SCREEN_WIDTH, SCREEN_HEIGHT, CAMPAIGN_WIDTH, CAMPAIGN_HEIGHT, CARD_WIDTH, CARD_HEIGHT, HERO_HEIGHT,
+  heroStyles, catStyles, campStyles, cardStyles, gridStyles, adStyles, secStyles, topStyles, mainStyles
+} from '../styles/styleLoja/styleAll';
+// ══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: HeroCarousel
 // Auto-scroll com parallax e indicadores minimalistas
 
@@ -462,99 +456,6 @@ const EditorialAdBanner = memo(() => (
   </View>
 ));
 
-const adStyles = StyleSheet.create({
-  outer: {
-    marginTop: 36,
-    marginBottom: 8,
-  },
-  topLine: {
-    height: 0.5,
-    backgroundColor: DS.glassBorderSub,
-  },
-  inner: {
-    height: 200,
-    marginHorizontal: DS.spacing.lg,
-    borderRadius: DS.radius.lg,
-    overflow: 'hidden',
-    flexDirection: 'row',
-    borderWidth: 0.75,
-    borderColor: 'rgba(140,0,8,0.3)',
-    marginTop: 1,
-    marginBottom: 1,
-  },
-  sideLabel: {
-    width: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRightWidth: 0.5,
-    borderRightColor: 'rgba(255,255,255,0.07)',
-  },
-  sideLabelText: {
-    fontSize: 7,
-    fontWeight: '700',
-    color: DS.textFaint,
-    letterSpacing: 2,
-    transform: [{ rotate: '-90deg' }],
-    width: 120,
-    textAlign: 'center',
-  },
-  content: {
-    flex: 1,
-    paddingLeft: 24,
-    paddingVertical: 28,
-    justifyContent: 'center',
-  },
-  eyebrow: {
-    fontSize: 8,
-    fontWeight: '700',
-    color: DS.accent,
-    letterSpacing: 2.5,
-    marginBottom: 12,
-  },
-  headline: {
-    fontSize: 48,
-    fontWeight: '900',
-    color: DS.text,
-    lineHeight: 46,
-    letterSpacing: -2,
-  },
-  underline: {
-    width: 28,
-    height: 2,
-    backgroundColor: DS.accent,
-    marginVertical: 14,
-    borderRadius: 1,
-  },
-  body: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: DS.textDim,
-    lineHeight: 18,
-    letterSpacing: 0.2,
-  },
-  graphicElement: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    width: 3,
-    bottom: 0,
-    opacity: 0.6,
-  },
-  watermark: {
-    position: 'absolute',
-    right: -10,
-    bottom: -20,
-    fontSize: 160,
-    fontWeight: '900',
-    color: 'rgba(255,255,255,0.025)',
-    lineHeight: 150,
-    letterSpacing: -6,
-  },
-  bottomLine: {
-    height: 0.5,
-    backgroundColor: DS.glassBorderSub,
-  },
-});
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: SectionHeader
@@ -570,47 +471,6 @@ const SectionHeader = memo(({ tag, title, subtitle }) => (
     {subtitle && <Text style={secStyles.subtitle}>{subtitle}</Text>}
   </View>
 ));
-
-const secStyles = StyleSheet.create({
-  container: {
-    paddingHorizontal: DS.spacing.lg,
-    marginTop: 32,
-    marginBottom: 4,
-  },
-  tagRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 10,
-  },
-  tagLine: {
-    width: 18,
-    height: 2,
-    backgroundColor: DS.accent,
-    borderRadius: 1,
-  },
-  tag: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: DS.accent,
-    letterSpacing: 2.5,
-    textTransform: 'uppercase',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: DS.text,
-    letterSpacing: -0.8,
-    lineHeight: 30,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: DS.textFaint,
-    fontWeight: '400',
-    marginTop: 6,
-    letterSpacing: 0.2,
-  },
-});
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: TopBar
@@ -642,56 +502,6 @@ const TopBar = memo(({ search, onSearch, onClose }) => (
   </View>
 ));
 
-const topStyles = StyleSheet.create({
-  bar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: DS.spacing.lg,
-    paddingVertical: 12,
-    gap: 12,
-  },
-  logoContainer: {
-    width: 38,
-    height: 38,
-    borderRadius: DS.radius.sm,
-    backgroundColor: DS.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: DS.text,
-    letterSpacing: -0.5,
-  },
-  searchContainer: {
-    flex: 1,
-    height: 38,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    backgroundColor: DS.glass,
-    borderRadius: DS.radius.md,
-    borderWidth: 0.75,
-    borderColor: DS.glassBorder,
-  },
-  searchInput: {
-    flex: 1,
-    color: DS.text,
-    fontSize: 13,
-    fontWeight: '400',
-  },
-  closeBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: DS.radius.sm,
-    backgroundColor: DS.glass,
-    borderWidth: 0.75,
-    borderColor: DS.glassBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMPONENTE PRINCIPAL: LojaContent
@@ -764,37 +574,6 @@ function LojaContent({ navigation }) {
   );
 }
 
-const mainStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DS.bg,
-    paddingBottom: 100,
-  },
-  bg: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  bgGlowRed: {
-    position: 'absolute',
-    top: SCREEN_HEIGHT * 0.1,
-    left: -80,
-    width: 320,
-    height: 320,
-    borderRadius: 160,
-    backgroundColor: DS.accent,
-    opacity: 0.04,
-    shadowColor: DS.accent,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 120,
-  },
-  bgDots: {
-    // Placeholder para textura futura — pode implementar com SVG ou Canvas
-    opacity: 0,
-  },
-  scrollContent: {
-    // Sem paddingBottom aqui — tratado com View spacer
-  },
-});
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // EXPORT: Wrapper com SafeAreaProvider

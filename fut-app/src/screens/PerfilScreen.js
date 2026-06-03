@@ -365,7 +365,7 @@ export default function PerfilScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 110,
+    paddingBottom: 100,
   },
 
   content: {

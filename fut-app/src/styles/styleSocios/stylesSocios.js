@@ -5,7 +5,7 @@ import { StyleSheet } from "react-native";
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingBottom: 110, // Espaço para o NavbarGlass
+    paddingBottom: 100, // Espaço para o NavbarGlass
   },
 
   background: {

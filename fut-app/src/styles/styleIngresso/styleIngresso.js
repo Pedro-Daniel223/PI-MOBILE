@@ -5,7 +5,7 @@ export const stylesIngresso = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f0f0f0',
         paddingTop: 30,
-        paddingBottom: 110, // Espaço para a navbar
+        paddingBottom: 100, // Espaço para a navbar
         marginBottom: 10, // Para a navbar ficar sobreposta
     },
     titulo: {
