@@ -1,15 +1,16 @@
 import { StyleSheet } from "react-native";
+import { scaleFont } from "../../utils/fontScale";
 
 export const estilos = StyleSheet.create({
     texto: {
         color: '#fff',
-        fontSize: 36,
+        fontSize: scaleFont(36),
         fontWeight: 'bold',
         alignSelf: 'center',
     },
     texto2: {
         color: '#fff',
-        fontSize: 20,
+        fontSize: scaleFont(20),
         fontWeight: 'bold',
         alignSelf: 'center',
     },
@@ -27,7 +28,7 @@ export const estilos = StyleSheet.create({
     },
     textoButton: {
         color: '#880000',
-        fontSize: 20,
+        fontSize: scaleFont(20),
         fontFamily: 'Roboto',
     },
     background: {
@@ -38,7 +39,7 @@ export const estilos = StyleSheet.create({
     },
     textoImg: {
         color: '#880000',
-        fontSize: 32,
+        fontSize: scaleFont(32),
         fontWeight: 'bold',
     },
 });

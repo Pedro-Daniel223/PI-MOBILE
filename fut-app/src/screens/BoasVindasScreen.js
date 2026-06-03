@@ -1,7 +1,9 @@
 import { Image, View, Text, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation as nav} from '@react-navigation/native';
-import { estilos } from "../styles/styleBoasVindas/styles";
+import { estilos } from "../styles/styleBoasVindas/styleBoasVindas";
+import { conteudo } from "../styles/styleBoasVindas/styleConteudo";
+import { icone } from "../styles/styleBoasVindas/styleIcone";
 
 export default function BoasVindasScreen() {
     const navigation = nav()
@@ -14,7 +16,7 @@ export default function BoasVindasScreen() {
             >                
                 <View style={estilos.camadaEscura}/>
 
-                <View style={styles.conteudo}>
+                <View style={conteudo.conteudo}>
                     <TouchableOpacity
                     onPress={() => navigation.reset({
                         index: 0,
@@ -22,7 +24,7 @@ export default function BoasVindasScreen() {
                             { name: 'AuthStack', state: { index: 0, routes: [{ name: 'Login' }] } },
                         ],
                     })}
-                    style={styles.icone}>
+                    style={icone.icone}>
                         <Text style={estilos.texto2}>Pular</Text>
                         <Ionicons name='arrow-forward' size={20} color='#fff'/>
                     </TouchableOpacity>
@@ -38,23 +40,3 @@ export default function BoasVindasScreen() {
             </ImageBackground>
     );
 }
-
-
-const styles = StyleSheet.create({
-    conteudo: {
-        width: '90%',
-        height: '80%',
-        margin: 12,
-        alignItems: 'center',
-        alignSelf: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 100
-    },
-    icone: {
-        display:"flex",
-        flexDirection:"row",
-        gap: 8,
-        alignItems: 'flex-end',
-        alignSelf: 'flex-end'
-    }
-});

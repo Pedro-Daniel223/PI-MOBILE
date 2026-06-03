@@ -1,6 +1,7 @@
 import { StyleSheet, View, TouchableOpacity, Text, Image, ImageBackground } from "react-native";
 import { useNavigation as nav} from "@react-navigation/native";
-import { estilos} from "../styles/styleBoasVindas/styles";
+import { estilos} from "../styles/styleBoasVindas/styleBoasVindas";
+import { stylesBV2 } from "../styles/styleBoasVindas/styleBV2";
 
 export default function BoasVindas2Screen(){
     const navegation = nav()
@@ -28,19 +29,4 @@ export default function BoasVindas2Screen(){
     )
 };
 
-
-const stylesBV2 = StyleSheet.create({
-    background: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        justifyContent: 'flex-end'
-    },
-    conteudo: {
-        width: '100%',
-        height: '45%',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 100
-    }
-});
+ 

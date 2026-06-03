@@ -12,21 +12,8 @@ import {
   TextInput
 } from 'react-native';
 import CustomButton from '../components/CustomButton';
-
-const colors = {
-  primary: '#880000',
-  background: '#E8E8E8',
-  white: '#FFFFFF',
-  text: '#121212',
-  mutedText: '#707070',
-  otpBackground: '#D1D1D1',
-  accent: '#B22222',
-  glassBorder: 'rgba(255, 255, 255, 0.7)',
-  glassBg: 'rgba(255, 255, 255, 0.3)',
-  shadowDark: 'rgba(0, 0, 0, 0.18)',
-  ringOuter: 'rgba(136, 0, 0, 0.08)',
-  ringInner: 'rgba(136, 0, 0, 0.12)'
-};
+import { colorsVerificar } from '../data/dataVerificarCodigo';
+import { stylesVerificar } from '../styles/styleVerificarCodigo/styleVerificarCodigo';
 
 export default function VerificarCodigo({ navigation }) {
   const [code, setCode] = useState(['', '', '', '', '']);
@@ -71,49 +58,49 @@ export default function VerificarCodigo({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={stylesVerificar.safe}>
       {/* Elemento de fundo para profundidade */}
-      <View style={styles.bgCircle} />
+      <View style={stylesVerificar.bgCircle} />
 
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={{ flex: 1 }}
       >
         <ScrollView 
-          contentContainerStyle={styles.scrollGrow} 
+          contentContainerStyle={stylesVerificar.scrollGrow} 
           bounces={false}
           showsVerticalScrollIndicator={false}
         >
           
           {/* BOTÃO VOLTAR GLASS SUTIL */}
-          <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-            <Text style={styles.backText}>←</Text>
+          <TouchableOpacity style={stylesVerificar.back} onPress={() => navigation.goBack()}>
+            <Text style={stylesVerificar.backText}>←</Text>
           </TouchableOpacity>
 
           {/* HEADER REESTILIZADO */}
-          <View style={styles.header}>
-            <View style={styles.iconWrap}>
-              <View style={styles.iconRingOuter}>
-                <View style={styles.iconRingInner}>
-                  <View style={styles.iconCircle}>
-                    <Text style={styles.iconEmoji}>✉️</Text>
+          <View style={stylesVerificar.header}>
+            <View style={stylesVerificar.iconWrap}>
+              <View style={stylesVerificar.iconRingOuter}>
+                <View style={stylesVerificar.iconRingInner}>
+                  <View style={stylesVerificar.iconCircle}>
+                    <Text style={stylesVerificar.iconEmoji}>✉️</Text>
                   </View>
                 </View>
               </View>
             </View>
             
-            <Text style={styles.headerTitle}>Verifique seu e-mail</Text>
-            <Text style={styles.headerSubtitle}>
-              Acabamos de enviar um código de <Text style={styles.highlightText}>5 dígitos</Text> para você.
+            <Text style={stylesVerificar.headerTitle}>Verifique seu e-mail</Text>
+            <Text style={stylesVerificar.headerSubtitle}>
+              Acabamos de enviar um código de <Text style={stylesVerificar.highlightText}>5 dígitos</Text> para você.
             </Text>
           </View>
 
           {/* INPUTS DE CÓDIGO (OTP) */}
-          <View style={styles.otpContainer}>
+          <View style={stylesVerificar.otpContainer}>
             {code.map((digit, index) => (
               <TextInput
                 key={index}
-                style={styles.otpInput}
+                style={stylesVerificar.otpInput}
                 keyboardType="number-pad"
                 maxLength={1}
                 selectTextOnFocus={true} 
@@ -128,13 +115,13 @@ export default function VerificarCodigo({ navigation }) {
           </View>
 
           {/* ÁREA DO BOTÃO COM EFEITO GLASS */}
-          <View style={styles.formContent}>
-            <View style={styles.buttonWrap}>
+          <View style={stylesVerificar.formContent}>
+            <View style={stylesVerificar.buttonWrap}>
               <CustomButton 
                 title="Verificar Código" 
                 onPress={handleVerify} 
-                style={styles.glassButton} 
-                textStyle={styles.buttonTitle}
+                style={stylesVerificar.glassButton} 
+                textStyle={stylesVerificar.buttonTitle}
               />
             </View>
 
@@ -142,10 +129,10 @@ export default function VerificarCodigo({ navigation }) {
             <TouchableOpacity
               disabled={timer > 0}
               onPress={() => setTimer(30)}
-              style={styles.resendButton}
+              style={stylesVerificar.resendButton}
             >
-              <Text style={styles.resendText}>
-                Não recebeu o código? <Text style={styles.resendTextBold}>{timer > 0 ? `Aguarde ${timer}s` : 'Reenviar código'}</Text>
+              <Text style={stylesVerificar.resendText}>
+                Não recebeu o código? <Text style={stylesVerificar.resendTextBold}>{timer > 0 ? `Aguarde ${timer}s` : 'Reenviar código'}</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -193,64 +180,7 @@ const styles = StyleSheet.create({
      justifyContent: 'center',
      zIndex: 10,
      elevation: 3,
-     shadowColor: colors.shadowDark,
-     shadowOffset: { width: 0, height: 2 },
-     shadowOpacity: 0.2,
-     shadowRadius: 5,
-   },
-   backText: {
-     fontSize: 26,
-     color: colors.text,
-     fontWeight: '300',
-   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-    width: '100%',
-    paddingHorizontal: 30,
-  },
-  iconWrap: {
-    marginBottom: 30,
-  },
-   iconRingOuter: {
-     width: 130,
-     height: 130,
-     borderRadius: 65,
-     backgroundColor: colors.ringOuter,
-     alignItems: 'center',
-     justifyContent: 'center',
-   },
-   iconRingInner: {
-     width: 110,
-     height: 110,
-     borderRadius: 55,
-     backgroundColor: colors.ringInner,
-     alignItems: 'center',
-     justifyContent: 'center',
-   },
-   iconCircle: {
-     width: 90,
-     height: 90,
-     borderRadius: 45,
-     backgroundColor: colors.primary,
-     alignItems: 'center',
-     justifyContent: 'center',
-     elevation: 7,
-     shadowColor: colors.primary,
-     shadowOffset: { width: 0, height: 5 },
-     shadowOpacity: 0.28,
-     shadowRadius: 8,
-   },
-   iconEmoji: {
-     fontSize: 40,
-   },
-   headerTitle: {
-     fontSize: 25,
-     fontWeight: '800',
-     color: colors.text,
-     marginBottom: 13,
-     letterSpacing: 0.3,
-     lineHeight: 30,
+      // styles moved to src/styles/styleVerificarCodigo/styleVerificarCodigo.js
    },
    headerSubtitle: {
      fontSize: 15,
