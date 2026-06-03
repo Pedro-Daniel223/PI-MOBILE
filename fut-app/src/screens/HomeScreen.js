@@ -18,47 +18,10 @@ import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCar
 import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
 import { useNavigation } from "@react-navigation/native";
 import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
-
-const products = [
-  {
-    image: require('../assets/img/Produtos/acessorios/objeto 1/cachecol_transparent (3).png'),
-    title: 'Camisa Milan 2006',
-    price: 'R$ 199,90',
-  },
-  {
-      image: require('../assets/img/Produtos/acessorios/objeto 2/boneco_transparent (3).png'),
-    title: 'Camisa Real Madrid',
-    price: 'R$ 249,90',
-  },
-  {
-    image: require('../assets/img/Produtos/acessorios/objeto 3/touca_transparent.png'),
-    title: 'Camisa Brasil',
-    price: 'R$ 179,90',
-  },
-];
-
-// Sua branch Nayane - Bom proveito!
-
-
-
-
+import { products } from '../data/dataHome';
+import { stylesHome } from '../styles/styleHome/styleHome';
 
 export default function Home({ navigation }) {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  import React, { useState } from 'react';
-  import { View, Text, StyleSheet, ScrollView } from 'react-native';
-  import { LinearGradient } from 'expo-linear-gradient';
-  import GlassCarousel from '../components/Cards_home/GlassCarousel';
-  import CardProfileWelcome from '../components/Cards_home/CardProfileWelcome';
-  import CardActionGlass from '../components/Cards_home/cardActionGlass';
-  import CardSocioGlass from '../components/Cards_home/CardSocioGlass';
-  import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCarousel';
-  import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
-  import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
-  import { products } from '../data/dataHome';
-  import { stylesHome } from '../styles/styleHome/styleHome';
-
-  export default function Home() {
     const [isDarkMode, setIsDarkMode] = useState(true);
 
     return (
