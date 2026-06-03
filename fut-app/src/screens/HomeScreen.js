@@ -18,7 +18,6 @@ import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCar
 import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
 import { useNavigation } from "@react-navigation/native";
 import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
-import { stylesHome } from '../styles/styleHome/styleHome';
 
 const products = [
   {
@@ -46,50 +45,65 @@ const products = [
 
 export default function Home({ navigation }) {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  import React, { useState } from 'react';
+  import { View, Text, StyleSheet, ScrollView } from 'react-native';
+  import { LinearGradient } from 'expo-linear-gradient';
+  import GlassCarousel from '../components/Cards_home/GlassCarousel';
+  import CardProfileWelcome from '../components/Cards_home/CardProfileWelcome';
+  import CardActionGlass from '../components/Cards_home/cardActionGlass';
+  import CardSocioGlass from '../components/Cards_home/CardSocioGlass';
+  import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCarousel';
+  import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
+  import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
+  import { products } from '../data/dataHome';
+  import { stylesHome } from '../styles/styleHome/styleHome';
 
-  return (
-    <View style={stylesHome.container}>
-      <LinearGradient
-        colors={isDarkMode ? ['#080808', '#1a0000'] : ['#050505', '#7b0000']}
-        style={StyleSheet.absoluteFill}
-      />
+  export default function Home() {
+    const [isDarkMode, setIsDarkMode] = useState(true);
 
-      <ScrollView contentContainerStyle={stylesHome.content}>
-        <CardProfileWelcome isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+    return (
+      <View style={stylesHome.container}>
+        <LinearGradient
+          colors={isDarkMode ? ['#080808', '#1a0000'] : ['#050505', '#7b0000']}
+          style={StyleSheet.absoluteFill}
+        />
 
-        <View style={stylesHome.row}>
-          <CardActionGlass
-            style={{ flex: 1 }}
-            flatRight
-            icon="storefront-outline"
-            title="Drakos Store"
-            desc="Veja produtos"
-            image={require('../assets/img/img_home/milan_r2006(2).png')}
-          />
+        <ScrollView contentContainerStyle={stylesHome.content}>
+          <CardProfileWelcome isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
-          <CardSocioGlass flatLeft />
-        </View>
+          <View style={stylesHome.row}>
+            <CardActionGlass
+              style={{ flex: 1 }}
+              flatRight
+              icon="storefront-outline"
+              title="Drakos Store"
+              desc="Veja produtos"
+              image={require('../assets/img/img_home/milan_r2006(2).png')}
+            />
 
-        <GlassCarousel />
-
-        <View style={{ marginTop: 25 }}>
-          <View style={stylesHome.sectionHeader}>
-            <Text style={stylesHome.sectionTitle}>Produtos em destaque</Text>
-            <View style={stylesHome.sectionLine} />
+            <CardSocioGlass flatLeft />
           </View>
 
-          <InfiniteProductCarousel
-            data={products}
-            renderItem={({ item }) => (
-              <View style={stylesHome.productWrapper}>
-                <ProductCardGlassPro image={item.image} title={item.title} price={item.price} />
-              </View>
-            )}
-          />
-        </View>
+          <GlassCarousel />
 
-        <PremiumGlassCard Text="Seja um membro Premium e tenha acesso a benefícios exclusivos!" />
-      </ScrollView>
-    </View>
-  );
-}
+          <View style={{ marginTop: 25 }}>
+            <View style={stylesHome.sectionHeader}>
+              <Text style={stylesHome.sectionTitle}>Produtos em destaque</Text>
+              <View style={stylesHome.sectionLine} />
+            </View>
+
+            <InfiniteProductCarousel
+              data={products}
+              renderItem={({ item }) => (
+                <View style={stylesHome.productWrapper}>
+                  <ProductCardGlassPro image={item.image} title={item.title} price={item.price} />
+                </View>
+              )}
+            />
+          </View>
+
+          <PremiumGlassCard Text="Seja um membro Premium e tenha acesso a benefícios exclusivos!" />
+        </ScrollView>
+      </View>
+    );
+  }
