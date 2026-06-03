@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,6 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-
-import NavbarGlass from '../components/NavbarGlass';
 import GlassCarousel from '../components/Cards_home/GlassCarousel';
 import CardProfileWelcome from '../components/Cards_home/CardProfileWelcome';
 import CardActionGlass from '../components/Cards_home/cardActionGlass';
@@ -46,6 +44,7 @@ const products = [
 
 
 export default function Home({ navigation }) {
+  const [isDarkMode, setIsDarkMode] = useState(true);
   return (
     <View style={styles.container}>
 
@@ -53,14 +52,34 @@ export default function Home({ navigation }) {
 
       {/* BACKGROUND */}
       <LinearGradient
-        colors={['#b30000', '#5a0000', '#1a0000']}
+        colors={
+          isDarkMode
+            ? ['#080808', '#1a0000'] // Tema escuro vermelho
+            : ['#050505', '#7b0000'] // Tema claro
+        }
         style={StyleSheet.absoluteFill}
       />
+
+      // Alternativas
+      {/* //  colors={[ */}
+      //   '#050505',
+      //   '#050505',
+      //   '#1a0000',
+      {/* // ]} */}
+
+      {/* // colors={[ */}
+      //   '#050505',
+      //   '#2b0000',
+      //   '#050505',
+      {/* //   ]} */}
 
       <ScrollView contentContainerStyle={styles.content}>
 
 
-        <CardProfileWelcome />
+        <CardProfileWelcome
+          isDarkMode={isDarkMode}
+          setIsDarkMode={setIsDarkMode}
+        />
 
 
         <View style={{
@@ -90,7 +109,7 @@ export default function Home({ navigation }) {
 
 
         {/* CARD GRANDE */}
-          <GlassCarousel />
+        <GlassCarousel />
               {/* CARROSEL DE PRODUTOS */}
       <View style={{ marginTop: 25 }}>
 
@@ -124,7 +143,7 @@ export default function Home({ navigation }) {
 
 
       {/* NAVBAR */}
-      <NavbarGlass navigation={navigation} />
+      {/* <NavbarGlass navigation={navigation} /> */}
 
 
     </View>

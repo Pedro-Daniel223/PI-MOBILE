@@ -1,12 +1,16 @@
 {
   "expo": {
-    "name": "fut-app",
-    "slug": "fut-app",
+    "name": "Drakos-app",
+    "slug": "Drakos-app",
     "version": "1.0.0",
-      "plugins": [
-        "expo-font",
-        "expo-local-authentication"
-      ],
+    "splash": {
+      "image": "./src/assets/img/icon_escudo_drakos.png",
+      "resizeMode": "contain"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-local-authentication"
+    ],
     "ios": {
       "infoPlist": {
         "NSFaceIDUsageDescription": "O Covil dos Drakos utiliza biometria para garantir a segurança dos seus ingressos."

@@ -49,7 +49,7 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Erro', 'Email inválido!');
       return;
     }
-    navigation.replace('Home');
+    navigation.navigate('MainTabs');
   };
 
   // NOVO: Função de Autenticação Biométrica
@@ -70,7 +70,7 @@ export default function LoginScreen({ navigation }) {
     });
 
     if (result.success) {
-      navigation.replace('Home');
+      navigation.replace('MainTabs');
     }
   };
 
@@ -140,7 +140,7 @@ export default function LoginScreen({ navigation }) {
               <View style={styles.forgotRow}>
                 <Text style={styles.forgotText}>Esqueceu Senha?</Text>
                 <TouchableOpacity 
-                  onPress={() => navigation.navigate('EsqueceuSenhaScreen')} 
+                  onPress={() => navigation.navigate('EsqueceuSenha')}
                   style={styles.redefineBtn}
                 >
                   <Text style={[styles.forgotText, styles.linkBold]}>Redefinir</Text>
@@ -171,7 +171,7 @@ export default function LoginScreen({ navigation }) {
             <TouchableOpacity 
               onPress={() => {
                 console.log("Navegando para Cadastro...");
-                navigation.navigate('CadastroScreen');
+                navigation.navigate('Cadastro');
               }}
               activeOpacity={0.7}
               style={styles.footerContainer}

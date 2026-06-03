@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { styleSocioModal } from '../styles/styleSocios/styleSociosModal';
 
-import NavbarGlass from '../components/NavbarGlass';
 import { useSubscription } from '../contexts/SubscriptionContext';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
@@ -359,9 +358,6 @@ export default function PerfilScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-
-      {/* NAVBAR */}
-      <NavbarGlass navigation={navigation} />
     </View>
   );
 }

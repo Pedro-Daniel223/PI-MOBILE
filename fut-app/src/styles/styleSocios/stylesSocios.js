@@ -109,20 +109,6 @@ import { StyleSheet } from "react-native";
     elevation: 2,
   },
 
-  categoryText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-
-  plansSubtitle: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#333',
-    letterSpacing: 1,
-    marginBottom: 16,
-  },
-
   // ─────── Card de plano ───────
   planCard: {
     flexDirection: 'row',
@@ -144,7 +130,7 @@ import { StyleSheet } from "react-native";
   },
 
   planTitle: {
-    fontSize: 22,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 4,
@@ -159,16 +145,16 @@ import { StyleSheet } from "react-native";
     borderRadius: 12,
     marginBottom: 10,
   },
-
+  
   cardBadgeText: {
-    fontSize: 10,
+    fontSize: 15,
     fontWeight: '600',
     color: '#000',
     letterSpacing: 0.3,
   },
 
   planDescription: {
-    fontSize: 12,   
+    fontSize: 16,   
     lineHeight: 16,
     marginBottom: 16,
   },
@@ -189,7 +175,7 @@ import { StyleSheet } from "react-native";
   },
 
   verMaisText: {
-    fontSize: 12,
+    fontSize: 16,
     fontWeight: '600',
     color: '#333',
     letterSpacing: 0.5,
@@ -221,7 +207,7 @@ import { StyleSheet } from "react-native";
 
   footerText: {
     color: '#888',
-    fontSize: 12,
+    fontSize: 16,
     textAlign: 'center',
     lineHeight: 18,
   },
