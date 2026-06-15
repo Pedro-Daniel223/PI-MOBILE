@@ -1,5 +1,5 @@
 import { Dimensions } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
 
 // Dimensões da tela para cálculos responsivos
 

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
 import { SCREEN_HEIGHT } from './dimensoes';
 
 export const mainStyles = StyleSheet.create({

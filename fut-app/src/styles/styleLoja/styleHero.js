@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { SCREEN_WIDTH, SCREEN_HEIGHT, HERO_HEIGHT } from './dimensoes';
-import { DS } from './root';
+import { DS } from './rootLoja';
 import { scaleFont } from '../../utils/fontScale';
 
 export const heroStyles = StyleSheet.create({

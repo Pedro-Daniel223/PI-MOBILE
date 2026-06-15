@@ -1,4 +1,4 @@
-import { DS } from './root';
+import { DS } from './rootLoja';
 import { StyleSheet } from 'react-native';
 
 export const catStyles = StyleSheet.create({

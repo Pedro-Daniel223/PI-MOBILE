@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
 import { scaleFont } from '../../utils/fontScale';
 
 // Estilos para os cards de produto na Loja do FUT, seguindo a estética cinematográfica escura e moderna definida em DS

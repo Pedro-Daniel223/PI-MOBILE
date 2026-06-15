@@ -1,6 +1,6 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react'; // Adicionado useEffect
-import { View, Text, StyleSheet, Alert, SafeAreaView, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Image, StatusBar } from 'react-native';
-import * as LocalAuthentication from 'expo-local-authentication'; // NOVO: Importação
+import React, { useState, useLayoutEffect, useEffect } from 'react';
+import { View, Text, Alert, SafeAreaView, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Image, StatusBar } from 'react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,13 +11,12 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPass, setShowPass] = useState(false);
-  const [isBiometricSupported, setIsBiometricSupported] = useState(false); // NOVO: Estado para verificar suporte
+  const [isBiometricSupported, setIsBiometricSupported] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  // NOVO: Verifica se o dispositivo suporta biometria ao carregar a tela
   useEffect(() => {
     (async () => {
       const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -39,15 +38,10 @@ export default function LoginScreen({ navigation }) {
     navigation.navigate('MainTabs');
   };
 
-  // NOVO: Função de Autenticação Biométrica
   const handleBiometricAuth = async () => {
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
     if (!isEnrolled) {
-      return Alert.alert(
-        'Biometria não configurada',
-        'Por favor, configure uma digital ou FaceID nas configurações do seu celular.'
-      );
+      return Alert.alert('Biometria não configurada', 'Por favor, configure uma digital ou FaceID nas configurações do seu celular.');
     }
 
     const result = await LocalAuthentication.authenticateAsync({
@@ -56,33 +50,27 @@ export default function LoginScreen({ navigation }) {
       disableDeviceFallback: false,
     });
 
-    if (result.success) {
-      navigation.replace('MainTabs');
-    }
+    if (result.success) navigation.replace('MainTabs');
   };
 
   return (
-  <SafeAreaView style={stylesLogin.safe}>
-      {/* Define a cor da barra de status do celular */}
+    <SafeAreaView style={stylesLogin.safe}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
-      
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={stylesLogin.container}
       >
-        <ScrollView 
-          contentContainerStyle={stylesLogin.scrollGrow} 
-          bounces={false} 
+        <ScrollView
+          contentContainerStyle={stylesLogin.scrollGrow}
+          bounces={false}
           showsVerticalScrollIndicator={false}
         >
+
           {/* HEADER VERMELHO */}
           <View style={stylesLogin.header}>
-            <Image 
-              source={escudoDrakos}
-              style={stylesLogin.escudoHeader}
-              resizeMode="contain"
-            />
-            <View style={styles.headerContent}>
+            <Image source={escudoDrakos} style={stylesLogin.escudoHeader} resizeMode="contain" />
+            <View style={stylesLogin.headerContent}>
               <Text style={stylesLogin.headerTitle}>BEM-VINDO DE VOLTA AO COVIL</Text>
               <Text style={stylesLogin.headerSubtitle}>Faça seu login para entrar no Covil dos Drakos</Text>
             </View>
@@ -92,7 +80,7 @@ export default function LoginScreen({ navigation }) {
           <View style={stylesLogin.card}>
             <Text style={stylesLogin.formTitle}>Login</Text>
 
-            <View style={styles.formContent}>
+            <View style={stylesLogin.formContent}>
               <Text style={stylesLogin.label}>Seu EMAIL/CPF:</Text>
               <CustomInput
                 placeholder="email@exemplo.com"
@@ -103,7 +91,7 @@ export default function LoginScreen({ navigation }) {
                 style={stylesLogin.inputStyle}
                 rightComponent={
                   emailValid && (
-                    <View style={styles.iconContainer}>
+                    <View style={stylesLogin.iconContainer}>
                       <Text style={stylesLogin.checkIcon}>✓</Text>
                     </View>
                   )
@@ -118,7 +106,7 @@ export default function LoginScreen({ navigation }) {
                 secureTextEntry={!showPass}
                 style={stylesLogin.inputStyle}
                 rightComponent={
-                  <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.iconContainer}>
+                  <TouchableOpacity onPress={() => setShowPass(!showPass)} style={stylesLogin.iconContainer}>
                     <Text style={stylesLogin.inlineIconText}>{showPass ? <Ionicons name="eye-off" style={stylesLogin.iconEye} /> : <Ionicons name="eye" style={stylesLogin.iconEye} />}</Text>
                   </TouchableOpacity>
                 }
@@ -126,45 +114,27 @@ export default function LoginScreen({ navigation }) {
 
               <View style={stylesLogin.forgotRow}>
                 <Text style={stylesLogin.forgotText}>Esqueceu Senha?</Text>
-                <TouchableOpacity 
-                  onPress={() => navigation.navigate('EsqueceuSenha')}
-                  style={styles.redefineBtn}
-                >
+                <TouchableOpacity onPress={() => navigation.navigate('EsqueceuSenha')} style={stylesLogin.redefineBtn}>
                   <Text style={[stylesLogin.forgotText, stylesLogin.linkBold]}>Redefinir</Text>
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.buttonWrap}>
-                <CustomButton
-                  title="Entrar"
-                  onPress={handleLogin}
-                  style={stylesLogin.glassButton}
-                  textStyle={stylesLogin.buttonTitle}
-                />
+              <View style={stylesLogin.buttonWrap}>
+                <CustomButton title="Entrar" onPress={handleLogin} style={stylesLogin.glassButton} textStyle={stylesLogin.buttonTitle} />
 
-                {/* NOVO: Botão de Biometria condicional */}
                 {isBiometricSupported && (
-                  <TouchableOpacity 
-                    onPress={handleBiometricAuth} 
-                    style={stylesLogin.biometricBtn}
-                  >
+                  <TouchableOpacity onPress={handleBiometricAuth} style={stylesLogin.biometricBtn}>
                     <Ionicons name="finger-print" size={24} color={colors.primary} />
                     <Text style={stylesLogin.biometricText}>Entrar com Biometria</Text>
                   </TouchableOpacity>
                 )}
               </View>
             </View>
-            <TouchableOpacity 
-              onPress={() => {
-                console.log("Navegando para Cadastro...");
-                navigation.navigate('Cadastro');
-              }}
-              activeOpacity={0.7}
-              style={stylesLogin.footerContainer}
-            >
-               <Text style={stylesLogin.footerText}>
-                 Não possui uma conta? <Text style={stylesLogin.linkBold}>Registrar</Text>
-               </Text>
+
+            <TouchableOpacity onPress={() => navigation.navigate('Cadastro')} activeOpacity={0.7} style={stylesLogin.footerContainer}>
+              <Text style={stylesLogin.footerText}>
+                Não possui uma conta? <Text style={stylesLogin.linkBold}>Registrar</Text>
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

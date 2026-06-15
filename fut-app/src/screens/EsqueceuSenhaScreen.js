@@ -73,7 +73,7 @@ export default function EsqueceuSenhaScreen({ navigation }) {
                     <Text style={styles.checkIcon}>✓</Text>
                   ) : null
                 }
-                style={{ backgroundColor: colors.inputBackground }}
+                style={{ backgroundColor: colors?.inputBackground }}
               />
             </View>
 

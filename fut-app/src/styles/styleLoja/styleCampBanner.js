@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
 import { SCREEN_WIDTH, SCREEN_HEIGHT, CAMPAIGN_HEIGHT, CAMPAIGN_WIDTH } from './dimensoes';
 import { scaleFont } from '../../utils/fontScale';
 

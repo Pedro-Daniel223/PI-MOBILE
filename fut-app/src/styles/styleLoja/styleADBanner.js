@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
 import { scaleFont } from '../../utils/fontScale';
 
 export const adStyles = StyleSheet.create({

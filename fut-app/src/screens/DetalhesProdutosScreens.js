@@ -45,7 +45,6 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconButton}>
           <Ionicons name="chevron-back" size={20} color="#333" />
@@ -55,7 +54,6 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Image carousel */}
         <View style={styles.imageCard}>
           <ScrollView
             horizontal
@@ -66,7 +64,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             scrollEventThrottle={16}
           >
             {imagens.map((img, idx) => (
-              <View key={idx} style={[styles.imageSlide, { width: slideWidth }]}> 
+              <View key={idx} style={[styles.imageSlide, { width: slideWidth }]}>
                 <Image source={img} style={styles.productImage} resizeMode="contain" />
               </View>
             ))}
@@ -143,161 +141,3 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
     </SafeAreaView>
   );
 }
-   pagination: {
-     flexDirection: 'row',
-     position: 'absolute',
-     bottom: 15,
-     gap: 6,
-   },
-   dot: {
-     width: 8,
-     height: 8,
-     borderRadius: 4,
-     backgroundColor: '#999',
-   },
-   dotActive: {
-     backgroundColor: '#A52A2A',
-     width: 20,
-   },
-   navButton: {
-     position: 'absolute',
-     top: '45%',
-     transform: [{ translateY: -30 }],
-     width: 36,
-     height: 36,
-     borderRadius: 18,
-     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-     justifyContent: 'center',
-     alignItems: 'center',
-     elevation: 4,
-     shadowColor: '#000',
-     shadowOffset: { width: 0, height: 2 },
-     shadowOpacity: 0.15,
-     shadowRadius: 4,
-   },
-   navButtonLeft: {
-     left: 8,
-   },
-   navButtonRight: {
-     right: 8,
-   },
-  infoSection: {
-    paddingHorizontal: 20,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
-  },
-  currentPrice: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  oldPrice: {
-    fontSize: 16,
-    color: '#BBB',
-    textDecorationLine: 'line-through',
-    marginLeft: 10,
-  },
-  discountBadge: {
-    backgroundColor: '#FFF1F1',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 5,
-    marginLeft: 'auto',
-  },
-  discountText: {
-    color: '#D00',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-   productName: {
-     fontSize: 16,
-     color: '#666',
-     marginBottom: 20,
-   },
-   sizeGrid: {
-     flexDirection: 'row',
-     flexWrap: 'wrap',
-     justifyContent: 'space-between',
-     marginBottom: 30,
-     gap: 12,
-   },
-   sizeLabelTitle: {
-     fontSize: 16,
-     fontWeight: '700',
-     color: '#333',
-     marginBottom: 10,
-     width: '100%',
-   },
-  sizeBox: {
-    width: width * 0.2,
-    height: 50,
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#EEE',
-  },
-  sizeBoxActive: {
-    backgroundColor: '#000',
-    borderColor: '#000',
-  },
-  sizeLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  sizeLabelActive: {
-    color: '#FFF',
-  },
-  descriptionContainer: {
-    marginTop: 10,
-  },
-  descriptionHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  descLine: {
-    width: 100,
-    height: 2,
-    backgroundColor: '#EEE',
-    marginVertical: 10,
-  },
-  descriptionText: {
-    fontSize: 16,
-    color: '#666',
-    lineHeight: 20,
-    textAlign: 'left',
-  },
-  cartButton: {
-    backgroundColor: '#000',
-    paddingVertical: 18,
-    paddingHorizontal: 40,
-    borderRadius: 35,
-    alignSelf: 'center',
-    marginTop: 30,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  cartButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cartButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 10,
-    letterSpacing: 0.5,
-  },
-});
