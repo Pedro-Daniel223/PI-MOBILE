@@ -72,9 +72,9 @@ export default function IngressosScreen({navigation}) {
                             <View style={stylesIngresso.dataHoraContainer}>
                                 <Ionicons name="calendar-outline" size={20} color="#ddd" />
                                 <Text style={stylesIngresso.data}>{item.dia}</Text>
-                                <Text style={stylesIngresso.data}>-</Text>
+                                <Text style={stylesIngresso.data}> - </Text>
                                 <Ionicons name="time-outline" size={20} color="#ddd" />
-                                <Text style={stylesIngresso.hora}>{item.hora}</Text>
+                                <Text style={stylesIngresso.data}>{item.hora}</Text>
                             </View>
 
                             <Text style={stylesIngresso.valor}>{item.valor}</Text>
