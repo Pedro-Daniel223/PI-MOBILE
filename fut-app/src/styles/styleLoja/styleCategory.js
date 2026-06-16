@@ -1,5 +1,6 @@
 import { DS } from './rootLoja';
 import { StyleSheet } from 'react-native';
+import { scaleFont } from '../../utils/fontScale';
 
 export const catStyles = StyleSheet.create({
   strip: { marginTop: 28 },
@@ -20,7 +21,7 @@ export const catStyles = StyleSheet.create({
     borderColor: DS.accent,
   },
   pillText: {
-    fontSize: 12,
+    fontSize: scaleFont(12),
     fontWeight: '600',
     letterSpacing: 0.5,
     color: DS.textDim,

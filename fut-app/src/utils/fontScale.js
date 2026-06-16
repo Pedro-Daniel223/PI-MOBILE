@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Dimensions, PixelRatio } from 'react-native';
 
+// Função para obter a escala de fonte atual do dispositivo
 export function getFontScale() {
   return PixelRatio.getFontScale(); // ou Dimensions.get('window').fontScale
 }
 
+// Função para escalar fonte com base na largura da tela e na configuração de escala de fonte do usuário
 export function scaleFont(size, fontScale = getFontScale(), baseWidth = 375) {
   const { width } = Dimensions.get('window');
   const scaleFactor = width / baseWidth; // adapta por largura de tela

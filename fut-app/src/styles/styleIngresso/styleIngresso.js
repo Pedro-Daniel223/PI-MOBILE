@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import { scaleFont } from "../../utils/fontScale";
 
 export const stylesIngresso = StyleSheet.create({
     container: {
@@ -8,8 +9,8 @@ export const stylesIngresso = StyleSheet.create({
         paddingBottom: 100, // Espaço para a navbar
         marginBottom: 10, // Para a navbar ficar sobreposta
     },
-    titulo: {
-        fontSize: 32,
+  titulo: {
+    fontSize: scaleFont(32),
         textAlign: 'center',
         fontWeight: 'bold',
         marginBottom: 4,
@@ -43,31 +44,31 @@ export const stylesIngresso = StyleSheet.create({
         borderWidth: 2,
         borderColor: '#fff'
     },
-    nome: {
-        fontSize: 28,
-        fontWeight: 'bold',
+  nome: {
+    fontSize: scaleFont(28),
+    fontWeight: 'bold',
         color: '#fff',
     },
-    lugar: {
-        fontSize: 20,
-        color: '#eee',
+  lugar: {
+    fontSize: scaleFont(20),
+    color: '#eee',
     },
     dataHoraContainer: {
         flexDirection: 'row',
         gap: 8,
         marginTop: 8,
     },
-    data: {
-        fontSize: 20,
-        color: '#ddd',
+  data: {
+    fontSize: scaleFont(20),
+    color: '#ddd',
     },
-    hora: {
-        fontSize: 20,
-        color: '#ddd',
+  hora: {
+    fontSize: scaleFont(20),
+    color: '#ddd',
     },
-    valor: {
-        fontSize: 24,
-        fontWeight: 'bold',
+  valor: {
+    fontSize: scaleFont(24),
+    fontWeight: 'bold',
         color: '#fff',
         marginTop: 5,
     },
@@ -77,10 +78,10 @@ export const stylesIngresso = StyleSheet.create({
         paddingHorizontal: 30,
         borderRadius: 20,
     },
-    textoBtn: {
-        color: '#880000',
-        fontSize: 20,
-        fontWeight: 'bold'
+  textoBtn: {
+    color: '#880000',
+    fontSize: scaleFont(20),
+    fontWeight: 'bold'
     },
     qtdButtonContainer: {
         flexDirection: 'row',
@@ -94,8 +95,8 @@ export const stylesIngresso = StyleSheet.create({
         gap: 16,
         alignItems: 'center',
     },
-    textoQtd: {
-        color: '#fff',
-        fontSize: 32,
+  textoQtd: {
+    color: '#fff',
+    fontSize: scaleFont(32),
     },
 });

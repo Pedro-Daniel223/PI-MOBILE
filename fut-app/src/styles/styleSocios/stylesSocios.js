@@ -1,6 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import { scaleFont } from "../../utils/fontScale";
 
- export const stylesSocio = StyleSheet.create({
+export const stylesSocio = StyleSheet.create({
   // ─────── Layout principal ───────
   container: {
     flex: 1,
@@ -53,7 +54,7 @@ import { StyleSheet } from "react-native";
 
   titleLine1: {
     fontFamily: 'serif',
-    fontSize: 42,
+    fontSize: scaleFont(42),
     fontWeight: 'bold',
     color: '#000',
     letterSpacing: 1,
@@ -67,14 +68,14 @@ import { StyleSheet } from "react-native";
 
   titleSocio: {
     fontFamily: 'serif',
-    fontSize: 28,
+    fontSize: scaleFont(28),
     fontWeight: 'bold',
     color: '#000',
   },
 
   titleTorcedor: {
     fontFamily: 'serif',
-    fontSize: 36,
+    fontSize: scaleFont(36),
     fontWeight: 'bold',
     color: '#8b0000',
   },
@@ -130,7 +131,7 @@ import { StyleSheet } from "react-native";
   },
 
   planTitle: {
-    fontSize: 30,
+    fontSize: scaleFont(30),
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 4,
@@ -147,15 +148,15 @@ import { StyleSheet } from "react-native";
   },
   
   cardBadgeText: {
-    fontSize: 15,
+    fontSize: scaleFont(15),
     fontWeight: '600',
     color: '#000',
     letterSpacing: 0.3,
   },
 
   planDescription: {
-    fontSize: 16,   
-    lineHeight: 16,
+    fontSize: scaleFont(16),
+    lineHeight: scaleFont(16),
     marginBottom: 16,
   },
 
@@ -175,7 +176,7 @@ import { StyleSheet } from "react-native";
   },
 
   verMaisText: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     fontWeight: '600',
     color: '#333',
     letterSpacing: 0.5,
@@ -207,8 +208,8 @@ import { StyleSheet } from "react-native";
 
   footerText: {
     color: '#888',
-    fontSize: 16,
+    fontSize: scaleFont(16),
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: scaleFont(18),
   },
  });
