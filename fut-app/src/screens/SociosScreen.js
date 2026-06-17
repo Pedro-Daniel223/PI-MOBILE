@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, TouchableWithoutFeedback,} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSubscription } from '../contexts/SubscriptionContext';
-import { dadosPlano } from '../data/dataSocios';
+import { dadosPlano } from '../data/dataSocios/dataSocios';
 import { stylesSocio } from '../styles/styleSocios/stylesSocios';
 import { styleSocioModal } from '../styles/styleSocios/styleSociosModal';
 import NavbarGlass from '../components/NavbarGlass';
