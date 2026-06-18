@@ -7,7 +7,7 @@ export const dadosPlano = [
       vagas: 'Limitado a 350 vagas',
       textColor: '#000',
       cardColor: '#e0e0e0',
-      cardImage: require('../assets/img/socios/card_branco.png'),
+      cardImage: require('../../assets/img/socios/card_branco.png'),
       beneficios: [
         'Plano anual',
         'Acesso livre aos jogos*',
@@ -28,7 +28,7 @@ export const dadosPlano = [
       vagas: 'Limitado a 150 vagas',
       textColor: '#fff',
       cardColor: '#E80000',
-      cardImage: require('../assets/img/socios/card_red.png'),
+      cardImage: require('../../assets/img/socios/card_red.png'),
       beneficios: [
         'Plano anual',
         'Acesso livre aos jogos*',
@@ -49,7 +49,7 @@ export const dadosPlano = [
       vagas: 'Limitado a 50 vagas',
       textColor: '#fff',
       cardColor: '#000000',
-      cardImage: require('../assets/img/socios/card_preto.png'),
+      cardImage: require('../../assets/img/socios/card_preto.png'),
       beneficios: [
         'Plano anual',
         'Acesso livre aos jogos*',
