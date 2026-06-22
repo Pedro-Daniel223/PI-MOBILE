@@ -105,6 +105,26 @@ eas build --platform ios --profile preview
 
 ---
 
+## Atualizando o APK após mudanças no app
+
+Sempre que fizer alterações no código (telas, estilos, assets, dependências), siga este fluxo para garantir que o build tenha suas últimas mudanças:
+
+**1. Limpe o projeto local:**
+```sh
+cd fut-app
+npx expo prebuild --platform android --clean
+```
+> Isso remove a pasta `android` antiga e recria a estrutura nativa.
+
+**2. Gere um novo APK:**
+```sh
+eas build --platform android --profile preview
+```
+
+**3. Baixe o APK atualizado** pelo link exibido ao final do build (mesmo fluxo da seção 5).
+
+---
+
 ## Problemas comuns
 
 | Erro | Causa | Solução |
