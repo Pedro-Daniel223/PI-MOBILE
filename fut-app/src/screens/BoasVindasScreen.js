@@ -10,7 +10,7 @@ export default function BoasVindasScreen() {
 
     return (
             <ImageBackground
-            source={require('../assets/images/tela1.png')}
+            source={require('../assets/images/tela1.jpg')}
             style={estilos.background}
             resizeMode="cover"
             >                
