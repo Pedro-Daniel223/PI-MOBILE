@@ -14,8 +14,10 @@
     ],
     "ios": {
       "infoPlist": {
-        "NSFaceIDUsageDescription": "O Covil dos Drakos utiliza biometria para garantir a segurança dos seus ingressos."
-      }
+        "NSFaceIDUsageDescription": "O Covil dos Drakos utiliza biometria para garantir a segurança dos seus ingressos.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.fernandoff.Drakosapp"
     },
     "android": {
       "permissions": [
