@@ -160,35 +160,14 @@ export default function BoasVindasScreen() {
           </TouchableOpacity>
         </Animated.View>
 
+          {/* Dragon glow ring */}
+          {/* <Animated.View style={[styles.glowRing, { opacity: glowPulse }]} /> */}
+
+          {/* Logo emblem placeholder — swap for your <Image> */}
         {/* Center block */}
         <View style={styles.centerBlock}>
 
-          {/* Dragon glow ring */}
-          <Animated.View style={[styles.glowRing, { opacity: glowPulse }]} />
-
-          {/* Logo emblem placeholder — swap for your <Image> */}
-          <Animated.View
-            style={[
-              styles.logoWrap,
-              {
-                opacity: logoAnim,
-                transform: [
-                  {
-                    translateY: logoAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [-30, 0],
-                    }),
-                  },
-                  { scale: logoAnim },
-                ],
-              },
-            ]}
-          >
-            {/* Dragon SVG-style text badge — replace with <Image source={require('../assets/logo.png')} /> */}
-            <View style={styles.dragonBadge}>
-              <Text style={styles.dragonGlyph}>🐉</Text>
-            </View>
-          </Animated.View>
+      
 
           {/* Title */}
           <Animated.Text
