@@ -1,6 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { SCREEN_WIDTH, SCREEN_HEIGHT, HERO_HEIGHT } from './dimensoes';
-import { DS } from './root';
+import { DS } from './rootLoja';
+import { scaleFont } from '../../utils/fontScale';
 
 export const heroStyles = StyleSheet.create({
   container: {
@@ -48,15 +49,15 @@ export const heroStyles = StyleSheet.create({
     marginBottom: 20,
   },
   tagText: {
-    fontSize: 9,
+    fontSize: scaleFont(9),
     fontWeight: '700',
     letterSpacing: 2.5,
   },
   title: {
-    fontSize: 68,
+    fontSize: scaleFont(68),
     fontWeight: '900',
     color: DS.text,
-    lineHeight: 64,
+    lineHeight: scaleFont(64),
     letterSpacing: -2,
     textTransform: 'uppercase',
   },
@@ -68,10 +69,10 @@ export const heroStyles = StyleSheet.create({
     borderRadius: 1,
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: scaleFont(15),
     fontWeight: '300',
     color: DS.textDim,
-    lineHeight: 22,
+    lineHeight: scaleFont(22),
     letterSpacing: 0.3,
     marginBottom: 28,
   },
@@ -85,7 +86,7 @@ export const heroStyles = StyleSheet.create({
     paddingVertical: 11,
   },
   ctaText: {
-    fontSize: 12,
+    fontSize: scaleFont(12),
     fontWeight: '700',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
@@ -94,10 +95,10 @@ export const heroStyles = StyleSheet.create({
     position: 'absolute',
     right: -12,
     bottom: 60,
-    fontSize: 200,
+    fontSize: scaleFont(200),
     fontWeight: '900',
     color: 'rgba(255,255,255,0.025)',
-    lineHeight: 190,
+    lineHeight: scaleFont(190),
     letterSpacing: -8,
   },
   indicators: {

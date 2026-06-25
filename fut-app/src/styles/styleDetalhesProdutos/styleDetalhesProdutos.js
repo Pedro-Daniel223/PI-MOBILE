@@ -1,0 +1,113 @@
+import { StyleSheet, Dimensions, Platform } from 'react-native';
+import { scaleFont } from '../../utils/fontScale';
+
+const { width } = Dimensions.get('window');
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    height: 60,
+  },
+  headerTitle: {
+    fontSize: scaleFont(17),
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  iconButton: {
+    width: 45,
+    height: 45,
+    borderRadius: 25,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+  },
+  scrollContent: {
+    paddingBottom: 30,
+  },
+  imageCard: {
+    backgroundColor: '#EFEFEF',
+    margin: 20,
+    height: 280,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  imageSlide: {
+    width: width - 40,
+    height: 280,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  productImage: {
+    width: '85%',
+    height: '85%',
+  },
+  pagination: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 15,
+    gap: 6,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#999',
+  },
+  dotActive: {
+    backgroundColor: '#A52A2A',
+    width: 20,
+  },
+  navButton: {
+    position: 'absolute',
+    top: '45%',
+    transform: [{ translateY: -30 }],
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  navButtonLeft: { left: 8 },
+  navButtonRight: { right: 8 },
+  infoSection: { paddingHorizontal: 20 },
+  priceRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
+  currentPrice: { fontSize: scaleFont(28), fontWeight: 'bold', color: '#000' },
+  oldPrice: { fontSize: scaleFont(16), color: '#BBB', textDecorationLine: 'line-through', marginLeft: 10 },
+  discountBadge: { backgroundColor: '#FFF1F1', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5, marginLeft: 'auto' },
+  discountText: { color: '#D00', fontWeight: 'bold', fontSize: scaleFont(12) },
+  productName: { fontSize: scaleFont(16), color: '#666', marginBottom: 20 },
+  sizeGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 30, gap: 12 },
+  sizeLabelTitle: { fontSize: scaleFont(16), fontWeight: '700', color: '#333', marginBottom: 10, width: '100%' },
+  sizeBox: { width: width * 0.2, height: 50, backgroundColor: '#FFF', borderRadius: 12, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#EEE' },
+  sizeBoxActive: { backgroundColor: '#000', borderColor: '#000' },
+  sizeLabel: { fontSize: scaleFont(16), fontWeight: 'bold', color: '#000' },
+  sizeLabelActive: { color: '#FFF' },
+  descriptionContainer: { marginTop: 10 },
+  descriptionHeader: { fontSize: scaleFont(20), fontWeight: 'bold', color: '#000' },
+  descLine: { width: 100, height: 2, backgroundColor: '#EEE', marginVertical: 10 },
+  descriptionText: { fontSize: scaleFont(16), color: '#666', lineHeight: scaleFont(20), textAlign: 'left' },
+  cartButton: { backgroundColor: '#000', paddingVertical: 18, paddingHorizontal: 40, borderRadius: 35, alignSelf: 'center', marginTop: 30, elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8, borderWidth: 1, borderColor: '#333' },
+  cartButtonContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  cartButtonText: { color: '#FFF', fontSize: scaleFont(18), fontWeight: '600', marginLeft: 10, letterSpacing: 0.5 },
+});
+
+export default styles;

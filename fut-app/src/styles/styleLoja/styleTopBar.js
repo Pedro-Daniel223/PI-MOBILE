@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
+import { scaleFont } from '../../utils/fontScale';
 
 export const topStyles = StyleSheet.create({
   bar: {
@@ -18,7 +19,7 @@ export const topStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoText: {
-    fontSize: 18,
+    fontSize: scaleFont(18),
     fontWeight: '900',
     color: DS.text,
     letterSpacing: -0.5,
@@ -37,7 +38,7 @@ export const topStyles = StyleSheet.create({
   searchInput: {
     flex: 1,
     color: DS.text,
-    fontSize: 13,
+    fontSize: scaleFont(13),
     fontWeight: '400',
   },
   closeBtn: {

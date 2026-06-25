@@ -1,5 +1,5 @@
 // src/styles/styleLoja/index.js
-export { DS } from './root';
+export { DS } from './rootLoja';
 export { SCREEN_WIDTH, SCREEN_HEIGHT, CAMPAIGN_WIDTH, CAMPAIGN_HEIGHT, CARD_WIDTH, CARD_HEIGHT, HERO_HEIGHT } from './dimensoes';
 export { heroStyles } from './styleHero';
 export { catStyles } from './styleCategory';

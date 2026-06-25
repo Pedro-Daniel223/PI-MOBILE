@@ -1,101 +1,187 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import { scaleFont } from "../../utils/fontScale";
 
 export const stylesIngresso = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f0f0f0',
-        paddingTop: 30,
-        paddingBottom: 100, // Espaço para a navbar
-        marginBottom: 10, // Para a navbar ficar sobreposta
-    },
-    titulo: {
-        fontSize: 32,
-        textAlign: 'center',
-        fontWeight: 'bold',
-        marginBottom: 4,
-        color: '#880000',
-    },
-    // Ajustado para ser apenas o wrapper do ticket
-    cardContainer: {
-        width: '90%',
-        height: 290, // Altura fixa para o SVG não distorcer
-        marginVertical: 10,
-        alignSelf: 'center',
-    },
-    content: {
-        flex: 1,
-        padding: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    containerImg: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 30,
-        marginBottom: 8,
-        alignItems: 'center',
-        width: '100%',
-    },
-    img: {
-        width: 80,
-        height: 80,
-        borderRadius: 50,
-        borderWidth: 2,
-        borderColor: '#fff'
-    },
-    nome: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#fff',
-    },
-    lugar: {
-        fontSize: 20,
-        color: '#eee',
-    },
-    dataHoraContainer: {
-        flexDirection: 'row',
-        gap: 8,
-        marginTop: 8,
-    },
-    data: {
-        fontSize: 20,
-        color: '#ddd',
-    },
-    hora: {
-        fontSize: 20,
-        color: '#ddd',
-    },
-    valor: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginTop: 5,
-    },
-    btn: {
-        backgroundColor: '#fff', // Botão branco para contrastar com o ticket vermelho
-        paddingVertical: 8,
-        paddingHorizontal: 30,
-        borderRadius: 20,
-    },
-    textoBtn: {
-        color: '#880000',
-        fontSize: 20,
-        fontWeight: 'bold'
-    },
-    qtdButtonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
-        marginTop: 10,
-    },
-    qtdButton: {
-        flexDirection: 'row',
-        gap: 16,
-        alignItems: 'center',
-    },
-    textoQtd: {
-        color: '#fff',
-        fontSize: 32,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#F0F4FA',
+    marginBottom: 75,
+  },
+  header: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    marginTop: 20,
+  },
+  headerTitle: {
+    fontSize: scaleFont(16),
+    fontWeight: '700',
+    color: '#000000',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  teamsCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+    marginHorizontal: 16,
+  },
+  teamContainer: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 8,
+  },
+  teamLogo: {
+    width: 60,
+    height: 60,
+    borderRadius: 28,
+    backgroundColor: '#F0F0F0',
+  },
+  teamName: {
+    fontSize: scaleFont(10),
+    fontWeight: '700',
+    textAlign: 'center',
+    color: '#000000',
+    letterSpacing: 0.3,
+  },
+  vsText: {
+    fontSize: scaleFont(18),
+    fontWeight: '700',
+    color: '#000000',
+    paddingHorizontal: 10,
+    marginTop: 16,
+  },
+  infoCard: {
+    backgroundColor: '#F0F4FA',
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    marginTop: 16,
+    marginHorizontal: 16,
+  },
+  infoDate: {
+    fontSize: scaleFont(15),
+    fontWeight: '700',
+    color: '#000000',
+    marginBottom: 4,
+  },
+  infoTime: {
+    fontSize: scaleFont(14),
+    color: '#4B4B4B',
+    marginBottom: 4,
+  },
+  infoLocation: {
+    fontSize: scaleFont(14),
+    color: '#4B4B4B',
+  },
+  sectionLabel: {
+    fontSize: scaleFont(14),
+    fontWeight: '700',
+    marginTop: 20,
+    marginBottom: 8,
+    color: '#333',
+    letterSpacing: 0.3,
+    marginHorizontal: 16,
+  },
+  dropdown: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#CECECE',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+  },
+  dropdownText: {
+    fontSize: scaleFont(12),
+    fontWeight: '600',
+    color: '#000000',
+  },
+  ingressoList: {
+    marginTop: 16,
+    gap: 14,
+    paddingBottom: 10,
+  },
+  ingressoCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#CECECE',
+    borderRadius: 12,
+    padding: 14,
+  },
+  ingressoInfo: {
+    flexShrink: 1,
+    paddingRight: 12,
+  },
+  ingressoNome: {
+    fontSize: scaleFont(15),
+    fontWeight: '700',
+    color: '#000000',
+    marginBottom: 2,
+  },
+  ingressoLugar: {
+    fontSize: scaleFont(13),
+    color: '#4B4B4B',
+    marginBottom: 6,
+  },
+  ingressoValor: {
+    fontSize: scaleFont(14),
+    fontWeight: '800',
+    color: '#000000',
+  },
+  stepperCompact: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0F4FA',
+    borderRadius: 8,
+    padding: 2,
+  },
+  stepperButtonCompact: {
+    backgroundColor: '#800000',
+    borderRadius: 6,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quantityTextCompact: {
+    fontSize: scaleFont(15),
+    fontWeight: '700',
+    paddingHorizontal: 12,
+    color: '#000000',
+  },
+  buyContainer: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    bottom: 24,
+  },
+  buyButton: {
+    backgroundColor: '#800000',
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  buyButtonText: {
+    fontSize: scaleFont(16),
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
 });

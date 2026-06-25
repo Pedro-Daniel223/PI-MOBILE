@@ -1,6 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import { scaleFont } from "../../utils/fontScale";
 
- export const styleSocioModal = StyleSheet.create({
+export const styleSocioModal = StyleSheet.create({
   // ═══════════ Estilos do Modal ═══════════
   modal:{
 
@@ -24,7 +25,7 @@ import { StyleSheet } from "react-native";
 
   // Título do plano dentro do modal
   modalPlanTitle: {
-    fontSize: 28,
+    fontSize: scaleFont(28),
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 8,
@@ -32,10 +33,10 @@ import { StyleSheet } from "react-native";
 
   // Descrição do plano dentro do modal
   modalPlanDescription: {
-    fontSize: 13,
+    fontSize: scaleFont(13),
     color: '#555',
     marginBottom: 12,
-    lineHeight: 18,
+    lineHeight: scaleFont(18),
   },
 
   // Cartão imagem dentro do modal
@@ -50,7 +51,7 @@ import { StyleSheet } from "react-native";
 
   // Título "Benefícios"
   beneficiosTitle: {
-    fontSize: 20,
+    fontSize: scaleFont(20),
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 16,
@@ -72,17 +73,17 @@ import { StyleSheet } from "react-native";
 
   // Bullet point "•"
   bulletPoint: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     color: '#b30000',
     marginRight: 10,
     fontWeight: 'bold',
   },
 
   beneficioText: {
-    fontSize: 14,
+    fontSize: scaleFont(14),
     color: '#333',
     flex: 1,
-    lineHeight: 20,
+    lineHeight: scaleFont(20),
   },
 
   // Rodapé do modal: preço + botões
@@ -93,7 +94,7 @@ import { StyleSheet } from "react-native";
   },
 
   modalPrice: {
-    fontSize: 24,
+    fontSize: scaleFont(24),
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 16,
@@ -115,7 +116,7 @@ import { StyleSheet } from "react-native";
   },
 
   fecharButtonText: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     fontWeight: '600',
     color: '#555',
   },
@@ -130,7 +131,7 @@ import { StyleSheet } from "react-native";
   },
 
   assinarButtonText: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     fontWeight: 'bold',
     color: '#fff',
   },

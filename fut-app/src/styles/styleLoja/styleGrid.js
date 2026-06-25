@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
 
 // Estilos para o grid de produtos na Loja do FUT
 export const gridStyles = StyleSheet.create({

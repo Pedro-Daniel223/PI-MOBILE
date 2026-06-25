@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
 import { SCREEN_WIDTH, SCREEN_HEIGHT, CAMPAIGN_HEIGHT, CAMPAIGN_WIDTH } from './dimensoes';
+import { scaleFont } from '../../utils/fontScale';
 
 
 export const campStyles = StyleSheet.create({
@@ -31,21 +32,21 @@ export const campStyles = StyleSheet.create({
     paddingHorizontal: DS.spacing.xl,
   },
   campaignTag: {
-    fontSize: 8,
+    fontSize: scaleFont(8),
     fontWeight: '700',
     letterSpacing: 2.2,
     color: DS.accent,
     marginBottom: 8,
   },
   campaignTitle: {
-    fontSize: 40,
+    fontSize: scaleFont(40),
     fontWeight: '900',
     color: DS.text,
-    lineHeight: 38,
+    lineHeight: scaleFont(38),
     letterSpacing: -1.5,
   },
   campaignSub: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: DS.textDim,
     letterSpacing: 0.5,
     marginTop: 8,
@@ -65,7 +66,7 @@ export const campStyles = StyleSheet.create({
     position: 'absolute',
     right: -8,
     bottom: -18,
-    fontSize: 88,
+    fontSize: scaleFont(88),
     fontWeight: '900',
     color: 'rgba(255,255,255,0.04)',
     letterSpacing: -3,

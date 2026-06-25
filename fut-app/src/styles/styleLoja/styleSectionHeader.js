@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
+import { scaleFont } from '../../utils/fontScale';
 
 export const secStyles = StyleSheet.create({
   container: {
@@ -20,21 +21,21 @@ export const secStyles = StyleSheet.create({
     borderRadius: 1,
   },
   tag: {
-    fontSize: 9,
+    fontSize: scaleFont(9),
     fontWeight: '700',
     color: DS.accent,
     letterSpacing: 2.5,
     textTransform: 'uppercase',
   },
   title: {
-    fontSize: 28,
+    fontSize: scaleFont(28),
     fontWeight: '900',
     color: DS.text,
     letterSpacing: -0.8,
-    lineHeight: 30,
+    lineHeight: scaleFont(30),
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: scaleFont(12),
     color: DS.textFaint,
     fontWeight: '400',
     marginTop: 6,

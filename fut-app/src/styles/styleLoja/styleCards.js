@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
+import { scaleFont } from '../../utils/fontScale';
 
 // Estilos para os cards de produto na Loja do FUT, seguindo a estética cinematográfica escura e moderna definida em DS
 
@@ -45,7 +46,7 @@ export const cardStyles = StyleSheet.create({
     paddingVertical: 4,
   },
   badgeText: {
-    fontSize: 9,
+    fontSize: scaleFont(9),
     fontWeight: '800',
     color: DS.text,
     letterSpacing: 0.5,
@@ -57,16 +58,16 @@ export const cardStyles = StyleSheet.create({
     gap: 4,
   },
   categoria: {
-    fontSize: 8,
+    fontSize: scaleFont(8),
     fontWeight: '700',
     color: DS.accent,
     letterSpacing: 1.8,
   },
   nome: {
-    fontSize: 12,
+    fontSize: scaleFont(12),
     fontWeight: '700',
     color: DS.text,
-    lineHeight: 16,
+    lineHeight: scaleFont(16),
     letterSpacing: 0.1,
   },
   priceRow: {
@@ -76,13 +77,13 @@ export const cardStyles = StyleSheet.create({
     marginTop: 2,
   },
   preco: {
-    fontSize: 14,
+    fontSize: scaleFont(14),
     fontWeight: '900',
     color: DS.text,
     letterSpacing: -0.3,
   },
   precoAntigo: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: DS.textFaint,
     textDecorationLine: 'line-through',
     fontWeight: '400',

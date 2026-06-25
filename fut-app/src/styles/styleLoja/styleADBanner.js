@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { DS } from './root';
+import { DS } from './rootLoja';
+import { scaleFont } from '../../utils/fontScale';
 
 export const adStyles = StyleSheet.create({
   outer: {
@@ -29,7 +30,7 @@ export const adStyles = StyleSheet.create({
     borderRightColor: 'rgba(255,255,255,0.07)',
   },
   sideLabelText: {
-    fontSize: 7,
+    fontSize: scaleFont(7),
     fontWeight: '700',
     color: DS.textFaint,
     letterSpacing: 2,
@@ -44,17 +45,17 @@ export const adStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   eyebrow: {
-    fontSize: 8,
+    fontSize: scaleFont(8),
     fontWeight: '700',
     color: DS.accent,
     letterSpacing: 2.5,
     marginBottom: 12,
   },
   headline: {
-    fontSize: 48,
+    fontSize: scaleFont(48),
     fontWeight: '900',
     color: DS.text,
-    lineHeight: 46,
+    lineHeight: scaleFont(46),
     letterSpacing: -2,
   },
   underline: {
@@ -65,10 +66,10 @@ export const adStyles = StyleSheet.create({
     borderRadius: 1,
   },
   body: {
-    fontSize: 12,
+    fontSize: scaleFont(12),
     fontWeight: '300',
     color: DS.textDim,
-    lineHeight: 18,
+    lineHeight: scaleFont(18),
     letterSpacing: 0.2,
   },
   graphicElement: {
@@ -83,10 +84,10 @@ export const adStyles = StyleSheet.create({
     position: 'absolute',
     right: -10,
     bottom: -20,
-    fontSize: 160,
+    fontSize: scaleFont(160),
     fontWeight: '900',
     color: 'rgba(255,255,255,0.025)',
-    lineHeight: 150,
+    lineHeight: scaleFont(150),
     letterSpacing: -6,
   },
   bottomLine: {

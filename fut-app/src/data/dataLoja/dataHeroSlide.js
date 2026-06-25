@@ -1,4 +1,4 @@
-import { DS } from '../../styles/styleLoja/root';
+import { DS } from '../../styles/styleLoja/rootLoja';
 
 // Dados para os slides do Hero da Loja
 

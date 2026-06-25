@@ -1,9 +1,10 @@
 import { StyleSheet } from 'react-native';
+import { scaleFont } from '../../utils/fontScale';
 
-const styles = StyleSheet.create({
+export const stylesPerfil = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 110,
+    paddingBottom: 100,
   },
 
   content: {
@@ -12,7 +13,6 @@ const styles = StyleSheet.create({
     gap: 20,
   },
 
-  /* ── ENGRENAGEM (Canto superior direito) ── */
   settingsGear: {
     position: 'absolute',
     top: 50,
@@ -31,7 +31,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.2)',
   },
 
-  /* ── HEADER ── */
   header: {
     alignItems: 'center',
     paddingVertical: 24,
@@ -74,35 +73,30 @@ const styles = StyleSheet.create({
   },
   username: {
     color: '#fff',
-    fontSize: 22,
+    fontSize: scaleFont(22),
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 4,
   },
   userStatus: {
     color: 'rgba(255,255,255,0.65)',
-    fontSize: 13,
+    fontSize: scaleFont(13),
     textAlign: 'center',
   },
 
-  /* ── WELCOME CARD ── */
   welcomeCard: {
-    borderRadius: 22,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    marginTop: 4,
-    shadowColor: '#ff2b2b',
-    shadowOpacity: 0.2,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 12,
-    padding: 20,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
   },
-  innerBorder: {
+  welcomeBorder: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   welcomeHeader: {
     flexDirection: 'row',
@@ -112,8 +106,9 @@ const styles = StyleSheet.create({
   },
   welcomeTitle: {
     color: '#fff',
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: scaleFont(22),
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   notifBadge: {
     position: 'relative',
@@ -134,16 +129,15 @@ const styles = StyleSheet.create({
   },
   welcomeBody: {
     color: 'rgba(255,255,255,0.75)',
-    fontSize: 14,
-    lineHeight: 22,
-    marginBottom: 16,
+    fontSize: scaleFont(14),
+    lineHeight: scaleFont(22),
+    marginBottom: 12,
   },
 
-  /* ── ASSINATURA ATIVA ── */
   subBadge: {
     borderRadius: 30,
     overflow: 'hidden',
-    marginBottom: 14,
+    marginBottom: 0,
   },
   subBadgeBlur: {
     flexDirection: 'row',
@@ -157,85 +151,89 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   subBadgeText: {
-    color: '#ffd700',
-    fontSize: 13,
+    color: '#800000',
+    fontSize: scaleFont(13),
     fontWeight: '700',
   },
   subBadgePrice: {
     color: 'rgba(255,255,255,0.8)',
-    fontSize: 11,
+    fontSize: scaleFont(11),
     fontWeight: '600',
   },
 
-  /* ── AÇÕES RÁPIDAS ── */
   actionsRow: {
     flexDirection: 'row',
     gap: 12,
   },
   actionCard: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    borderRadius: 22,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    paddingVertical: 20,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    paddingVertical: 16,
     paddingHorizontal: 8,
-    minHeight: 105,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    minHeight: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  actionBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  actionContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   actionLabel: {
     color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: 8,
+    fontSize: scaleFont(12),
+    fontWeight: '500',
     textAlign: 'center',
   },
 
-  /* ── SECTION HEADER ── */
-  sectionHeader: {
+  sectionHeaderCustom: {
     marginBottom: 4,
     marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   sectionTitle: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: scaleFont(18),
     fontWeight: '800',
     letterSpacing: 0.3,
   },
-  sectionLine: {
-    marginTop: 6,
-    width: 36,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#ff2b2b',
-    shadowColor: '#ff2b2b',
-    shadowOpacity: 0.8,
-    shadowRadius: 6,
-    elevation: 6,
+  sectionEditBtn: {
+    padding: 8,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
 
-  /* ── INFO CARD ── */
   infoCard: {
-    borderRadius: 22,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  infoBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 16,
   },
   infoLeft: {
     flexDirection: 'row',
@@ -243,66 +241,68 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   infoTextGroup: {
-    marginLeft: 12,
+    marginLeft: 14,
     flex: 1,
   },
   infoLabel: {
     color: 'rgba(255,255,255,0.5)',
-    fontSize: 11,
+    fontSize: scaleFont(12),
     fontWeight: '500',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    marginBottom: 4,
   },
   infoValue: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: scaleFont(16),
     fontWeight: '600',
-    marginTop: 2,
   },
   infoDivider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     marginHorizontal: 18,
   },
-  editRowBtn: {
-    padding: 8,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
 
-  /* ── LOGOUT ── */
   logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,0,0,0.15)',
     borderRadius: 16,
-    paddingVertical: 14,
-    marginTop: 6,
+    paddingVertical: 16,
+    marginTop: 12,
+    gap: 12,
+    overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,0,0,0.25)',
-    gap: 8,
+    borderColor: 'rgba(255,100,100,0.3)',
+  },
+  logoutBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,100,100,0.2)',
   },
   logoutText: {
-    color: '#ff2b2b',
-    fontSize: 16,
-    fontWeight: '700',
+    color: '#ff6b6b',
+    fontSize: scaleFont(16),
+    fontWeight: '600',
     letterSpacing: 0.5,
   },
 
-  /* ── HISTORY SECTION (inline, no popup) ── */
   historySection: {
-    borderRadius: 22,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     marginTop: 8,
     marginBottom: 12,
-    shadowColor: '#ff2b2b',
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
     padding: 16,
+  },
+  historyBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   historyHeader: {
     flexDirection: 'row',
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   },
   historyTitle: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: scaleFont(17),
     fontWeight: '700',
   },
   historySubBadge: {
@@ -329,18 +329,18 @@ const styles = StyleSheet.create({
   },
   historySubText: {
     color: '#ffd700',
-    fontSize: 13,
+    fontSize: scaleFont(13),
     fontWeight: '600',
     flex: 1,
   },
   historySubPrice: {
-    color: '#fff',
-    fontSize: 13,
+    color: '#ffd700',
+    fontSize: scaleFont(13),
     fontWeight: '700',
   },
   historyListTitle: {
     color: 'rgba(255,255,255,0.65)',
-    fontSize: 13,
+    fontSize: scaleFont(13),
     fontWeight: '600',
     marginBottom: 8,
     letterSpacing: 0.4,
@@ -349,30 +349,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
-    gap: 10,
   },
   historyInfo: {
     flex: 1,
+    marginLeft: 10,
   },
   historyPlan: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: scaleFont(14),
     fontWeight: '600',
   },
   historyDate: {
     color: 'rgba(255,255,255,0.5)',
-    fontSize: 11,
+    fontSize: scaleFont(11),
     marginTop: 1,
   },
   historyPrice: {
-    color: '#880000',
-    fontSize: 14,
+    color: '#fff',
+    fontSize: scaleFont(14),
     fontWeight: '700',
   },
   historyDivider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     marginVertical: 2,
+  },
+  historyProductImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    marginRight: 8,
   },
   historyEmpty: {
     alignItems: 'center',
@@ -381,7 +387,34 @@ const styles = StyleSheet.create({
   },
   historyEmptyText: {
     color: 'rgba(255,255,255,0.4)',
-    fontSize: 13,
+    fontSize: scaleFont(13),
     textAlign: 'center',
+  },
+
+  modalTitle: {
+    fontSize: scaleFont(24),
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalField: {
+    marginBottom: 16,
+  },
+  modalLabel: {
+    fontSize: scaleFont(14),
+    color: '#555',
+    marginBottom: 6,
+    fontWeight: '600',
+  },
+  modalInput: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: scaleFont(15),
+    color: '#000',
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
 });

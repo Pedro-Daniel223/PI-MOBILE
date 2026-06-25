@@ -1,5 +1,6 @@
 import { View, Animated, Image, Text } from 'react-native';
 import { useEffect, useRef } from 'react';
+import { stylesSplash } from '../styles/styleSplash/styleSplash';
 
 export default function Splash({ navigation }) {
   const opacity = useRef(new Animated.Value(0)).current;
@@ -51,33 +52,16 @@ export default function Splash({ navigation }) {
   }, []);
 
   return (
-    <View style={{
-      flex: 1,
-      backgroundColor: '#6f0f0f',
-      justifyContent: 'center',
-      alignItems: 'center'
-    }}>
+    <View style={stylesSplash.container}>
 
-        <View style={{
-          position: 'absolute',
-          width: 300, // 👈 ESSENCIAL
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}> 
+      <View style={stylesSplash.centerWrap}>
 
         {/* TEXTO */}
         <Animated.Text
-          style={{
-            position: 'absolute',
-            left: 100,
-            color: '#fff',
-            fontSize: 22, // 👈 levemente menor pra caber melhor
-            fontWeight: 'bold',
-            // letterSpacing: 1,
-
-            opacity: textOpacity,
-            transform: [{ translateX: textTranslateX }]
-          }}
+          style={[
+            stylesSplash.animatedText,
+            { opacity: textOpacity, transform: [{ translateX: textTranslateX }] }
+          ]}
         >
           DRAKOS APP
         </Animated.Text>
@@ -85,15 +69,10 @@ export default function Splash({ navigation }) {
         {/* LOGO */}
         <Animated.Image
           source={require('../assets/img/Escudo_Drakos.png')}
-          style={{
-            width: 120,
-            height: 120,
-            opacity,
-            transform: [
-              { scale },
-              { translateX: logoTranslateX }
-            ]
-          }}
+          style={[
+            stylesSplash.logo,
+            { opacity, transform: [{ scale }, { translateX: logoTranslateX }] }
+          ]}
           resizeMode="contain"
         />
 

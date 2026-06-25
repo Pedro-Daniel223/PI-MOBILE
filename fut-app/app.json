@@ -2,6 +2,7 @@
   "expo": {
     "name": "Drakos-app",
     "slug": "Drakos-app",
+    "icon": "./src/assets/img/icon_escudo_drakos.png",
     "version": "1.0.0",
     "splash": {
       "image": "./src/assets/img/icon_escudo_drakos.png",
@@ -13,13 +14,23 @@
     ],
     "ios": {
       "infoPlist": {
-        "NSFaceIDUsageDescription": "O Covil dos Drakos utiliza biometria para garantir a segurança dos seus ingressos."
-      }
+        "NSFaceIDUsageDescription": "O Covil dos Drakos utiliza biometria para garantir a segurança dos seus ingressos.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.fernandoff.Drakosapp"
     },
     "android": {
       "permissions": [
-        "USE_BIOMETRIC"
-      ]
+        "USE_BIOMETRIC",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "package": "com.fernandoff.Drakosapp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "26d9ef91-4a07-4b71-b663-2c79581b1905"
+      }
     }
   }
 }
