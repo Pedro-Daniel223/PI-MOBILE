@@ -15,7 +15,7 @@ Em produção, substitua `http://localhost:8000` pelo domínio real da API (ex.:
 Instale os pacotes:
 
 ```bash
-pip install djangorestframework drf-yasg
+pip install djangorestframework drf-yasg django-filter
 ```
 
 ### 1.2 `settings.py`
@@ -28,10 +28,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # --- apps do projeto ---
+    # terceiros
     "rest_framework",
     "drf_yasg",
-    # seus apps aqui: "loja", "usuarios", etc.
+    "django_filters",
+    # apps do projeto
+    "app_futebol",
+    "accounts",
+    "minigame",
 ]
 
 REST_FRAMEWORK = {
@@ -56,7 +60,7 @@ CORS_ALLOWED_ORIGINS = [
 
 ```python
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
@@ -74,82 +78,280 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # Redirect raiz para o Swagger
     path("", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
-    # Endpoints da API
-    path("api/", include("loja.urls")),
-    path("api/", include("usuarios.urls")),
-    # Documentação OpenAPI (JSON/YAML)
-    re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
+    path("api/", include("app_futebol.urls")),
+    path("swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
 ]
 ```
 
-### 1.4 Modelos, Views, Serializers e URLs
+---
 
-```python
-# loja/serializers.py
-from rest_framework import serializers
-from .models import Categoria, Produto
+## 2) Estrutura de apps e domínios
 
-class CategoriaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Categoria
-        fields = ["id", "nome", "slug", "imagem", "ordem"]
+Com base em `db/banco_definitivo_local.sql`, o banco `projeto_futebol_definitivo` contém os seguintes domínios:
 
-class ProdutoSerializer(serializers.ModelSerializer):
-    categoria_nome = serializers.CharField(source="categoria.nome", read_only=True)
-
-    class Meta:
-        model = Produto
-        fields = ["id", "nome", "descricao", "preco", "imagem", "categoria", "categoria_nome"]
-```
-
-```python
-# loja/views.py
-from rest_framework import viewsets, filters
-from django_filters.rest_framework import DjangoFilterBackend
-from .models import Categoria, Produto
-from .serializers import CategoriaSerializer, ProdutoSerializer
-
-class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Categoria.objects.all()
-    serializer_class = CategoriaSerializer
-    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
-    filterset_fields = ["slug"]
-    ordering_fields = ["ordem", "nome"]
-
-class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Produto.objects.all()
-    serializer_class = ProdutoSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["categoria"]
-    search_fields = ["nome", "descricao"]
-    ordering_fields = ["preco", "nome"]
-```
-
-```python
-# loja/urls.py
-from rest_framework.routers import DefaultRouter
-from .views import CategoriaViewSet, ProdutoViewSet
-
-router = DefaultRouter()
-router.register(r"categorias", CategoriaViewSet, basename="categoria")
-router.register(r"produtos", ProdutoViewSet, basename="produto")
-
-urlpatterns = router.urls
-```
-
-### 1.5 Acessando o Swagger
-
-- Interface visual: `http://localhost:8000/`
-- JSON OpenAPI: `http://localhost:8000/swagger.json`
-- YAML OpenAPI: `http://localhost:8000/swagger.yaml`
+- **app_futebol**: loja e operações
+- **accounts**: perfis de usuário autenticado
+- **minigame**: quiz e gamificação
 
 ---
 
-## 2) Integração no Frontend (React Native)
+### 2.1 Modelos principais (`app_futebol`)
 
-### 2.1 Configuração base (`src/services/api.js`)
+| Grupo | Tabela | Responsabilidade |
+|---|---|---|
+| Catálogo | `categoria_produtos` | Categorias de produtos (Acessórios, Camisas FC, Calçados, Ingressos) |
+| Catálogo | `produtos` | Produtos da loja |
+| Catálogo | `imagem_produto` | Imagens adicionais de produto |
+| Loja | `categoria_cliente` | Planos de sócio (Diamante, Ouro, Prata, Não-sócio) |
+| Loja | `clientes` | Clientes e dados de jogador/sócio |
+| Loja | `endereco_cliente` | Endereço de entrega |
+| Loja | `pedido` | Pedidos de compra |
+| Loja | `compra` | Itens de um pedido |
+| Clube | `jogos` | Jogos da temporada |
+| Clube | `times` | Times cadastrados |
+| Staff | `funcionarios` | Funcionários do clube |
+| Staff | `setor_funcionarios` | Setores (Financeiro, Administrativo, Comercial, TI) |
+| Staff | `endereco_funcionarios` | Endereço de funcionários |
+| Gamificação | `questoes` | Perguntas do quiz |
+| Gamificação | `alternativas` | Alternativas vinculadas a questões |
+| Gamificação | `respostas` | Respostas de clientes |
+| Gamificação | `progresso_fases` | Progresso do cliente no quiz |
+| Gamificação | `historico_titulos` | Histórico de títulos de clientes |
+| Gamificação | `titulos` | Títulos disponíveis |
+| Recuperação | `recuperacao_senha` | Códigos de recuperação |
+
+---
+
+## 3) Endpoints previstos
+
+### 3.1 Categorias de produtos
+
+```python
+# GET /api/categorias-produtos/
+class CategoriaProdutosViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = CategoriaProdutos.objects.all().order_by("nome_categoria_produtos")
+    serializer_class = CategoriaProdutosSerializer
+    filter_backends = [OrderingFilter]
+    ordering_fields = ["nome_categoria_produtos"]
+```
+
+Exemplo frontend:
+
+```javascript
+export async function fetchCategoriasProdutos() {
+  const { data } = await api.get("/categorias-produtos/");
+  return data.results ?? data;
+}
+```
+
+---
+
+### 3.2 Produtos
+
+```python
+# GET /api/produtos/
+class ProdutosViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Produtos.objects.all()
+    serializer_class = ProdutosSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ["categoria_produtos"]
+    search_fields = ["nome_produtos", "descricao_produtos"]
+    ordering_fields = ["valor_produtos", "nome_produtos"]
+```
+
+Exemplo frontend:
+
+```javascript
+export async function fetchProdutos(params = {}) {
+  const { data } = await api.get("/produtos/", { params });
+  return data.results ?? data;
+}
+```
+
+---
+
+### 3.3 Categorias de cliente (planos/sócios)
+
+```python
+# GET /api/planos/
+class CategoriaClienteViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = CategoriaCliente.objects.all()
+    serializer_class = CategoriaClienteSerializer
+    filter_backends = [OrderingFilter]
+    ordering_fields = ["preco_categ"]
+```
+
+Exemplo frontend:
+
+```javascript
+export async function fetchPlanos() {
+  const { data } = await api.get("/planos/");
+  return data.results ?? data;
+}
+```
+
+---
+
+### 3.4 Autenticação e perfil
+
+A base atual usa `accounts.perfil` ligado ao `auth_user`. O frontend deve consumir endpoints para:
+
+- login com email/senha
+- cadastro com dados do perfil
+- logout / revogação de token
+- alteração de senha
+- consulta/alteração do próprio perfil
+
+Regra de negócio esperada:
+
+- Cliente padrão nasce com `score_rank = 0`, `total_acertos = 0`, `precisao = 0`
+- `accounts_perfil` é único por usuário
+
+---
+
+### 3.5 Endereços do cliente
+
+```python
+# GET/POST /api/enderecos/
+class EnderecoClienteViewSet(viewsets.ModelViewSet):
+    serializer_class = EnderecoClienteSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["cliente_id_cliente"]
+```
+
+Exemplo frontend:
+
+```javascript
+export async function fetchMeusEnderecos() {
+  const { data } = await api.get("/enderecos/");
+  return data.results ?? data;
+}
+```
+
+---
+
+### 3.6 Pedidos e compras
+
+```python
+# GET /api/pedidos/
+class PedidoViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = PedidoSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ["status", "cliente_id_cliente"]
+    ordering_fields = ["-data_pedido"]
+```
+
+```python
+# GET /api/compras/
+class CompraViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = CompraSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["pedido_id_pedido"]
+```
+
+Exemplo frontend:
+
+```javascript
+export async function fetchMeusPedidos() {
+  const { data } = await api.get("/pedidos/");
+  return data.results ?? data;
+}
+```
+
+---
+
+### 3.7 Jogos e ingressos
+
+As tabelas `jogos` e `times` viram produtos na categoria Ingressos.
+
+```python
+# GET /api/jogos/
+class JogosViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Jogos.objects.select_related("times_id_times").all()
+    serializer_class = JogosSerializer
+    filter_backends = [OrderingFilter]
+    ordering_fields = ["dia_jogo", "hora_jogo"]
+```
+
+Exemplo frontend:
+
+```javascript
+export async function fetchJogos() {
+  const { data } = await api.get("/jogos/");
+  return data.results ?? data;
+}
+```
+
+---
+
+### 3.8 Funcionários (app interno)
+
+```python
+# GET /api/funcionarios/
+class FuncionariosViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Funcionarios.objects.select_related("setor_funcionarios_id_setor_funcionarios").all()
+    serializer_class = FuncionariosSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["setor_funcionarios_id_setor_funcionarios"]
+```
+
+---
+
+### 3.9 Quiz e gamificação
+
+```python
+# GET /api/questoes/
+class QuestoesViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Questoes.objects.all()
+    serializer_class = QuestoesSerializer
+    filterset_fields = ["id_questao"]
+
+# POST /api/respostas/
+class RespostasViewSet(viewsets.ModelViewSet):
+    serializer_class = RespostasSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["cliente_id", "questao_id"]
+
+# GET/POST /api/progresso-fases/
+class ProgressoFasesViewSet(viewsets.ModelViewSet):
+    serializer_class = ProgressoFasesSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["cliente_id"]
+```
+
+Exemplo frontend:
+
+```javascript
+export async function fetchQuestao() {
+  const { data } = await api.get("/questoes/", { params: { pergunta: "..." } });
+  return data.results?.[0] ?? data;
+}
+```
+
+---
+
+### 3.10 Recuperação de senha
+
+```python
+# POST /api/recuperacao-senha/
+class RecuperacaoSenhaViewSet(viewsets.ViewSet):
+    ...
+```
+
+Exemplo frontend:
+
+```javascript
+export async function solicitarRecuperacao(email) {
+  await api.post("/recuperacao-senha/", { email });
+}
+```
+
+---
+
+## 4) Integração no Frontend (React Native)
+
+### 4.1 Configuração base (`src/services/api.js`)
 
 ```javascript
 import Axios from "axios";
@@ -168,7 +370,7 @@ export const api = Axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = global.userToken; // use seu estado global / SecureStore
+  const token = global.userToken;
   if (token) {
     config.headers.Authorization = `Token ${token}`;
   }
@@ -186,143 +388,9 @@ api.interceptors.response.use(
 );
 ```
 
-### 2.2 Endpoints consumidos pelo app
-
-#### Produtos em destaque (Hero Slider)
-
-```javascript
-// src/data/dataHeroSlide.js
-import { api } from "../../services/api";
-
-export async function fetchProdutosDestaque() {
-  const { data } = await api.get("/produtos/", {
-    params: { ordering: "-id", page_size: 5 },
-  });
-  return data.results ?? data;
-}
-```
-
-#### Categorias
-
-```javascript
-// src/data/dataHeroSlide.js
-export async function fetchCategorias() {
-  const { data } = await api.get("/categorias/", {
-    params: { ordering: "ordem" },
-  });
-  return data.results ?? data;
-}
-```
-
-#### Detalhes do produto
-
-```javascript
-// src/screens/DetalhesProdutosScreens.js
-import { api } from "../../services/api";
-
-export async function fetchProduto(slug) {
-  const { data } = await api.get(`/produtos/${slug}/`);
-  return data;
-}
-```
-
-#### Login (Token authentication)
-
-```javascript
-// src/screens/LoginScreen.js
-import { api } from "../../services/api";
-
-export async function login(email, password) {
-  const response = await api.post("/auth/token/", {
-    email,
-    password,
-  });
-  return response.data.token;
-}
-```
-
-#### Recuperação de senha
-
-```javascript
-// src/screens/EsqueceuSenhaScreen.js
-export async function solicitarRecuperacao(email) {
-  await api.post("/auth/password/reset/", { email });
-}
-
-// src/screens/VerificarCodigoScreens.js
-export async function verificarCodigo(codigo) {
-  await api.post("/auth/password/verify/", { codigo });
-}
-
-export async function redefinirSenha(codigo, novaSenha) {
-  await api.post("/auth/password/confirm/", { codigo, novaSenha: novaSenha });
-}
-```
-
 ---
 
-## 3) Exemplo de View compatível com Swagger
-
-```python
-# usuarios/serializers.py
-from rest_framework import serializers
-from django.contrib.auth.models import User
-
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
-
-class TokenResponseSerializer(serializers.Serializer):
-    token = serializers.CharField()
-
-# usuarios/views.py
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from drf_yasg.utils import swagger_auto_schema
-from .serializers import LoginSerializer, TokenResponseSerializer
-
-@swagger_auto_schema(
-    method="post",
-    request_body=LoginSerializer,
-    responses={200: TokenResponseSerializer, 400: "Credenciais inválidas"},
-)
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def login_view(request):
-    serializer = LoginSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    user = User.objects.filter(
-        email=serializer.validated_data["email"]
-    ).first()
-    if not user or not user.check_password(serializer.validated_data["password"]):
-        return Response({"detail": "Credenciais inválidas."}, status=400)
-    token, _ = Token.objects.get_or_create(user=user)
-    return Response({"token": token.key})
-```
-
-### Équivalentes para ViewSets
-
-```python
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-
-class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
-    ...
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter("categoria", openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
-            openapi.Parameter("search", openapi.IN_QUERY, type=openapi.TYPE_STRING),
-        ],
-        responses={200: ProdutoSerializer(many=True)},
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-```
-
----
-
-## 4) Testando a API antes de consumir no app
+## 5) Testando a API antes de consumir no app
 
 1. Execute o servidor Django: `python manage.py runserver`
 2. Abra `http://localhost:8000/`
@@ -331,7 +399,7 @@ class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
 
 ---
 
-## 5) Estrutura esperada
+## 6) Estrutura esperada
 
 ```
 backend/
@@ -339,23 +407,26 @@ backend/
 ├─ projeto/
 │  ├─ settings.py
 │  └─ urls.py
-├─ loja/
+├─ app_futebol/
 │  ├─ models.py
 │  ├─ serializers.py
 │  ├─ views.py
 │  └─ urls.py
-└─ usuarios/
-   ├─ serializers.py
-   └─ views.py
+├─ accounts/
+│  └─ models.py
+└─ minigame/
+   ├─ models.py
+   └─ ...
 ```
 
 ---
 
-## 6) Boas práticas
+## 7) Boas práticas
 
 - Nunca commite `SECRET_KEY` ou credenciais.
 - Use HTTPS em produção.
-- Tokens expiram? Implemente `/auth/token/refresh/`.
+- Revise permissões por view; por padrão o backend exige autenticação.
+- Tokens expiram? Implemente rota de renovação.
 - Versionar a API (`/api/v1/`) planejando atualizações.
 - Documente novos endpoints com `@swagger_auto_schema`.
-- Garanta que os dados do serializer coincidam com o que o app espera.
+- Garanta que os campos do serializer coincidam com o que o app espera.

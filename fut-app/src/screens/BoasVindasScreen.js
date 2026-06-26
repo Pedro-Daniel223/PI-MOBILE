@@ -128,7 +128,7 @@ export default function BoasVindasScreen() {
 
       {/* ── Background ── */}
       <ImageBackground
-        source={require('../assets/images/tela1.png')}
+        source={require('../assets/images/tela1.jpg')}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
       />
