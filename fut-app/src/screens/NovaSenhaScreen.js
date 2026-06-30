@@ -78,7 +78,7 @@ export default function NovaSenhaScreens({ navigation }) {
           {/* FORMULÁRIO - MANTENDO SEUS INPUTS ORIGINAIS */}
           <View style={stylesNovaSenha.formContent}>
             
-            <View style={styles.inputGroup}>
+            <View style={stylesNovaSenha.inputGroup}>
               <Text style={stylesNovaSenha.label}>Nova senha:</Text>
               <CustomInput
                 placeholder="********"
@@ -94,7 +94,7 @@ export default function NovaSenhaScreens({ navigation }) {
               />
             </View>
 
-            <View style={styles.inputGroup}>
+            <View style={stylesNovaSenha.inputGroup}>
               <Text style={stylesNovaSenha.label}>Confirmar senha:</Text>
               <CustomInput
                 placeholder="********"

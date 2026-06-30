@@ -24,7 +24,7 @@ import { stylesHome } from '../styles/styleHome/styleHome';
 export default function Home({ navigation }) {
   const [isDarkMode, setIsDarkMode] = useState(true);
   return (
-    <View style={styles.container}>
+    <View style={stylesHome.container}>
 
       
 
@@ -38,20 +38,20 @@ export default function Home({ navigation }) {
         style={StyleSheet.absoluteFill}
       />
 
-      // Alternativas
-      {/* //  colors={[ */}
-      //   '#050505',
-      //   '#050505',
-      //   '#1a0000',
-      {/* // ]} */}
+      {/* Alternativas */}
+      {/* colors={[
+        '#050505',
+        '#050505',
+        '#1a0000',
+      ]} */}
 
-      {/* // colors={[ */}
-      //   '#050505',
-      //   '#2b0000',
-      //   '#050505',
-      {/* //   ]} */}
+      {/* colors={[
+        '#050505',
+        '#2b0000',
+        '#050505',
+      ]} */}
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={stylesHome.content}>
 
 
         <CardProfileWelcome
@@ -90,7 +90,9 @@ export default function Home({ navigation }) {
             />
           </View>
 
-          <PremiumGlassCard Text="Seja um membro Premium e tenha acesso a benefícios exclusivos!" />
+          <PremiumGlassCard>
+            <Text>Seja um membro Premium e tenha acesso a benefícios exclusivos!</Text>
+          </PremiumGlassCard>
         </ScrollView>
       </View>
     );
