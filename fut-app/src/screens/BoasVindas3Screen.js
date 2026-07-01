@@ -144,142 +144,232 @@ export default function BoasVindas3Screen() {
   const pressOut = (a) => Animated.spring(a, { toValue: 1, tension: 80, friction: 5, useNativeDriver: true }).start();
 
   return (
-    <View style={styles.root}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+  <View style={styles.root}>
+    <StatusBar
+      barStyle="light-content"
+      translucent
+      backgroundColor="transparent"
+    />
 
-      {/* background */}
-      <ImageBackground
-        source={require('../assets/images/bemvindo3.png')}
-        style={StyleSheet.absoluteFill}
-        resizeMode="cover"
-      />
+    {/* background */}
+    <ImageBackground
+      source={require("../assets/images/bemvindo3.png")}
+      style={StyleSheet.absoluteFill}
+      resizeMode="cover"
+    />
 
-      {/* dark overlay */}
-      <View style={styles.overlay} />
+    {/* dark overlay */}
+    <View style={styles.overlay} />
 
-      {/* embers */}
-      <View style={styles.embersLayer} pointerEvents="none">
-        {EMBERS.map((e) => <Ember key={e.id} {...e} />)}
-      </View>
-
-      {/* content */}
-      <View
-        style={[
-          styles.container,
-          { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 28 },
-        ]}
-      >
-        {/* top spacer — lets background breathe */}
-        <View />
-        <View style={styles.centerSpacer} />
-
-        {/* ── bottom block ── */}
-        <View style={styles.bottomBlock}>
-
-          {/* overline */}
-          <Animated.View
-            style={[
-              styles.overlineWrap,
-              {
-                opacity: overlineAnim,
-                transform: [
-                  { translateY: overlineAnim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) },
-                ],
-              },
-            ]}
-          >
-            <View style={styles.overlineDot} />
-            <Text style={styles.overlineText}>INGRESSOS DIGITAIS</Text>
-            <View style={styles.overlineDot} />
-          </Animated.View>
-
-          {/* main title */}
-          <Animated.Text
-            style={[
-              styles.title,
-              {
-                opacity: titleAnim,
-                transform: [
-                  { translateY: titleAnim.interpolate({ inputRange: [0, 1], outputRange: [18, 0] }) },
-                ],
-              },
-            ]}
-          >
-            Sistema de compra de ingresso para{' '}
-            <Text style={styles.titleAccent}>estádio,{'\n'}objetiva e segura</Text>
-          </Animated.Text>
-
-          {/* feature rows */}
-          <Animated.View
-            style={[
-              styles.featuresBlock,
-              {
-                opacity: featuresAnim,
-                transform: [
-                  { translateY: featuresAnim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] }) },
-                ],
-              },
-            ]}
-          >
-            <FeatureRow icon="qr-code-outline"    label="QR Code exclusivo por ingresso"  delay={0}   />
-            <FeatureRow icon="shield-checkmark-outline" label="Pagamento 100% seguro"     delay={90}  />
-            <FeatureRow icon="flash-outline"      label="Acesso instantâneo ao estádio"   delay={180} />
-          </Animated.View>
-
-          {/* rule */}
-          <Animated.View style={[styles.rule, { opacity: featuresAnim }]}>
-            <View style={styles.ruleLine} />
-            <Animated.View style={[styles.ruleDiamond, { opacity: accentPulse }]} />
-            <View style={styles.ruleLine} />
-          </Animated.View>
-
-          {/* page dots — third dot active */}
-          <View style={styles.dots}>
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-            <View style={[styles.dot, styles.dotActive]} />
-          </View>
-
-          {/* CTA — COMEÇAR */}
-          <Animated.View
-            style={[
-              styles.btnWrap,
-              {
-                opacity: btnAnim,
-                transform: [
-                  { translateY: btnAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) },
-                  { scale: startScale },
-                ],
-              },
-            ]}
-          >
-            {/* pulsing outer glow ring */}
-            <Animated.View style={[styles.btnGlowRing, { opacity: btnGlow }]} />
-
-            <TouchableOpacity
-              activeOpacity={1}
-              onPressIn={() => pressIn(startScale)}
-              onPressOut={() => pressOut(startScale)}
-              onPress={() => navigation.navigate('AuthStack', { screen: 'Login' })}
-              style={styles.startBtn}
-            >
-              {Platform.OS === 'ios' ? (
-                <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
-              ) : (
-                <View style={[StyleSheet.absoluteFill, styles.startBtnAndroid]} />
-              )}
-              <View style={styles.startBtnInner}>
-                <Ionicons name="football-outline" size={20} color={RED} style={{ marginRight: 10 }} />
-                <Text style={styles.startBtnText}>COMEÇAR</Text>
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
-
-          <Text style={styles.legalNote}>Bem-vindo ao Drakos Club — a arena é sua</Text>
-        </View>
-      </View>
+    {/* embers */}
+    <View style={styles.embersLayer} pointerEvents="none">
+      {EMBERS.map((e) => (
+        <Ember key={e.id} {...e} />
+      ))}
     </View>
-  );
+
+    {/* CONTENT */}
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top + 12,
+          paddingBottom: insets.bottom + 28,
+        },
+      ]}
+    >
+
+      {/* HERO */}
+      <View style={styles.heroContent}>
+
+        <Animated.View
+          style={[
+            styles.overlineWrap,
+            {
+              opacity: overlineAnim,
+              transform: [
+                {
+                  translateY: overlineAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [12, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <View style={styles.overlineDot} />
+          <Text style={styles.overlineText}>
+            INGRESSOS DIGITAIS
+          </Text>
+          <View style={styles.overlineDot} />
+        </Animated.View>
+
+        <Animated.Text
+          style={[
+            styles.title,
+            {
+              opacity: titleAnim,
+              transform: [
+                {
+                  translateY: titleAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [18, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          Sistema de compra de ingresso para{" "}
+          <Text style={styles.titleAccent}>
+            estádio,{"\n"}objetiva e segura
+          </Text>
+        </Animated.Text>
+
+        <Animated.View
+          style={[
+            styles.featuresBlock,
+            {
+              opacity: featuresAnim,
+              transform: [
+                {
+                  translateY: featuresAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [14, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <FeatureRow
+            icon="qr-code-outline"
+            label="QR Code exclusivo por ingresso"
+            delay={0}
+          />
+
+          <FeatureRow
+            icon="shield-checkmark-outline"
+            label="Pagamento 100% seguro"
+            delay={90}
+          />
+
+          <FeatureRow
+            icon="flash-outline"
+            label="Acesso instantâneo ao estádio"
+            delay={180}
+          />
+        </Animated.View>
+
+      </View>
+
+      {/* BOTTOM FIXO */}
+      <View style={styles.bottomBlock}>
+
+        <Animated.View
+          style={[
+            styles.rule,
+            {
+              opacity: featuresAnim,
+            },
+          ]}
+        >
+          <View style={styles.ruleLine} />
+          <Animated.View
+            style={[
+              styles.ruleDiamond,
+              {
+                opacity: accentPulse,
+              },
+            ]}
+          />
+          <View style={styles.ruleLine} />
+        </Animated.View>
+
+        <View style={styles.dots}>
+          <View style={styles.dot} />
+          <View style={styles.dot} />
+          <View style={[styles.dot, styles.dotActive]} />
+        </View>
+
+        <Animated.View
+          style={[
+            styles.btnWrap,
+            {
+              opacity: btnAnim,
+              transform: [
+                {
+                  translateY: btnAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [30, 0],
+                  }),
+                },
+                {
+                  scale: startScale,
+                },
+              ],
+            },
+          ]}
+        >
+          <Animated.View
+            style={[
+              styles.btnGlowRing,
+              {
+                opacity: btnGlow,
+              },
+            ]}
+          />
+
+          <TouchableOpacity
+            activeOpacity={1}
+            onPressIn={() => pressIn(startScale)}
+            onPressOut={() => pressOut(startScale)}
+            onPress={() =>
+              navigation.navigate("AuthStack", {
+                screen: "Login",
+              })
+            }
+            style={styles.startBtn}
+          >
+            {Platform.OS === "ios" ? (
+              <BlurView
+                intensity={30}
+                tint="dark"
+                style={StyleSheet.absoluteFill}
+              />
+            ) : (
+              <View
+                style={[
+                  StyleSheet.absoluteFill,
+                  styles.startBtnAndroid,
+                ]}
+              />
+            )}
+
+            <View style={styles.startBtnInner}>
+              <Ionicons
+                name="football-outline"
+                size={20}
+                color={RED}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.startBtnText}>
+                COMEÇAR
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Text style={styles.legalNote}>
+          Bem-vindo ao Drakos Club — a arena é sua
+        </Text>
+
+      </View>
+
+    </View>
+  </View>
+);
 }
 
 /* ─── Styles ─────────────────────────────────────────────── */
@@ -322,17 +412,22 @@ const styles = StyleSheet.create({
   centerSpacer: { flex: 1 },
 
   bottomBlock: {
-    width:      '100%',
-    alignItems: 'center',
-    gap:        14,
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingBottom: 8,
+      gap: 14,
   },
 
+
   /* overline */
-  overlineWrap: {
-    flexDirection: 'row',
-    alignItems:    'center',
-    gap:           10,
-  },
+    overlineWrap: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        marginBottom: 18,
+    },
   overlineDot: {
     width:           6,
     height:          6,
@@ -356,7 +451,8 @@ const styles = StyleSheet.create({
     fontSize:         26,
     fontWeight:       '800',
     color:            '#ffffff',
-    textAlign:        'center',
+    textAlign: 'center',
+    justifyContent:    'center',
     lineHeight:       36,
     letterSpacing:    0.3,
     textShadowColor:  'rgba(255,45,45,0.35)',
@@ -370,8 +466,9 @@ const styles = StyleSheet.create({
 
   /* feature rows */
   featuresBlock: {
-    width: '100%',
-    gap:   10,
+      width: '100%',
+      justifyContent: 'center',
+      gap: 16,
   },
   featureRow: {
     flexDirection: 'row',
@@ -426,7 +523,8 @@ const styles = StyleSheet.create({
   /* page dots */
   dots: {
     flexDirection: 'row',
-    gap:           8,
+    gap:           10,
+    justifyContent: 'center',
   },
   dot: {
     width:           8,
@@ -465,7 +563,7 @@ const styles = StyleSheet.create({
     borderRadius: 29,
     overflow:     'hidden',
     borderWidth:  1,
-    borderColor:  'rgba(137, 137, 137, 0.6)',
+    borderColor:  'rgba(199, 0, 0, 0.6)',
     shadowColor:  RED,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.6,
@@ -473,7 +571,7 @@ const styles = StyleSheet.create({
     elevation:    12,
   },
   startBtnAndroid: {
-    backgroundColor: 'rgba(10,0,0,0.72)',
+    backgroundColor: 'rgba(241, 241, 241, 0.72)',
   },
   startBtnInner: {
     flex:              1,
@@ -488,6 +586,13 @@ const styles = StyleSheet.create({
     fontWeight:    '800',
     letterSpacing: 3.5,
   },
+
+
+  heroContent: {
+    marginTop: 35,
+    width: '82%',
+    alignItems: 'center',
+},
 
 
 });
