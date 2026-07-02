@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -10,39 +10,95 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
-export default function ProductCardGlass({ image, title, price }) {
-  const [active, setActive] = useState(false);
+const parsePrice = (value) => {
+  if (typeof value === 'number') {
+    return value;
+  }
 
-  const rotateAnim = useRef(new Animated.Value(-8)).current;
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  if (typeof value !== 'string') {
+    return 0;
+  }
 
-  const handlePress = () => {
-    const toValue = active ? -8 : 0;
+  const normalized = value
+    .replace(/[^\d,.-]/g, '')
+    .replace(/\./g, '')
+    .replace(',', '.');
 
-    Animated.parallel([
-      Animated.timing(rotateAnim, {
-        toValue,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(overlayOpacity, {
-        toValue: active ? 0 : 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
 
-    setActive(!active);
+export default function ProductCardGlass({ image, title, price, product }) {
+  const navigation = useNavigation();
+
+  const pressAnim = useRef(new Animated.Value(0)).current;
+
+  const productData = product ?? { image, title, price };
+  const productImage = productData.image ?? image;
+  const productTitle = productData.title ?? title ?? 'Produto';
+  const productPrice = productData.price ?? price;
+  const productDetails = {
+    id: productData.id ?? productTitle,
+    nome: productData.nome ?? productTitle,
+    preco:
+      typeof productData.preco === 'number'
+        ? productData.preco
+        : parsePrice(productPrice),
+    imagem: productData.imagem ?? productImage,
+    imagens: productData.imagens ?? (productImage ? [productImage] : []),
+    descricao:
+      productData.descricao ??
+      productData.description ??
+      'Produto em destaque da Home',
+    categoria: productData.categoria,
+    precoAntigo: productData.precoAntigo,
+    desconto: productData.desconto,
   };
 
-  const rotate = rotateAnim.interpolate({
-    inputRange: [-8, 0],
+  const handlePressIn = () => {
+    Animated.spring(pressAnim, {
+      toValue: 1,
+      tension: 350,
+      friction: 18,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(pressAnim, {
+      toValue: 0,
+      tension: 250,
+      friction: 20,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePress = () => {
+    navigation.navigate('Loja', {
+      screen: 'DetalhesProdutos',
+      params: { produto: productDetails },
+    });
+  };
+
+  const rotate = pressAnim.interpolate({
+    inputRange: [0, 1],
     outputRange: ['-8deg', '0deg'],
   });
 
+  const overlayOpacity = pressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 0.18],
+  });
+
   return (
-    <TouchableOpacity activeOpacity={0.9} onPress={handlePress}>
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
       <View style={styles.card}>
         <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
@@ -66,7 +122,7 @@ export default function ProductCardGlass({ image, title, price }) {
         <View style={styles.imageContainer}>
 
           <Animated.Image
-            source={image}
+            source={productImage}
             style={[
               styles.productImage,
               { transform: [{ rotate }] },
@@ -75,15 +131,15 @@ export default function ProductCardGlass({ image, title, price }) {
 
           {/* OVERLAY */}
           <Animated.View
-            pointerEvents={active ? 'auto' : 'none'}
+            pointerEvents="none"
             style={[
               styles.overlay,
               { opacity: overlayOpacity },
             ]}
           >
-            <TouchableOpacity style={styles.overlayButton}>
-              <Text style={styles.overlayText}>Ver na loja</Text>
-            </TouchableOpacity>
+            <View style={styles.overlayButton}>
+              <Text style={styles.overlayText}>Ver detalhes</Text>
+            </View>
           </Animated.View>
 
           <LinearGradient
@@ -107,14 +163,14 @@ export default function ProductCardGlass({ image, title, price }) {
 
         {/* INFO */}
         <View style={styles.infoContainer}>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.title}>{productTitle}</Text>
 
           <Text style={styles.description}>
             Edição clássica retrô com tecido premium
           </Text>
 
           <View style={styles.footer}>
-            <Text style={styles.price}>{price}</Text>
+            <Text style={styles.price}>{productPrice}</Text>
 
             <TouchableOpacity style={styles.addButton}>
               <Ionicons name="cart-outline" size={18} color="#a90000" />

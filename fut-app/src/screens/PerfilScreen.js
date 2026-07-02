@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import {View, Text, StyleSheet, Image,TouchableOpacity, ScrollView, Modal, TextInput} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styleSocioModal } from '../styles/styleSocios/styleSociosModal';
 import { stylesPerfil } from '../styles/stylePerfil/stylePerfil';
 import { escudoDrakos, user as defaultUser } from '../data/dataPerfil';
@@ -10,17 +12,77 @@ import { escudoDrakos, user as defaultUser } from '../data/dataPerfil';
 import { useSubscription } from '../contexts/SubscriptionContext';
 
 const user = defaultUser;
+const PROFILE_IMAGE_KEY = '@fut_app/profile_image';
 
 export default function PerfilScreen({ navigation }) {
   const [editingField, setEditingField] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [profileImage, setProfileImage] = useState(defaultUser.avatar);
+  const [profileImageLoaded, setProfileImageLoaded] = useState(false);
   const [editedUser, setEditedUser] = useState({ 
     name: user.name,
     email: user.email,
     phone: user.phone
   });
   const { subscription, purchaseHistory } = useSubscription();
+
+  useEffect(() => {
+    const loadProfileImage = async () => {
+      try {
+        const savedImage = await AsyncStorage.getItem(PROFILE_IMAGE_KEY);
+
+        if (savedImage) {
+          setProfileImage(savedImage);
+        }
+      } catch (error) {
+        console.log('Erro ao carregar foto de perfil', error);
+      } finally {
+        setProfileImageLoaded(true);
+      }
+    };
+
+    loadProfileImage();
+  }, []);
+
+  useEffect(() => {
+    if (!profileImageLoaded) {
+      return;
+    }
+
+    const saveProfileImage = async () => {
+      try {
+        await AsyncStorage.setItem(PROFILE_IMAGE_KEY, profileImage);
+      } catch (error) {
+        console.log('Erro ao salvar foto de perfil', error);
+      }
+    };
+
+    saveProfileImage();
+  }, [profileImage, profileImageLoaded]);
+
+  const pickProfileImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert(
+        'Permissão necessária',
+        'Precisamos de acesso à galeria para escolher uma foto de perfil.'
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets?.length > 0) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
 
   return (
     <View style={stylesPerfil.container}>
@@ -49,8 +111,12 @@ export default function PerfilScreen({ navigation }) {
         <View style={stylesPerfil.header}>
           <Image source={escudoDrakos} style={stylesPerfil.drakosBg} resizeMode="contain" />
           <View style={stylesPerfil.avatarWrapper}>
-            <Image source={{ uri: user.avatar }} style={stylesPerfil.avatar} />
-            <TouchableOpacity style={stylesPerfil.editAvatarBtn} activeOpacity={0.8}>
+            <Image source={{ uri: profileImage }} style={stylesPerfil.avatar} />
+            <TouchableOpacity
+              style={stylesPerfil.editAvatarBtn}
+              activeOpacity={0.8}
+              onPress={pickProfileImage}
+            >
               <Ionicons name="camera" size={14} color="#fff" />
             </TouchableOpacity>
           </View>

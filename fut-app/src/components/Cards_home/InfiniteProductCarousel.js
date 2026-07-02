@@ -330,6 +330,7 @@ export default function InfiniteProductCarousel({ data, renderItem }) {
 
   // 🖐️ TOQUE
   const panResponder = useRef(
+    
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
 
@@ -386,6 +387,7 @@ export default function InfiniteProductCarousel({ data, renderItem }) {
 
   return (
     <View style={{ overflow: 'hidden' }} {...panResponder.panHandlers}>
+      
       <Animated.View
         style={{
           flexDirection: 'row',

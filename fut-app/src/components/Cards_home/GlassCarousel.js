@@ -46,7 +46,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-
+import { useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -63,6 +63,7 @@ const { Value, timing, loop, sequence, delay } = Animated;
 
 // ─── Single Premium Glass Card ────────────────────────────────────────────────
 const PremiumMatchCard = ({ item, shimmerAnim }) => {
+  const navigation = useNavigation();
   const shimmerX = shimmerAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [-(CARD_WIDTH * 1.6), CARD_WIDTH * 1.6],
@@ -274,23 +275,25 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
             <Text style={styles.smallTitle}>próximos jogos</Text>
             <Text style={styles.dateLabel}>Data:</Text>
             <Text style={styles.date}>{item.date}</Text>
+
+            
             <TouchableOpacity
               style={styles.button}
               activeOpacity={0.75}
+              onPress={() => navigation.navigate('Ingressos')}
             >
-              {/* Botão premium com glass interno */}
-              <View style={styles.buttonGlass} />
-              <LinearGradient
-                colors={[
-                  'transparent',
-                  'transparent',
-                ]}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-              />
-              <Text style={styles.buttonText}>VER JOGO</Text>
+                <View style={styles.buttonGlass} />
+
+                <LinearGradient
+                  colors={['transparent', 'transparent']}
+                  style={StyleSheet.absoluteFill}
+                />
+
+                <Text style={styles.buttonText}>
+                    VER JOGO
+                </Text>
             </TouchableOpacity>
+            
           </View>
 
           {/* DIREITA — Match display */}

@@ -11,10 +11,53 @@ import styles from '../styles/styleDetalhesProdutos/styleDetalhesProdutos';
 
 const { width } = Dimensions.get('window');
 
+const parseCurrencyValue = (value) => {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  if (typeof value !== 'string') {
+    return 0;
+  }
+
+  const normalized = value
+    .replace(/[^\d,.-]/g, '')
+    .replace(/\./g, '')
+    .replace(',', '.');
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const normalizeImages = (produto) => {
+  if (Array.isArray(produto.imagens) && produto.imagens.length > 0) {
+    return produto.imagens;
+  }
+
+  if (produto.imagem) {
+    return [produto.imagem];
+  }
+
+  if (produto.image) {
+    return [produto.image];
+  }
+
+  return [];
+};
+
 export default function DetalhesProdutosScreens({ route, navigation }) {
   const { addToCart, getCartCount } = useCart();
 
-  const produto = (route.params && route.params.produto) ? route.params.produto : DEFAULT_PRODUTO;
+  const produtoEntrada = (route.params && route.params.produto) ? route.params.produto : DEFAULT_PRODUTO;
+  const produto = {
+    ...produtoEntrada,
+    nome: produtoEntrada.nome ?? produtoEntrada.title ?? 'Produto',
+    preco: typeof produtoEntrada.preco === 'number' ? produtoEntrada.preco : parseCurrencyValue(produtoEntrada.price),
+    precoAntigo: typeof produtoEntrada.precoAntigo === 'number' ? produtoEntrada.precoAntigo : parseCurrencyValue(produtoEntrada.precoAntigo),
+    imagens: normalizeImages(produtoEntrada),
+    imagem: produtoEntrada.imagem ?? produtoEntrada.image,
+    descricao: produtoEntrada.descricao ?? produtoEntrada.description ?? DEFAULT_PRODUTO.descricao,
+  };
 
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState('M');
   const [indiceImagem, setIndiceImagem] = useState(0);

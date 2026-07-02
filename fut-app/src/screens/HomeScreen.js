@@ -16,17 +16,17 @@ import CardActionGlass from '../components/Cards_home/cardActionGlass';
 import CardSocioGlass from '../components/Cards_home/CardSocioGlass';
 import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCarousel';
 import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
-import { useNavigation } from "@react-navigation/native";
 import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
 import { products } from '../data/dataHome';
 import { stylesHome } from '../styles/styleHome/styleHome';
+
 
 export default function Home({ navigation }) {
   const [isDarkMode, setIsDarkMode] = useState(true);
   return (
     <View style={stylesHome.container}>
 
-      
+
 
       {/* BACKGROUND */}
       <LinearGradient
@@ -67,14 +67,18 @@ export default function Home({ navigation }) {
               title="Drakos Store"
               desc="Veja produtos"
               image={require('../assets/img/img_home/milan_r2006(2).png')}
+              onPress={() => navigation.navigate('Loja')}
             />
 
-            <CardSocioGlass flatLeft />
+            <CardSocioGlass
+              flatLeft
+              onPress={() => navigation.navigate('Socio')}
+            />
           </View>
 
           <GlassCarousel />
-
           <View style={{ marginTop: 25 }}>
+
             <View style={stylesHome.sectionHeader}>
               <Text style={stylesHome.sectionTitle}>Produtos em destaque</Text>
               <View style={stylesHome.sectionLine} />
@@ -84,13 +88,14 @@ export default function Home({ navigation }) {
               data={products}
               renderItem={({ item }) => (
                 <View style={stylesHome.productWrapper}>
-                  <ProductCardGlassPro image={item.image} title={item.title} price={item.price} />
+                  <ProductCardGlassPro product={item} />
                 </View>
               )}
             />
           </View>
 
           <PremiumGlassCard>
+
             <Text>Seja um membro Premium e tenha acesso a benefícios exclusivos!</Text>
           </PremiumGlassCard>
         </ScrollView>
