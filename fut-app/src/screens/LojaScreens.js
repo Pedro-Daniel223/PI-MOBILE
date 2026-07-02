@@ -8,7 +8,7 @@
  *   – Luxury Fashion Tech           → espaço negativo, hierarquia forte
  *
  * Estrutura de seções (topo → rodapé):
- *   A. TopBar            — barra minimalista com busca
+ *   A. TopBar            — barra minimalista com logo e acesso ao carrinho
  *   B. HeroCarousel      — carrossel cinematográfico (460px)
  *   C. CategoriasStrip   — filtros horizontais deslizantes
  *   D. CampaignBanner    — PremiumGlassCard como hero de campanha
@@ -28,7 +28,6 @@ import {
   Image,
   TouchableOpacity,
   StatusBar,
-  TextInput,
   ScrollView,
   Animated,
   Easing,
@@ -474,30 +473,21 @@ const SectionHeader = memo(({ tag, title, subtitle }) => (
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: TopBar
-// Barra superior com busca minimalista
+// Barra superior com logo e acesso rápido ao carrinho
 // ═══════════════════════════════════════════════════════════════════════════════
-const TopBar = memo(({ search, onSearch, onClose }) => (
+const TopBar = memo(({ onCartPress }) => (
   <View style={topStyles.bar}>
     {/* Logo / marca */}
     <View style={topStyles.logoContainer}>
       <Text style={topStyles.logoText}>D</Text>
     </View>
 
-    {/* Campo de busca */}
-    <View style={topStyles.searchContainer}>
-      <Ionicons name="search-outline" size={14} color={DS.textFaint} style={{ marginRight: 8 }} />
-      <TextInput
-        placeholder="Buscar..."
-        placeholderTextColor={DS.textFaint}
-        style={topStyles.searchInput}
-        value={search}
-        onChangeText={onSearch}
-      />
-    </View>
+    {/* Espaçador para empurrar o botão de carrinho pra direita */}
+    <View style={{ flex: 1 }} />
 
-    {/* Botão fechar */}
-    <TouchableOpacity onPress={onClose} style={topStyles.closeBtn} activeOpacity={0.7}>
-      <Ionicons name="close" size={18} color={DS.textDim} />
+    {/* Botão carrinho */}
+    <TouchableOpacity onPress={onCartPress} style={topStyles.closeBtn} activeOpacity={0.7}>
+      <Ionicons name="cart-outline" size={18} color={DS.textDim} />
     </TouchableOpacity>
   </View>
 ));
@@ -507,7 +497,6 @@ const TopBar = memo(({ search, onSearch, onClose }) => (
 // COMPONENTE PRINCIPAL: LojaContent
 // ═══════════════════════════════════════════════════════════════════════════════
 function LojaContent({ navigation }) {
-  const [search, setSearch]       = useState('');
   const [categoria, setCategoria] = useState('Todos');
   const insets                    = useSafeAreaInsets();
 
@@ -533,11 +522,7 @@ function LojaContent({ navigation }) {
         scrollEventThrottle={16}
       >
         {/* A. Barra superior */}
-        <TopBar
-          search={search}
-          onSearch={setSearch}
-          onClose={() => navigation.goBack()}
-        />
+          <TopBar onCartPress={() => navigation.navigate('Carrinho')} />
 
         {/* B. Carrossel hero */}
         <HeroCarousel />
