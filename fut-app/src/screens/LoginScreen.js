@@ -5,6 +5,7 @@ import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import { Ionicons } from '@expo/vector-icons';
 import { escudoDrakos, colors } from '../data/dataLogin';
+import { useAuth } from '../contexts/AuthContext';
 import { stylesLogin } from '../styles/styleLogin/styleLogin';
 
 export default function LoginScreen({ navigation }) {
@@ -12,6 +13,8 @@ export default function LoginScreen({ navigation }) {
   const [senha, setSenha] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signIn } = useAuth();
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -26,16 +29,25 @@ export default function LoginScreen({ navigation }) {
 
   const emailValid = email.includes('@') && email.includes('.');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !senha) {
       Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
+
     if (!emailValid) {
       Alert.alert('Erro', 'Email inválido!');
       return;
     }
-    navigation.navigate('MainTabs');
+
+    try {
+      setIsSubmitting(true);
+      await signIn(email, senha);
+    } catch (error) {
+      Alert.alert('Erro', error?.message || 'Não foi possível realizar o login.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBiometricAuth = async () => {
@@ -50,7 +62,21 @@ export default function LoginScreen({ navigation }) {
       disableDeviceFallback: false,
     });
 
-    if (result.success) navigation.replace('MainTabs');
+    if (result.success) {
+      if (!email || !senha) {
+        Alert.alert('Erro', 'Preencha email e senha para continuar.');
+        return;
+      }
+
+      try {
+        setIsSubmitting(true);
+        await signIn(email, senha);
+      } catch (error) {
+        Alert.alert('Erro', error?.message || 'Não foi possível realizar o login.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   };
 
   return (
@@ -120,7 +146,13 @@ export default function LoginScreen({ navigation }) {
               </View>
 
               <View style={stylesLogin.buttonWrap}>
-                <CustomButton title="Entrar" onPress={handleLogin} style={stylesLogin.glassButton} textStyle={stylesLogin.buttonTitle} />
+                <CustomButton
+                  title={isSubmitting ? 'Entrando...' : 'Entrar'}
+                  onPress={handleLogin}
+                  disabled={isSubmitting}
+                  style={stylesLogin.glassButton}
+                  textStyle={stylesLogin.buttonTitle}
+                />
 
                 {isBiometricSupported && (
                   <TouchableOpacity onPress={handleBiometricAuth} style={stylesLogin.biometricBtn}>

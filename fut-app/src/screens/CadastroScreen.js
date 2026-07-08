@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { 
-    View, 
-    Text, 
-    StyleSheet, 
-    Alert, 
-    SafeAreaView, 
-    TouchableOpacity, 
-    ScrollView, 
-    KeyboardAvoidingView, 
+import {
+    View,
+    Text,
+    Alert,
+    SafeAreaView,
+    TouchableOpacity,
+    ScrollView,
+    KeyboardAvoidingView,
     Platform,
-    Image 
+    Image
 } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
+import { useAuth } from '../contexts/AuthContext';
 
 import { escudoDrakos, colors } from '../data/dataCadastro';
 import styles from '../styles/styleCadastro/styleCadastro';
@@ -26,29 +26,58 @@ export default function CadastroScreen({ navigation }) {
     const [accepted, setAccepted] = useState(false);
     const [showPass, setShowPass] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { signUp } = useAuth();
 
-    const handleCadastro = () => {
+    const buildCadastroPayload = () => {
+        const nomePartes = nome.trim().split(/\s+/).filter(Boolean);
+
+        return {
+            nome: nomePartes[0] || '',
+            sobrenome: nomePartes.slice(1).join(' '),
+            email: email.trim(),
+            telefone: '',
+            cpf: cpf.trim(),
+            senha,
+            sexo: '',
+            rua: '',
+            casa_numero: '',
+            bairro: '',
+            cep: '',
+            complemento: '',
+        };
+    };
+
+    const handleCadastro = async () => {
         if (!nome || !email || !senha || !confirm) {
             Alert.alert('Erro', 'Preencha os campos obrigatórios!');
             return;
         }
+
         if (senha !== confirm) {
             Alert.alert('Erro', 'As senhas não coincidem!');
             return;
         }
+
         if (!accepted) {
             Alert.alert('Aviso', 'Você precisa aceitar as políticas de privacidade.');
             return;
         }
 
-        Alert.alert('Sucesso', 'Conta criada!');
-        navigation.navigate('Login');
+        try {
+            setIsSubmitting(true);
+            await signUp(buildCadastroPayload());
+        } catch (error) {
+            Alert.alert('Erro', error?.message || 'Não foi possível criar a conta.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <SafeAreaView style={styles.safe}>
-            <KeyboardAvoidingView 
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
             >
                 <ScrollView
@@ -56,10 +85,9 @@ export default function CadastroScreen({ navigation }) {
                     bounces={false}
                     showsVerticalScrollIndicator={false}
                 >
-                    
                     {/* HEADER COM ESCUDO INTEGRADO (IGUAL AO LOGIN) */}
                     <View style={styles.header}>
-                        <Image 
+                        <Image
                             source={escudoDrakos}
                             style={styles.escudoHeader}
                             resizeMode="contain"
@@ -67,7 +95,7 @@ export default function CadastroScreen({ navigation }) {
                         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
                             <Text style={styles.backText}>←</Text>
                         </TouchableOpacity>
-                        
+
                         <View style={styles.headerContent}>
                             <Text style={styles.headerTitle}>AQUI COMEÇA TUDO PARA VOCÊ!</Text>
                             <Text style={styles.headerSubtitle}>Crie sua conta para desbloquear o conteúdo exclusivo</Text>
@@ -76,7 +104,7 @@ export default function CadastroScreen({ navigation }) {
 
                     <View style={styles.card}>
                         <Text style={styles.formTitle}>Cadastro</Text>
-                        
+
                         <View style={styles.formContent}>
                             <Text style={styles.label}>NOME COMPLETO:</Text>
                             <CustomInput
@@ -115,7 +143,7 @@ export default function CadastroScreen({ navigation }) {
                                 style={styles.inputStyle}
                                 rightComponent={
                                     <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.iconContainer}>
-                                        <Text style={{fontSize: 18, opacity: 0.5}}>{showPass ? '🙈' : '👁'}</Text>
+                                        <Text style={{ fontSize: 18, opacity: 0.5 }}>{showPass ? '🙈' : '👁'}</Text>
                                     </TouchableOpacity>
                                 }
                             />
@@ -129,14 +157,14 @@ export default function CadastroScreen({ navigation }) {
                                 style={styles.inputStyle}
                                 rightComponent={
                                     <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)} style={styles.iconContainer}>
-                                        <Text style={{fontSize: 18, opacity: 0.5}}>{showConfirm ? '🙈' : '👁'}</Text>
+                                        <Text style={{ fontSize: 18, opacity: 0.5 }}>{showConfirm ? '🙈' : '👁'}</Text>
                                     </TouchableOpacity>
                                 }
                             />
 
                             <View style={styles.acceptRow}>
-                                <TouchableOpacity 
-                                    style={[styles.checkbox, accepted && styles.checkboxActive]} 
+                                <TouchableOpacity
+                                    style={[styles.checkbox, accepted && styles.checkboxActive]}
                                     onPress={() => setAccepted(!accepted)}
                                 >
                                     {accepted && <Text style={styles.checkIconSmall}>✓</Text>}
@@ -145,15 +173,16 @@ export default function CadastroScreen({ navigation }) {
                             </View>
 
                             <View style={styles.buttonWrap}>
-                                <CustomButton 
-                                    title="CRIAR CONTA" 
-                                    onPress={handleCadastro} 
+                                <CustomButton
+                                    title={isSubmitting ? 'CRIANDO...' : 'CRIAR CONTA'}
+                                    onPress={handleCadastro}
+                                    disabled={isSubmitting}
                                     style={styles.glassButton}
                                     textStyle={styles.glassButtonText}
                                 />
                             </View>
 
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => navigation.navigate('Login')}
                                 style={styles.footerTouchable}
                             >
