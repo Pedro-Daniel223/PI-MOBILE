@@ -10,6 +10,7 @@ import { stylesPerfil } from '../styles/stylePerfil/stylePerfil';
 import { escudoDrakos, user as defaultUser } from '../data/dataPerfil';
 
 import { useSubscription } from '../contexts/SubscriptionContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const user = defaultUser;
 const PROFILE_IMAGE_KEY = '@fut_app/profile_image';
@@ -26,6 +27,7 @@ export default function PerfilScreen({ navigation }) {
     phone: user.phone
   });
   const { subscription, purchaseHistory } = useSubscription();
+  const { signOut } = useAuth();
 
   useEffect(() => {
     const loadProfileImage = async () => {
@@ -81,6 +83,14 @@ export default function PerfilScreen({ navigation }) {
 
     if (!result.canceled && result.assets?.length > 0) {
       setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      Alert.alert('Erro', error?.message || 'Não foi possível sair da conta.');
     }
   };
 
@@ -334,7 +344,7 @@ export default function PerfilScreen({ navigation }) {
         </View>
 
         {/* BOTÃO SAIR */}
-        <TouchableOpacity style={stylesPerfil.logoutBtn} activeOpacity={0.8}>
+        <TouchableOpacity style={stylesPerfil.logoutBtn} activeOpacity={0.8} onPress={handleLogout}>
           <LinearGradient
             colors={['rgba(255,0,0,0.2)', 'rgba(255,0,0,0.1)']}
             style={StyleSheet.absoluteFill}

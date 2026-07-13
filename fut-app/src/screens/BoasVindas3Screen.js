@@ -11,6 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
@@ -66,6 +67,8 @@ const EMBERS = Array.from({ length: 14 }, (_, i) => ({
   startX:   20 + Math.random() * (width - 40),
   duration: 2600 + Math.random() * 2400,
 }));
+
+const ONBOARDING_KEY = 'onboarding_seen';
 
 /* ─── Animated security feature row ────────────────────── */
 function FeatureRow({ icon, label, delay }) {
@@ -142,6 +145,21 @@ export default function BoasVindas3Screen() {
 
   const pressIn  = (a) => Animated.spring(a, { toValue: 0.93, useNativeDriver: true }).start();
   const pressOut = (a) => Animated.spring(a, { toValue: 1, tension: 80, friction: 5, useNativeDriver: true }).start();
+
+  const handleStart = async () => {
+    try {
+      await SecureStore.setItemAsync(ONBOARDING_KEY, 'true');
+    } catch {
+      // Se o armazenamento falhar, seguimos o fluxo para não travar o usuário.
+    }
+
+    navigation.reset({
+      index: 0,
+      routes: [
+        { name: 'AuthStack', state: { index: 0, routes: [{ name: 'Login' }] } },
+      ],
+    });
+  };
 
   return (
   <View style={styles.root}>
@@ -325,11 +343,7 @@ export default function BoasVindas3Screen() {
             activeOpacity={1}
             onPressIn={() => pressIn(startScale)}
             onPressOut={() => pressOut(startScale)}
-            onPress={() =>
-              navigation.navigate("AuthStack", {
-                screen: "Login",
-              })
-            }
+            onPress={handleStart}
             style={styles.startBtn}
           >
             {Platform.OS === "ios" ? (

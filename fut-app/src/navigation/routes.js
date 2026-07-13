@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -9,10 +10,36 @@ import { useAuth } from '../contexts/AuthContext';
 import { CartProvider } from '../contexts/CartContext';
 import { SubscriptionProvider } from '../contexts/SubscriptionContext';
 
+const ONBOARDING_KEY = 'onboarding_seen';
+
 export default function Routes() {
   const { authenticated, loading } = useAuth();
+  const [onboardingSeen, setOnboardingSeen] = useState(false);
+  const [loadingOnboarding, setLoadingOnboarding] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    let mounted = true;
+    setLoadingOnboarding(true);
+
+    (async () => {
+      try {
+        const storedValue = await SecureStore.getItemAsync(ONBOARDING_KEY);
+        if (mounted) {
+          setOnboardingSeen(storedValue === 'true');
+        }
+      } finally {
+        if (mounted) {
+          setLoadingOnboarding(false);
+        }
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [authenticated]);
+
+  if (loading || loadingOnboarding) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
@@ -20,11 +47,17 @@ export default function Routes() {
     );
   }
 
+  const shouldShowMainStack = authenticated || !onboardingSeen;
+
   return (
     <CartProvider>
       <SubscriptionProvider>
         <NavigationContainer>
-          {authenticated ? <MainStack /> : <AuthStack />}
+          {shouldShowMainStack ? (
+            <MainStack key={authenticated ? 'main-auth' : 'main-guest'} />
+          ) : (
+            <AuthStack />
+          )}
         </NavigationContainer>
       </SubscriptionProvider>
     </CartProvider>

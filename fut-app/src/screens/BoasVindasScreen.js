@@ -11,6 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
@@ -77,6 +78,8 @@ const EMBERS = Array.from({ length: 14 }, (_, i) => ({
   duration: 2800 + Math.random() * 2200,
 }));
 
+const ONBOARDING_KEY = 'onboarding_seen';
+
 /* ─── Main screen ────────────────────────────────────────── */
 export default function BoasVindasScreen() {
   const navigation = useNavigation();
@@ -114,13 +117,20 @@ export default function BoasVindasScreen() {
   const pressOut = (anim) =>
     Animated.spring(anim, { toValue: 1, tension: 80, friction: 5, useNativeDriver: true }).start();
 
-  const handleSkip = () =>
+  const handleSkip = async () => {
+    try {
+      await SecureStore.setItemAsync(ONBOARDING_KEY, 'true');
+    } catch {
+      // Se o armazenamento falhar, seguimos o fluxo para não travar o usuário.
+    }
+
     navigation.reset({
       index: 0,
       routes: [
         { name: 'AuthStack', state: { index: 0, routes: [{ name: 'Login' }] } },
       ],
     });
+  };
 
   return (
     <View style={styles.root}>

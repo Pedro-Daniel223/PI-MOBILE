@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
   StyleSheet,
@@ -11,6 +10,7 @@ import {
   ScrollView,
   TextInput
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '../components/CustomButton';
 import { colorsVerificar } from '../data/dataVerificarCodigo';
 import { stylesVerificar } from '../styles/styleVerificarCodigo/styleVerificarCodigo';

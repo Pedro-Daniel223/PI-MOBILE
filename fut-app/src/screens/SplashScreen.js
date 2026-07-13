@@ -1,8 +1,10 @@
 import { View, Animated, Image, Text } from 'react-native';
 import { useEffect, useRef } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { stylesSplash } from '../styles/styleSplash/styleSplash';
 
 export default function Splash({ navigation }) {
+  const { authenticated } = useAuth();
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.8)).current;
 
@@ -44,7 +46,7 @@ export default function Splash({ navigation }) {
         }),
       ]).start(() => {
         setTimeout(() => {
-          navigation.replace('BoasVindas');
+          navigation.replace(authenticated ? 'MainTabs' : 'BoasVindas');
         }, 800);
       });
 

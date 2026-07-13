@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { cadastro, login, logout, meuPerfil } from '../services/authService';
 
@@ -66,6 +66,7 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const authRequestRef = useRef(0);
 
   const clearAuthState = useCallback(async (shouldRemoveStoredToken = true) => {
     setCliente(null);
@@ -112,19 +113,27 @@ export function AuthProvider({ children }) {
   }, []);
 
   const loadUser = useCallback(async (providedToken) => {
+    const requestId = ++authRequestRef.current;
     setLoading(true);
 
     try {
       const storedToken = providedToken || (await SecureStore.getItemAsync(AUTH_TOKEN_KEY));
 
+      if (requestId !== authRequestRef.current) {
+        return null;
+      }
+
       if (!storedToken) {
-        await clearAuthState(true);
         return null;
       }
 
       setToken(storedToken);
 
       const response = await meuPerfil(storedToken);
+      if (requestId !== authRequestRef.current) {
+        return null;
+      }
+
       const nextCliente = extractCliente(response) || response || null;
 
       setCliente(nextCliente);
@@ -132,6 +141,10 @@ export function AuthProvider({ children }) {
 
       return response;
     } catch (error) {
+      if (requestId !== authRequestRef.current) {
+        return null;
+      }
+
       await clearAuthState(true);
 
       if (!isTokenError(error)) {
@@ -140,11 +153,14 @@ export function AuthProvider({ children }) {
 
       return null;
     } finally {
-      setLoading(false);
+      if (requestId === authRequestRef.current) {
+        setLoading(false);
+      }
     }
   }, [clearAuthState]);
 
   const signIn = useCallback(async (email, senha) => {
+    authRequestRef.current += 1;
     setLoading(true);
 
     try {
@@ -178,6 +194,7 @@ export function AuthProvider({ children }) {
   }, [applySession, clearAuthState, loadUser, persistToken]);
 
   const signUp = useCallback(async (dadosCadastro) => {
+    authRequestRef.current += 1;
     setLoading(true);
 
     try {
@@ -207,6 +224,7 @@ export function AuthProvider({ children }) {
   }, [applySession, clearAuthState, loadUser, persistToken]);
 
   const signOut = useCallback(async () => {
+    authRequestRef.current += 1;
     setLoading(true);
 
     try {

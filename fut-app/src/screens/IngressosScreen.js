@@ -266,24 +266,24 @@ function GlassBackButton({ onPress }) {
       onPressOut={() => spring(pressAnim, { toValue: 0, tension: 260, friction: 20, useNativeDriver: true }).start()}
     >
       <Animated.View style={{ width: 44, height: 44, borderRadius: 22, transform: [{ scale }] }}>
-        <View style={{ borderRadius: 22, overflow: 'hidden', width: 44, height: 44 }}>
-          <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} />
-          <LinearGradient
+        {/* <View style={{ borderRadius: 22, overflow: 'hidden', width: 44, height: 44 }}>
+          <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} /> */}
+          {/* <LinearGradient
             colors={['rgba(255,255,255,0.16)', 'rgba(255,255,255,0.04)']}
             style={StyleSheet.absoluteFill}
             start={{ x: 0.2, y: 0 }}
             end={{ x: 0.8, y: 1 }}
-          />
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          /> */}
+          {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name="chevron-back" size={20} color={DS.textPrimary} />
-          </View>
-        </View>
+          </View> */}
+        {/* </View> */}
         <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute', top: 0, left: 8, right: 8, height: 1,
-            backgroundColor: 'rgba(255,255,255,0.7)', opacity: 0.6,
-          }}
+          // pointerEvents="none"
+          // style={{
+          //   position: 'absolute', top: 0, left: 8, right: 8, height: 1,
+          //   backgroundColor: 'rgba(255,255,255,0.7)', opacity: 0.6,
+          // }}
         />
         <View
           pointerEvents="none"
