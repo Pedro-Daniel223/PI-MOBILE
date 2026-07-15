@@ -1,4 +1,5 @@
-  const DEFAULT_BASE_URL = 'http://172.20.10.2:8000'; // Substitua pelo seu endereço IP e porta do backend
+  // const DEFAULT_BASE_URL = 'http://172.20.10.2:8000'; // Substitua pelo seu endereço IP e porta do backend (do curso)
+  const DEFAULT_BASE_URL = 'http://192.168.1.8:8000'; // Substitua pelo seu endereço IP e porta do backend  (de casa)
 
   const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_BASE_URL;
 

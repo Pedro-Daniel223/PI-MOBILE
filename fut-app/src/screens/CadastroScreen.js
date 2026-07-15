@@ -65,6 +65,14 @@ const formatCEP = (value) => {
 };
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+const isValidPassword = (value) => {
+    const password = String(value || '');
+    return (
+        password.length >= 8 &&
+        /[A-Z]/.test(password) &&
+        /\d/.test(password)
+    );
+};
 
 export default function CadastroScreen({ navigation }) {
     // ── Etapa atual ───────────────────────────────────────────────────────
@@ -161,6 +169,9 @@ export default function CadastroScreen({ navigation }) {
         if (!cpf.trim()) next.cpf = 'Informe seu CPF';
         if (!telefone.trim()) next.telefone = 'Informe seu telefone';
         if (!senha) next.senha = 'Informe uma senha';
+        else if (!isValidPassword(senha)) {
+            next.senha = 'A senha deve ter 8 caracteres, 1 letra maiúscula e 1 número';
+        }
         if (!confirm) next.confirm = 'Confirme sua senha';
         else if (senha !== confirm) next.confirm = 'As senhas não coincidem';
         return next;
@@ -200,6 +211,15 @@ export default function CadastroScreen({ navigation }) {
     };
 
     const handleCadastro = async () => {
+        const step1Errors = validateStep1();
+        const step2Errors = validateStep2();
+        const allErrors = { ...step1Errors, ...step2Errors };
+
+        if (Object.keys(allErrors).length > 0) {
+            setErrors(allErrors);
+            return;
+        }
+
         if (!accepted) {
             Alert.alert('Aviso', 'Você precisa aceitar as políticas de privacidade.');
             return;
