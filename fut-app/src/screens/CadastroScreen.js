@@ -456,7 +456,11 @@ export default function CadastroScreen({ navigation }) {
                                         style={[styles.inputStyle, errors.senha && localStyles.inputErrorBorder]}
                                         rightComponent={
                                             <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.iconContainer}>
-                                                <Text style={{ fontSize: 18, opacity: 0.5 }}>{showPass ? '🙈' : '👁'}</Text>
+                                                <Ionicons
+                                                    name={showPass ? 'eye-off' : 'eye'}
+                                                    size={18}
+                                                    color="rgba(192, 0, 10, 0.85)"
+                                                />
                                             </TouchableOpacity>
                                         }
                                     />
@@ -474,7 +478,11 @@ export default function CadastroScreen({ navigation }) {
                                         style={[styles.inputStyle, errors.confirm && localStyles.inputErrorBorder]}
                                         rightComponent={
                                             <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)} style={styles.iconContainer}>
-                                                <Text style={{ fontSize: 18, opacity: 0.5 }}>{showConfirm ? '🙈' : '👁'}</Text>
+                                                <Ionicons
+                                                    name={showConfirm ? 'eye-off' : 'eye'}
+                                                    size={18}
+                                                    color="rgba(192, 0, 10, 0.85)"
+                                                />
                                             </TouchableOpacity>
                                         }
                                     />
