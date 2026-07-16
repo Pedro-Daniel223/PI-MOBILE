@@ -47,27 +47,41 @@ import {
 
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAuth } from '../../contexts/AuthContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const { Value, timing, loop, sequence, delay } = Animated;
 
 
-  export default function CardProfileWelcome({
+export default function CardProfileWelcome({
     isDarkMode,
     setIsDarkMode,
   }) {
   // const [isDarkMode, setIsDarkMode] = useState(true);
+  const { cliente } = useAuth();
+  const avatarUri = cliente?.url_foto_clientes?.trim() || 'https://i.pravatar.cc/150?img=12';
 
   // ── Lógica original — intacta ─────────────────────────────────────────────
+  const nomeCompleto = [
+    cliente?.nome_clientes?.trim(),
+    cliente?.sobrenome_clientes?.trim(),
+  ].filter(Boolean).join(' ').trim() || 'Usuário';
+
   const fullText = [
     'Seja bem-vindo',
-    'fernando freitas,',
+    `${nomeCompleto},`,
     'aproveite nosso app'
   ];
 
   const [displayedText, setDisplayedText] = useState(['', '', '']);
   const [lineIndex, setLineIndex]         = useState(0);
   const [charIndex, setCharIndex]         = useState(0);
+
+  useEffect(() => {
+    setDisplayedText(['', '', '']);
+    setLineIndex(0);
+    setCharIndex(0);
+  }, [nomeCompleto, avatarUri]);
 
   useEffect(() => {
     const typingSpeed = 40;
@@ -324,7 +338,7 @@ const { Value, timing, loop, sequence, delay } = Animated;
               end={{ x: 0.5, y: 1 }}
             />
             <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=12' }}
+              source={{ uri: avatarUri }}
               style={styles.avatar}
             />
           </View>

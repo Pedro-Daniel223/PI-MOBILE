@@ -113,6 +113,8 @@
 
   export const put = (path, data, token, headers) => request('PUT', path, data, token, headers);
 
+  export const patch = (path, data, token, headers) => request('PATCH', path, data, token, headers);
+
   export const deleteRequest = (path, data, token, headers) => request('DELETE', path, data, token, headers);
 
   export { deleteRequest as delete };
@@ -120,8 +122,9 @@
   export default {
     get,
     post,
-    put,
-    delete: deleteRequest,
-    request,
-    BASE_URL,
-  };
+  put,
+  patch,
+  delete: deleteRequest,
+  request,
+  BASE_URL,
+};

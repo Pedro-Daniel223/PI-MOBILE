@@ -1,4 +1,4 @@
-import { get, post } from './api';
+import { get, post, put } from './api';
 
 const ENDPOINTS = {
   login: '/api/login/',
@@ -24,6 +24,9 @@ export const redefinirSenha = (dados) => post(ENDPOINTS.redefinirSenha, dados);
 
 export const meuPerfil = (token) => get(ENDPOINTS.meuPerfil, token);
 
+export const atualizarMeuPerfil = (dados, token) =>
+  put(ENDPOINTS.meuPerfil, dados, token);
+
 export default {
   login,
   cadastro,
@@ -32,4 +35,5 @@ export default {
   validarCodigo,
   redefinirSenha,
   meuPerfil,
+  atualizarMeuPerfil,
 };

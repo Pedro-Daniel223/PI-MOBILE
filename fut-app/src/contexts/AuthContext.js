@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { cadastro, login, logout, meuPerfil } from '../services/authService';
+import { cadastro, login, logout, meuPerfil, atualizarMeuPerfil } from '../services/authService';
 
 const AUTH_TOKEN_KEY = 'auth_token';
 
@@ -50,6 +50,31 @@ const extractCliente = (payload) => {
   return possibleCliente.find(Boolean) || null;
 };
 
+const PROFILE_KEYS = [
+  'url_foto_clientes',
+  'nome_clientes',
+  'sobrenome_clientes',
+  'email',
+  'telefone',
+  'sexo',
+  'rua',
+  'casa_numero',
+  'bairro',
+  'cep',
+  'complemento',
+  'cpf',
+  'id_clientes',
+  'categoria_clientes',
+];
+
+const isProfileLikeObject = (payload) => {
+  if (!payload || typeof payload !== 'object') {
+    return false;
+  }
+
+  return PROFILE_KEYS.some((key) => Object.prototype.hasOwnProperty.call(payload, key));
+};
+
 const isTokenError = (error) => {
   const message = String(error?.message || '').toLowerCase();
   return (
@@ -67,6 +92,14 @@ export function AuthProvider({ children }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const authRequestRef = useRef(0);
+
+  const mergeCliente = useCallback((baseCliente, updates) => {
+    if (baseCliente && updates) {
+      return { ...baseCliente, ...updates };
+    }
+
+    return baseCliente || updates || null;
+  }, []);
 
   const clearAuthState = useCallback(async (shouldRemoveStoredToken = true) => {
     setCliente(null);
@@ -134,7 +167,7 @@ export function AuthProvider({ children }) {
         return null;
       }
 
-      const nextCliente = extractCliente(response) || response || null;
+      const nextCliente = extractCliente(response) || (isProfileLikeObject(response) ? response : null) || null;
 
       setCliente(nextCliente);
       setAuthenticated(true);
@@ -158,6 +191,37 @@ export function AuthProvider({ children }) {
       }
     }
   }, [clearAuthState]);
+
+  const updateCliente = useCallback(async (updates = {}) => {
+    const requestId = ++authRequestRef.current;
+    const currentToken = token || (await SecureStore.getItemAsync(AUTH_TOKEN_KEY));
+
+    if (!currentToken) {
+      throw new Error('Token de autenticação não encontrado.');
+    }
+
+    const payload = Object.fromEntries(
+      Object.entries(updates).filter(([, value]) => typeof value !== 'undefined')
+    );
+
+    if (Object.keys(payload).length === 0) {
+      return cliente;
+    }
+
+    const response = await atualizarMeuPerfil(payload, currentToken);
+
+    if (requestId !== authRequestRef.current) {
+      return null;
+    }
+
+    const nextCliente = extractCliente(response)
+      || (isProfileLikeObject(response) ? response : null)
+      || mergeCliente(cliente, payload);
+    setCliente(nextCliente);
+    setAuthenticated(true);
+
+    return nextCliente;
+  }, [cliente, mergeCliente, token]);
 
   const signIn = useCallback(async (email, senha) => {
     authRequestRef.current += 1;
@@ -258,6 +322,7 @@ export function AuthProvider({ children }) {
     signUp,
     signOut,
     loadUser,
+    updateCliente,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
