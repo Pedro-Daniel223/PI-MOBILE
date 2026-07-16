@@ -47,6 +47,7 @@ import {
 
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -58,6 +59,7 @@ export default function CardProfileWelcome({
     setIsDarkMode,
   }) {
   // const [isDarkMode, setIsDarkMode] = useState(true);
+  const navigation = useNavigation();
   const { cliente } = useAuth();
   const avatarUri = cliente?.url_foto_clientes?.trim() || 'https://i.pravatar.cc/150?img=12';
 
@@ -191,10 +193,10 @@ export default function CardProfileWelcome({
         {/* Botão de configurações — zIndex 10, preservado integralmente */}
         <TouchableOpacity
           style={styles.editButton}
-          onPress={() => console.log('Editar perfil')}
+          onPress={() => navigation.navigate('Carrinho')}
         >
           <BlurView intensity={5} tint="dark" style={styles.editBlur}>
-            <Ionicons name="settings-outline" size={16} color="#fff" />
+            <Ionicons name="cart-outline" size={16} color="#fff" />
           </BlurView>
         </TouchableOpacity>
 

@@ -33,7 +33,7 @@ export default function Home({ navigation }) {
         colors={
           isDarkMode
             ? ['#080808', '#1a0000'] // Tema escuro vermelho
-            : ['#050505', '#7b0000'] // Tema claro
+            : ['#6b6b6b', '#6b6b6b'] // Tema claro
         }
         style={StyleSheet.absoluteFill}
       />
