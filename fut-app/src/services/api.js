@@ -1,7 +1,8 @@
-  const DEFAULT_BASE_URL = 'http://10.44.236.2:8000'; // Substitua pelo seu endereço IP e porta do backend (do curso)
-  // const DEFAULT_BASE_URL = 'http://192.168.1.8:8000'; // Substitua pelo seu endereço IP e porta do backend  (de casa)
+  // const DEFAULT_BASE_URL = 'http://10.44.236.2:8000'; // Substitua pelo seu endereço IP e porta do backend (do curso)
+  const DEFAULT_BASE_URL = 'http://192.168.1.6:8000'; // IP atual da máquina local
 
   const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_BASE_URL;
+  console.log('[API] BASE_URL =', BASE_URL);
 
   const buildUrl = (path) => {
     if (!path) {
@@ -86,6 +87,9 @@
   };
 
   const request = async (method, path, data, token, extraHeaders = {}) => {
+    const url = buildUrl(path);
+    console.log('[API] request start', { method, url, hasBody: typeof data !== 'undefined' });
+
     const response = await fetch(buildUrl(path), {
       method,
       headers: {
@@ -98,12 +102,15 @@
     });
 
     const payload = await parseResponse(response);
+    console.log('[API] response', { method, url, status: response.status, ok: response.ok });
 
     if (!response.ok) {
       const fallbackMessage = response.statusText || `Erro HTTP ${response.status}`;
+      console.log('[API] request error payload', payload);
       throw new Error(normalizeErrorMessage(payload, fallbackMessage));
     }
 
+    console.log('[API] request success', { method, url });
     return payload;
   };
 

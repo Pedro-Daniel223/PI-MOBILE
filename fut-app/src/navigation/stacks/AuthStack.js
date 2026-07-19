@@ -4,9 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from '../../screens/LoginScreen';
 import CadastroScreen from '../../screens/CadastroScreen';
-import EsqueceuSenhaScreen from '../../screens/EsqueceuSenhaScreen';
-import VerificarCodigoScreens from '../../screens/VerificarCodigoScreens';
-import NovaSenhaScreen from '../../screens/NovaSenhaScreen';
+import RedefinirSenhaScreen from '../../screens/Redefinirsenhascreen .js';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,18 +17,8 @@ export default function AuthStack() {
       <Stack.Screen name="Cadastro" component={CadastroScreen} />
 
       <Stack.Screen
-        name="EsqueceuSenha"
-        component={EsqueceuSenhaScreen}
-      />
-
-      <Stack.Screen
-        name="VerificarCodigo"
-        component={VerificarCodigoScreens}
-      />
-
-      <Stack.Screen
-        name="NovaSenha"
-        component={NovaSenhaScreen}
+        name="RedefinirSenha"
+        component={RedefinirSenhaScreen}
       />
 
     </Stack.Navigator>

@@ -141,7 +141,7 @@ export default function LoginScreen({ navigation }) {
 
               <View style={stylesLogin.forgotRow}>
                 <Text style={stylesLogin.forgotText}>Esqueceu Senha?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('EsqueceuSenha')} style={stylesLogin.redefineBtn}>
+                <TouchableOpacity onPress={() => navigation.navigate('RedefinirSenha')} style={stylesLogin.redefineBtn}>
                   <Text style={[stylesLogin.forgotText, stylesLogin.linkBold]}>Redefinir</Text>
                 </TouchableOpacity>
               </View>
