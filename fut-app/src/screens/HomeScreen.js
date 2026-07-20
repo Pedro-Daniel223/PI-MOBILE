@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -17,12 +17,16 @@ import CardSocioGlass from '../components/Cards_home/CardSocioGlass';
 import InfiniteProductCarousel from '../components/Cards_home/InfiniteProductCarousel';
 import ProductCardGlassPro from '../components/Cards_home/ProductCardGlass';
 import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
-import { products } from '../data/dataHome';
 import { stylesHome } from '../styles/styleHome/styleHome';
+import VideoHighlightCard from '../components/Cards_home/Videohighlightcard';
+import { Linking } from 'react-native';
+import { useProducts } from '../contexts/ProductContext';
 
 
 export default function Home({ navigation }) {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const { products } = useProducts();
+  const featuredProducts = useMemo(() => products.slice(0, 3), [products]);
   return (
     <View style={stylesHome.container}>
 
@@ -33,7 +37,7 @@ export default function Home({ navigation }) {
         colors={
           isDarkMode
             ? ['#080808', '#1a0000'] // Tema escuro vermelho
-            : ['#6b6b6b', '#6b6b6b'] // Tema claro
+            : ['#ac0707', '#9e0000'] // Tema claro
         }
         style={StyleSheet.absoluteFill}
       />
@@ -85,7 +89,7 @@ export default function Home({ navigation }) {
             </View>
 
             <InfiniteProductCarousel
-              data={products}
+              data={featuredProducts}
               renderItem={({ item }) => (
                 <View style={stylesHome.productWrapper}>
                   <ProductCardGlassPro product={item} />
@@ -94,10 +98,14 @@ export default function Home({ navigation }) {
             />
           </View>
 
-          <PremiumGlassCard>
+          {/* <PremiumGlassCard>
+          </PremiumGlassCard> */}
 
-            <Text>Seja um membro Premium e tenha acesso a benefícios exclusivos!</Text>
-          </PremiumGlassCard>
+          <VideoHighlightCard
+                onPress={() => {
+              Linking.openURL('https://youtu.be/K1qcPok3kjQ?si=F-WpGcvBMQ-jlwZy');
+            }}
+          />
         </ScrollView>
       </View>
     );

@@ -8,6 +8,7 @@ import MainStack from './stacks/MainStack';
 import AuthStack from './stacks/AuthStack';
 import { useAuth } from '../contexts/AuthContext';
 import { CartProvider } from '../contexts/CartContext';
+import { ProductProvider } from '../contexts/ProductContext';
 import { SubscriptionProvider } from '../contexts/SubscriptionContext';
 
 const ONBOARDING_KEY = 'onboarding_seen';
@@ -52,13 +53,15 @@ export default function Routes() {
   return (
     <CartProvider>
       <SubscriptionProvider>
-        <NavigationContainer>
-          {shouldShowMainStack ? (
-            <MainStack key={authenticated ? 'main-auth' : 'main-guest'} />
-          ) : (
-            <AuthStack />
-          )}
-        </NavigationContainer>
+        <ProductProvider>
+          <NavigationContainer>
+            {shouldShowMainStack ? (
+              <MainStack key={authenticated ? 'main-auth' : 'main-guest'} />
+            ) : (
+              <AuthStack />
+            )}
+          </NavigationContainer>
+        </ProductProvider>
       </SubscriptionProvider>
     </CartProvider>
   );

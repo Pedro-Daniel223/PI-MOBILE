@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View, Text, Image, TouchableOpacity, ScrollView,
   StatusBar, Dimensions, Alert
@@ -6,8 +6,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
+import { useProducts } from '../contexts/ProductContext';
 import CartBadge from '../components/CartBadge';
-import { DEFAULT_PRODUTO } from '../data/dataDetalhesProdutos';
 import styles from '../styles/styleDetalhesProdutos/styleDetalhesProdutos';
 
 const { width } = Dimensions.get('window');
@@ -46,19 +46,86 @@ const normalizeImages = (produto) => {
   return [];
 };
 
+const EMPTY_PRODUCT = {
+  id: '',
+  nome: 'Produto',
+  preco: 0,
+  precoAntigo: 0,
+  desconto: '',
+  imagens: [],
+  imagem: null,
+  descricao: '',
+  categoria: '',
+};
+
 export default function DetalhesProdutosScreens({ route, navigation }) {
   const { addToCart, getCartCount } = useCart();
+  const { getProductById } = useProducts();
 
-  const produtoEntrada = (route.params && route.params.produto) ? route.params.produto : DEFAULT_PRODUTO;
-  const produto = {
+  const produtoEntrada = route.params?.produto ?? null;
+  const produtoId = route.params?.produtoId ?? route.params?.id ?? produtoEntrada?.id ?? null;
+  const [produto, setProduto] = useState(produtoEntrada ? {
+    ...EMPTY_PRODUCT,
     ...produtoEntrada,
-    nome: produtoEntrada.nome ?? produtoEntrada.title ?? 'Produto',
+    nome: produtoEntrada.nome ?? produtoEntrada.title ?? EMPTY_PRODUCT.nome,
     preco: typeof produtoEntrada.preco === 'number' ? produtoEntrada.preco : parseCurrencyValue(produtoEntrada.price),
-    precoAntigo: typeof produtoEntrada.precoAntigo === 'number' ? produtoEntrada.precoAntigo : parseCurrencyValue(produtoEntrada.precoAntigo),
+    precoAntigo: typeof produtoEntrada.precoAntigo === 'number' ? produtoEntrada.precoAntigo : parseCurrencyValue(produtoEntrada.precoAntigo ?? produtoEntrada.oldPrice),
     imagens: normalizeImages(produtoEntrada),
-    imagem: produtoEntrada.imagem ?? produtoEntrada.image,
-    descricao: produtoEntrada.descricao ?? produtoEntrada.description ?? DEFAULT_PRODUTO.descricao,
-  };
+    imagem: produtoEntrada.imagem ?? produtoEntrada.image ?? normalizeImages(produtoEntrada)[0] ?? null,
+    descricao: produtoEntrada.descricao ?? produtoEntrada.description ?? EMPTY_PRODUCT.descricao,
+  } : EMPTY_PRODUCT);
+
+  useEffect(() => {
+    let active = true;
+
+    const resolveProduct = async () => {
+      if (produtoEntrada?.id && !produtoId) {
+        if (active) {
+          setProduto((prev) => ({
+            ...prev,
+            ...produtoEntrada,
+            nome: produtoEntrada.nome ?? produtoEntrada.title ?? prev.nome,
+            preco: typeof produtoEntrada.preco === 'number'
+              ? produtoEntrada.preco
+              : parseCurrencyValue(produtoEntrada.price),
+            precoAntigo: typeof produtoEntrada.precoAntigo === 'number'
+              ? produtoEntrada.precoAntigo
+              : parseCurrencyValue(produtoEntrada.precoAntigo ?? produtoEntrada.oldPrice),
+            imagens: normalizeImages(produtoEntrada),
+            imagem: produtoEntrada.imagem ?? produtoEntrada.image ?? normalizeImages(produtoEntrada)[0] ?? null,
+            descricao: produtoEntrada.descricao ?? produtoEntrada.description ?? prev.descricao,
+          }));
+        }
+        return;
+      }
+
+      if (!produtoId) {
+        return;
+      }
+
+      const resolved = await getProductById(produtoId);
+      if (!active || !resolved) {
+        return;
+      }
+
+      setProduto({
+        ...EMPTY_PRODUCT,
+        ...resolved,
+        nome: resolved.nome ?? resolved.title ?? EMPTY_PRODUCT.nome,
+        preco: typeof resolved.preco === 'number' ? resolved.preco : parseCurrencyValue(resolved.price),
+        precoAntigo: typeof resolved.precoAntigo === 'number' ? resolved.precoAntigo : parseCurrencyValue(resolved.precoAntigo ?? resolved.oldPrice),
+        imagens: normalizeImages(resolved),
+        imagem: resolved.imagem ?? resolved.image ?? normalizeImages(resolved)[0] ?? null,
+        descricao: resolved.descricao ?? resolved.description ?? EMPTY_PRODUCT.descricao,
+      });
+    };
+
+    resolveProduct();
+
+    return () => {
+      active = false;
+    };
+  }, [getProductById, produtoEntrada, produtoId]);
 
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState('M');
   const [indiceImagem, setIndiceImagem] = useState(0);
@@ -94,7 +161,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
           <Ionicons name="chevron-back" size={20} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes</Text>
-        <CartBadge count={getCartCount()} onPress={() => navigation.navigate('Carrinhos')} />
+        <CartBadge count={getCartCount()} onPress={() => navigation.navigate('Carrinho')} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>

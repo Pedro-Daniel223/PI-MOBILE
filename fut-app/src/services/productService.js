@@ -1,0 +1,156 @@
+import apiClient, { get } from './api';
+
+const { BASE_URL } = apiClient;
+
+const formatCurrencyBRL = (value) =>
+  Number(value || 0).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+
+const extractListPayload = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload?.results)) {
+    return payload.results;
+  }
+
+  return [];
+};
+
+const buildImageUrl = (path) => {
+  if (!path) {
+    return null;
+  }
+
+  const rawPath = String(path).trim();
+
+  if (!rawPath) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(rawPath)) {
+    return rawPath;
+  }
+
+  const normalizedPath = rawPath.replace(/^\/+/, '');
+  const mediaPath = normalizedPath.startsWith('media/') ? normalizedPath : `media/${normalizedPath}`;
+
+  try {
+    return new URL(`/${mediaPath}`, BASE_URL).toString();
+  } catch {
+    const normalizedBaseUrl = String(BASE_URL || '').replace(/\/+$/, '');
+    return `${normalizedBaseUrl}/${mediaPath}`;
+  }
+};
+
+const normalizeImages = (produto = {}) => {
+  const imageFromApi = buildImageUrl(
+    produto.url_imagem_produtos ?? produto.imagem_produtos ?? produto.image ?? produto.imagem,
+  );
+
+  if (Array.isArray(produto.imagens) && produto.imagens.length > 0) {
+    return produto.imagens.map((image) => buildImageUrl(image) || image).filter(Boolean);
+  }
+
+  if (Array.isArray(produto.images) && produto.images.length > 0) {
+    return produto.images.map((image) => buildImageUrl(image) || image).filter(Boolean);
+  }
+
+  return imageFromApi ? [imageFromApi] : [];
+};
+
+const normalizeProduct = (produto = {}, index = 0) => {
+  const id = String(produto.id_produtos ?? produto.id ?? produto.product_id ?? index + 1);
+  const nome = produto.nome_produtos ?? produto.nome ?? produto.name ?? produto.title ?? 'Produto';
+  const preco = Number(produto.preco_produtos ?? produto.valor_produtos ?? produto.preco ?? produto.price ?? 0);
+  const estoque = Number(produto.estoque_produtos ?? produto.quantidade_estoque_produtos ?? 0);
+  const descricao = produto.descricao_produtos ?? produto.descricao ?? produto.description ?? '';
+  const categoria =
+    produto.categoria_produtos ??
+    produto.categoria ??
+    produto.category ??
+    produto.cat ??
+    'Camisa';
+  const imagens = normalizeImages(produto);
+  const imagem = imagens[0] ?? buildImageUrl(produto.url_imagem_produtos ?? produto.imagem_produtos ?? produto.image ?? produto.imagem);
+  const status =
+    produto.status_produtos !== undefined && produto.status_produtos !== null
+      ? Number(produto.status_produtos)
+      : estoque > 0
+        ? 1
+        : 0;
+  const desconto = produto.desconto ?? produto.tag ?? '';
+
+  return {
+    id,
+    nome,
+    title: produto.title ?? nome,
+    name: produto.name ?? nome,
+    preco,
+    price: preco,
+    priceDisplay: formatCurrencyBRL(preco),
+    precoAntigo: null,
+    oldPrice: null,
+    oldPriceDisplay: null,
+    desconto,
+    tag: produto.tag ?? desconto,
+    categoria,
+    category: categoria,
+    cat: produto.cat ?? categoria,
+    imagens,
+    images: imagens,
+    imagem,
+    image: imagem,
+    descricao,
+    description: descricao,
+    estoque,
+    estoque_produtos: estoque,
+    status_produtos: status,
+    url_imagem_produtos: produto.url_imagem_produtos ?? produto.imagem_produtos ?? null,
+  };
+};
+
+let cachedProducts = null;
+
+export const listarProdutos = async () => {
+  const payload = await get('/api/produtos/');
+  const produtos = extractListPayload(payload).map((produto, index) => normalizeProduct(produto, index));
+
+  cachedProducts = produtos;
+  return produtos;
+};
+
+export const buscarProduto = async (id) => {
+  if (id === undefined || id === null || id === '') {
+    return null;
+  }
+
+  const cachedProduct = cachedProducts?.find((product) => String(product.id) === String(id));
+  if (cachedProduct) {
+    return cachedProduct;
+  }
+
+  const payload = await get(`/api/produtos/${id}/`);
+  if (!payload) {
+    return null;
+  }
+
+  return normalizeProduct(payload);
+};
+
+export const loadProducts = listarProdutos;
+
+export const getProductById = buscarProduto;
+
+export const getCachedProducts = () => cachedProducts || [];
+
+export default {
+  listarProdutos,
+  buscarProduto,
+  loadProducts,
+  getProductById,
+  getCachedProducts,
+};

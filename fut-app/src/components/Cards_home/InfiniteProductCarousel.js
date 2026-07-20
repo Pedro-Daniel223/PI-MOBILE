@@ -51,6 +51,7 @@ import {
 
 import { BlurView }       from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useProducts } from '../../contexts/ProductContext';
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
 const ITEM_WIDTH  = 280;   // preservado — usado no reset de posição do scroll
@@ -268,6 +269,7 @@ const GlassItemWrapper = ({ children, shimmerX }) => (
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 export default function InfiniteProductCarousel({ data, renderItem }) {
+  const { products } = useProducts();
 
   // ── Lógica original — intacta ─────────────────────────────────────────────
   const translateX     = useRef(new Animated.Value(0)).current;
@@ -276,7 +278,8 @@ export default function InfiniteProductCarousel({ data, renderItem }) {
   const timeoutRef     = useRef(null);
   const isDragging     = useRef(false);
 
-  const loopData = [...data, ...data, ...data];
+  const sourceData = Array.isArray(data) && data.length > 0 ? data : products;
+  const loopData = [...sourceData, ...sourceData, ...sourceData];
 
   // 🔥 ANIMAÇÃO
   const startAutoScroll = () => {
@@ -285,7 +288,7 @@ export default function InfiniteProductCarousel({ data, renderItem }) {
 
       currentOffset.current -= AUTO_SPEED;
 
-      const maxWidth   = data.length * ITEM_WIDTH;
+      const maxWidth   = sourceData.length * ITEM_WIDTH;
       const resetPoint = -maxWidth;
 
       if (Math.abs(currentOffset.current) >= maxWidth * 2) {
@@ -320,13 +323,17 @@ export default function InfiniteProductCarousel({ data, renderItem }) {
   };
 
   useEffect(() => {
+    if (!sourceData.length) {
+      return undefined;
+    }
+
     startAutoScroll();
 
     return () => {
       stopAutoScroll();
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, []);
+  }, [sourceData.length]);
 
   // 🖐️ TOQUE
   const panResponder = useRef(

@@ -5,12 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
+  Alert,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import { useCart } from '../../contexts/CartContext';
 
 const parsePrice = (value) => {
   if (typeof value === 'number') {
@@ -32,13 +34,14 @@ const parsePrice = (value) => {
 
 export default function ProductCardGlass({ image, title, price, product }) {
   const navigation = useNavigation();
+  const { addToCart } = useCart();
 
   const pressAnim = useRef(new Animated.Value(0)).current;
 
   const productData = product ?? { image, title, price };
   const productImage = productData.image ?? image;
   const productTitle = productData.title ?? title ?? 'Produto';
-  const productPrice = productData.price ?? price;
+  const productPrice = productData.priceDisplay ?? productData.price ?? price;
   const productDetails = {
     id: productData.id ?? productTitle,
     nome: productData.nome ?? productTitle,
@@ -80,6 +83,11 @@ export default function ProductCardGlass({ image, title, price, product }) {
       screen: 'DetalhesProdutos',
       params: { produto: productDetails },
     });
+  };
+
+  const handleAddToCart = () => {
+    addToCart(productDetails);
+    Alert.alert('Sucesso', 'Produto adicionado ao carrinho!');
   };
 
   const rotate = pressAnim.interpolate({
@@ -150,11 +158,6 @@ export default function ProductCardGlass({ image, title, price, product }) {
             style={StyleSheet.absoluteFill}
           />
 
-          {/* FAVORITO */}
-          <TouchableOpacity style={styles.favoriteButton}>
-            <Ionicons name="heart-outline" size={18} color="#000" />
-          </TouchableOpacity>
-
           {/* BADGE */}
           <View style={styles.badge}>
             <Text style={styles.badgeText}>Novo</Text>
@@ -172,7 +175,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
           <View style={styles.footer}>
             <Text style={styles.price}>{productPrice}</Text>
 
-            <TouchableOpacity style={styles.addButton}>
+            <TouchableOpacity style={styles.addButton} onPress={handleAddToCart} activeOpacity={0.8}>
               <Ionicons name="cart-outline" size={18} color="#a90000" />
             </TouchableOpacity>
           </View>
@@ -226,18 +229,6 @@ const styles = StyleSheet.create({
   overlayText: {
     fontWeight: '700',
     color: '#000',
-  },
-
-  favoriteButton: {
-    position: 'absolute',
-    top: 14,
-    right: 14,
-    backgroundColor: '#fff',
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 
   badge: {
