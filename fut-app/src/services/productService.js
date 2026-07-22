@@ -2,6 +2,8 @@ import apiClient, { get } from './api';
 
 const { BASE_URL } = apiClient;
 
+console.log('[productService] BASE_URL =', BASE_URL);
+
 const formatCurrencyBRL = (value) =>
   Number(value || 0).toLocaleString('pt-BR', {
     style: 'currency',
@@ -22,27 +24,53 @@ const extractListPayload = (payload) => {
 
 const buildImageUrl = (path) => {
   if (!path) {
+    console.log('[productService] buildImageUrl skipped: empty path');
     return null;
   }
 
   const rawPath = String(path).trim();
 
   if (!rawPath) {
+    console.log('[productService] buildImageUrl skipped: blank path');
     return null;
   }
 
   if (/^https?:\/\//i.test(rawPath)) {
+    console.log('[productService] image url already absolute', {
+      rawPath,
+      finalUrl: rawPath,
+    });
     return rawPath;
   }
 
   const normalizedPath = rawPath.replace(/^\/+/, '');
-  const mediaPath = normalizedPath.startsWith('media/') ? normalizedPath : `media/${normalizedPath}`;
+  let finalPath = normalizedPath;
+
+  if (normalizedPath.startsWith('static/')) {
+    finalPath = normalizedPath;
+  } else if (normalizedPath.startsWith('media/')) {
+    finalPath = normalizedPath;
+  } else {
+    finalPath = `media/${normalizedPath}`;
+  }
 
   try {
-    return new URL(`/${mediaPath}`, BASE_URL).toString();
+    const finalUrl = new URL(`/${finalPath}`, BASE_URL).toString();
+    console.log('[productService] image url resolved', {
+      rawPath,
+      finalPath,
+      finalUrl,
+    });
+    return finalUrl;
   } catch {
     const normalizedBaseUrl = String(BASE_URL || '').replace(/\/+$/, '');
-    return `${normalizedBaseUrl}/${mediaPath}`;
+    const finalUrl = `${normalizedBaseUrl}/${finalPath}`;
+    console.log('[productService] image url resolved via fallback join', {
+      rawPath,
+      finalPath,
+      finalUrl,
+    });
+    return finalUrl;
   }
 };
 
@@ -118,6 +146,15 @@ let cachedProducts = null;
 export const listarProdutos = async () => {
   const payload = await get('/api/produtos/');
   const produtos = extractListPayload(payload).map((produto, index) => normalizeProduct(produto, index));
+
+  console.log('[productService] listarProdutos', {
+    total: produtos.length,
+    firstImages: produtos.slice(0, 3).map((produto) => ({
+      id: produto.id,
+      url_imagem_produtos: produto.url_imagem_produtos,
+      image: produto.image,
+    })),
+  });
 
   cachedProducts = produtos;
   return produtos;

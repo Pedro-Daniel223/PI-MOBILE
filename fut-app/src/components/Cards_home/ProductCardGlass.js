@@ -14,6 +14,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { useCart } from '../../contexts/CartContext';
 
+const resolveImageSource = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    return { uri: value };
+  }
+
+  return value;
+};
+
 const parsePrice = (value) => {
   if (typeof value === 'number') {
     return value;
@@ -39,7 +51,14 @@ export default function ProductCardGlass({ image, title, price, product }) {
   const pressAnim = useRef(new Animated.Value(0)).current;
 
   const productData = product ?? { image, title, price };
-  const productImage = productData.image ?? image;
+  const productImageRaw =
+    productData.image ??
+    image ??
+    productData.imagem ??
+    productData.images?.[0] ??
+    productData.imagens?.[0] ??
+    null;
+  const productImage = resolveImageSource(productImageRaw);
   const productTitle = productData.title ?? title ?? 'Produto';
   const productPrice = productData.priceDisplay ?? productData.price ?? price;
   const productDetails = {
@@ -59,6 +78,16 @@ export default function ProductCardGlass({ image, title, price, product }) {
     precoAntigo: productData.precoAntigo,
     desconto: productData.desconto,
   };
+
+  console.log('[ProductCardGlass] image payload', {
+    id: productDetails.id,
+    image: productData.image ?? null,
+    imagem: productData.imagem ?? null,
+    images: productData.images ?? null,
+    imagens: productData.imagens ?? null,
+    raw: productImageRaw,
+    resolved: productImage,
+  });
 
   const handlePressIn = () => {
     Animated.spring(pressAnim, {
@@ -135,6 +164,19 @@ export default function ProductCardGlass({ image, title, price, product }) {
               styles.productImage,
               { transform: [{ rotate }] },
             ]}
+            onLoad={() => {
+              console.log('[ProductCardGlass] image loaded', {
+                id: productDetails.id,
+                source: productImage,
+              });
+            }}
+            onError={(event) => {
+              console.log('[ProductCardGlass] image error', {
+                id: productDetails.id,
+                source: productImage,
+                error: event?.nativeEvent,
+              });
+            }}
           />
 
           {/* OVERLAY */}

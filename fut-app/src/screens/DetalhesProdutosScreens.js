@@ -46,6 +46,18 @@ const normalizeImages = (produto) => {
   return [];
 };
 
+const resolveImageSource = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    return { uri: value };
+  }
+
+  return value;
+};
+
 const EMPTY_PRODUCT = {
   id: '',
   nome: 'Produto',
@@ -137,6 +149,17 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
 
   const slideWidth = width - 40;
 
+  useEffect(() => {
+    console.log('[DetalhesProdutosScreens] produto render', {
+      id: produto.id,
+      image: produto.image ?? null,
+      imagem: produto.imagem ?? null,
+      images: produto.images ?? null,
+      imagens,
+      mappedSources: imagens.map((item) => resolveImageSource(item)),
+    });
+  }, [imagens, produto.id, produto.image, produto.imagem, produto.images]);
+
   const scrollToImage = (index) => {
     if (scrollViewRef.current && imagens.length > 0) {
       const offset = index * slideWidth;
@@ -176,7 +199,24 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
           >
             {imagens.map((img, idx) => (
               <View key={idx} style={[styles.imageSlide, { width: slideWidth }]}>
-                <Image source={img} style={styles.productImage} resizeMode="contain" />
+                <Image
+                  source={resolveImageSource(img)}
+                  style={styles.productImage}
+                  resizeMode="contain"
+                  onLoad={() => {
+                    console.log('[DetalhesProdutosScreens] image loaded', {
+                      index: idx,
+                      source: resolveImageSource(img),
+                    });
+                  }}
+                  onError={(event) => {
+                    console.log('[DetalhesProdutosScreens] image error', {
+                      index: idx,
+                      source: resolveImageSource(img),
+                      error: event?.nativeEvent,
+                    });
+                  }}
+                />
               </View>
             ))}
           </ScrollView>

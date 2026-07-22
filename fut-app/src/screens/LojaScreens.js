@@ -89,7 +89,7 @@ const CARD_GAP = 14;
 const CARD_W = (SCREEN_WIDTH - 40 - CARD_GAP) / 2;
 const CARD_H = CARD_W * 1.36;
 
-const CATEGORIES = ['Tudo', 'Camisas', 'Treino', 'Calçados', 'Acessórios'];
+const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios'];
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: TopBar
@@ -428,6 +428,19 @@ function LojaContent({ navigation }) {
       loadProducts().catch(() => {});
     }
   }, [loadProducts, products.length]);
+
+  useEffect(() => {
+    console.log('[LojaScreens] products snapshot', {
+      total: products.length,
+      sample: products.slice(0, 5).map((item) => ({
+        id: item.id,
+        image: item.image ?? null,
+        imagem: item.imagem ?? null,
+        images: item.images ?? null,
+        imagens: item.imagens ?? null,
+      })),
+    });
+  }, [products]);
 
   const filtered = useMemo(() => (
     category === 'Tudo'
