@@ -1,106 +1,146 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
-const CartContext = createContext();
+const CartContext = createContext(null);
+
+const normalizeSize = (value) => {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  const normalized = String(value).trim();
+  return normalized ? normalized.toUpperCase() : null;
+};
+
+const normalizeQuantity = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1;
+};
+
+const normalizePrice = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getItemKey = (itemId, tamanho) => {
+  const sizeKey = normalizeSize(tamanho) ?? '__no-size__';
+  return `${String(itemId)}::${sizeKey}`;
+};
+
+const normalizeCartItem = (product = {}) => {
+  const tamanho = normalizeSize(product.tamanho);
+  const quantity = normalizeQuantity(product.quantity ?? product.quantidade);
+  const preco = normalizePrice(product.preco ?? product.price);
+
+  return {
+    id: String(product.id ?? ''),
+    nome: product.nome ?? product.title ?? product.name ?? 'Produto',
+    imagem: product.imagem ?? product.image ?? null,
+    image: product.image ?? product.imagem ?? null,
+    preco,
+    price: preco,
+    quantity,
+    ...(tamanho ? { tamanho } : {}),
+    imagens: product.imagens ?? product.images ?? [],
+    images: product.images ?? product.imagens ?? [],
+    categoria: product.categoria ?? product.category ?? product.cat ?? null,
+  };
+};
 
 export const useCart = () => {
   const context = useContext(CartContext);
+
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
+
   return context;
 };
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
-  // Load cart from AsyncStorage on mount
-  useEffect(() => {
-    // For now, we'll use local state. In a real app, you'd load from AsyncStorage
-    // const loadCart = async () => {
-    //   try {
-    //     const savedCart = await AsyncStorage.getItem('cart');
-    //     if (savedCart) {
-    //       setCartItems(JSON.parse(savedCart));
-    //     }
-    //   } catch (error) {
-    //     console.error('Error loading cart:', error);
-    //   }
-    // };
-    // loadCart();
-  }, []);
+  const addItem = useCallback((product) => {
+    const nextItem = normalizeCartItem(product);
+    const nextKey = getItemKey(nextItem.id, nextItem.tamanho);
 
-  // Save cart to AsyncStorage whenever it changes
-  useEffect(() => {
-    // const saveCart = async () => {
-    //   try {
-    //     await AsyncStorage.setItem('cart', JSON.stringify(cartItems));
-    //   } catch (error) {
-    //     console.error('Error saving cart:', error);
-    //   }
-    // };
-    // saveCart();
-  }, [cartItems]);
-
-  const addToCart = (product) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item =>
-        item.id === product.id && item.tamanho === product.tamanho
+    setCartItems((prevItems) => {
+      const existingIndex = prevItems.findIndex(
+        (item) => getItemKey(item.id, item.tamanho) === nextKey
       );
 
-      if (existingItem) {
-        return prevItems.map(item =>
-          item.id === product.id && item.tamanho === product.tamanho
-            ? { ...item, quantity: item.quantity + 1 }
+      if (existingIndex >= 0) {
+        const existingItem = prevItems[existingIndex];
+        const updatedQuantity = existingItem.quantity + nextItem.quantity;
+
+        return prevItems.map((item, index) => (
+          index === existingIndex
+            ? { ...item, quantity: updatedQuantity }
             : item
-        );
+        ));
       }
 
-      return [...prevItems, { ...product, quantity: 1 }];
+      return [...prevItems, { ...nextItem, quantity: nextItem.quantity }];
     });
-  };
+  }, []);
 
-  const removeFromCart = (productId, tamanho) => {
-    setCartItems(prevItems =>
-      prevItems.filter(item => !(item.id === productId && item.tamanho === tamanho))
-    );
-  };
+  const removeItem = useCallback((productId, tamanho) => {
+    const keyToRemove = getItemKey(productId, tamanho);
 
-  const updateQuantity = (productId, tamanho, quantity) => {
-    if (quantity <= 0) {
-      removeFromCart(productId, tamanho);
+    setCartItems((prevItems) => (
+      prevItems.filter((item) => getItemKey(item.id, item.tamanho) !== keyToRemove)
+    ));
+  }, []);
+
+  const updateQuantity = useCallback((productId, tamanho, quantity) => {
+    const parsedQuantity = Number(quantity);
+    const keyToUpdate = getItemKey(productId, tamanho);
+
+    if (!Number.isFinite(parsedQuantity) || parsedQuantity <= 0) {
+      removeItem(productId, tamanho);
       return;
     }
 
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId && item.tamanho === tamanho
-          ? { ...item, quantity }
+    const nextQuantity = Math.floor(parsedQuantity);
+
+    setCartItems((prevItems) => (
+      prevItems.map((item) => (
+        getItemKey(item.id, item.tamanho) === keyToUpdate
+          ? { ...item, quantity: nextQuantity }
           : item
-      )
-    );
-  };
+      ))
+    ));
+  }, [removeItem]);
 
-  const getCartCount = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
-
-  const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.preco * item.quantity), 0);
-  };
-
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
-  };
+  }, []);
 
-  const value = {
+  const totalItems = useMemo(
+    () => cartItems.reduce((total, item) => total + normalizeQuantity(item.quantity), 0),
+    [cartItems]
+  );
+
+  const subtotal = useMemo(
+    () => cartItems.reduce(
+      (total, item) => total + normalizePrice(item.preco ?? item.price) * normalizeQuantity(item.quantity),
+      0
+    ),
+    [cartItems]
+  );
+
+  const value = useMemo(() => ({
     cartItems,
-    addToCart,
-    removeFromCart,
+    addItem,
+    removeItem,
     updateQuantity,
-    getCartCount,
-    getCartTotal,
     clearCart,
-  };
+    totalItems,
+    subtotal,
+    addToCart: addItem,
+    removeFromCart: removeItem,
+    getCartCount: () => totalItems,
+    getCartTotal: () => subtotal,
+  }), [addItem, cartItems, clearCart, removeItem, subtotal, totalItems, updateQuantity]);
 
   return (
     <CartContext.Provider value={value}>

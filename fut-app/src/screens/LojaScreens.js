@@ -89,7 +89,7 @@ const CARD_GAP = 14;
 const CARD_W = (SCREEN_WIDTH - 40 - CARD_GAP) / 2;
 const CARD_H = CARD_W * 1.36;
 
-const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios'];
+const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios', 'Ingressos'];
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: TopBar
@@ -212,6 +212,52 @@ const CategoryRail = memo(({ selected, onSelect, s }) => (
     })}
   </ScrollView>
 ));
+
+const resolveImageSource = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    return { uri: value };
+  }
+
+  return value;
+};
+
+const normalizeCategory = (value) =>
+  String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+const matchesCategory = (productCategory, selectedCategory) => {
+  if (selectedCategory === 'Tudo') {
+    return true;
+  }
+
+  const productValue = normalizeCategory(productCategory);
+  const selectedValue = normalizeCategory(selectedCategory);
+
+  if (!productValue || !selectedValue) {
+    return false;
+  }
+
+  if (productValue === selectedValue) {
+    return true;
+  }
+
+  if (selectedValue === 'camisas') {
+    return productValue.includes('camisa');
+  }
+
+  if (selectedValue === 'ingressos') {
+    return productValue.includes('ingresso');
+  }
+
+  return productValue.includes(selectedValue);
+};
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: CampaignGlass
@@ -342,6 +388,14 @@ const SectionHeader = memo(({ index, title, subtitle, s }) => (
 // ═══════════════════════════════════════════════════════════════════════════════
 const ProductCard = memo(({ item, onPress, DS, s }) => {
   const press = useRef(new Animated.Value(0)).current;
+  const productImageRaw =
+    item.image ??
+    item.imagem ??
+    item.images?.[0] ??
+    item.imagens?.[0] ??
+    item.url_imagem_produtos ??
+    null;
+  const productImage = resolveImageSource(productImageRaw);
 
   const onIn = () =>
     Animated.spring(press, { toValue: 1, tension: 380, friction: 24, useNativeDriver: true }).start();
@@ -349,6 +403,17 @@ const ProductCard = memo(({ item, onPress, DS, s }) => {
     Animated.spring(press, { toValue: 0, tension: 220, friction: 18, useNativeDriver: true }).start();
 
   const scale = press.interpolate({ inputRange: [0, 1], outputRange: [1, 0.975] });
+
+  console.log('[LojaScreens] product card image payload', {
+    id: item.id,
+    image: item.image ?? null,
+    imagem: item.imagem ?? null,
+    images: item.images ?? null,
+    imagens: item.imagens ?? null,
+    url_imagem_produtos: item.url_imagem_produtos ?? null,
+    raw: productImageRaw,
+    resolved: productImage,
+  });
 
   return (
     <Animated.View style={{ width: CARD_W, transform: [{ scale }] }}>
@@ -365,6 +430,28 @@ const ProductCard = memo(({ item, onPress, DS, s }) => {
             start={{ x: 0.2, y: 0 }}
             end={{ x: 0.8, y: 1 }}
           />
+
+          {productImage ? (
+            <Image
+              source={productImage}
+              style={StyleSheet.absoluteFill}
+              resizeMode="contain"
+              onLoad={() => {
+                console.log('[LojaScreens] product card image loaded', {
+                  id: item.id,
+                  source: productImage,
+                });
+              }}
+              onError={(event) => {
+                console.log('[LojaScreens] product card image error', {
+                  id: item.id,
+                  source: productImage,
+                  error: event?.nativeEvent,
+                });
+              }}
+            />
+          ) : null}
+
           <View style={s.cardImageMark}>
             <Text style={s.cardImageMarkText}>DRAKOS</Text>
           </View>
@@ -438,14 +525,15 @@ function LojaContent({ navigation }) {
         imagem: item.imagem ?? null,
         images: item.images ?? null,
         imagens: item.imagens ?? null,
+        categoria: item.categoria ?? null,
+        category: item.category ?? null,
+        cat: item.cat ?? null,
       })),
     });
   }, [products]);
 
   const filtered = useMemo(() => (
-    category === 'Tudo'
-      ? products
-      : products.filter((p) => p.cat === category)
+    products.filter((p) => matchesCategory(p.cat ?? p.category ?? p.categoria, category))
   ), [category, products]);
 
   const goToDetail = useCallback(

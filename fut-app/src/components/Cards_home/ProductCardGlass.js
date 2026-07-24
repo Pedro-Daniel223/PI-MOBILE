@@ -44,9 +44,16 @@ const parsePrice = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const normalizeCategory = (value) =>
+  String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
 export default function ProductCardGlass({ image, title, price, product }) {
   const navigation = useNavigation();
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
 
   const pressAnim = useRef(new Animated.Value(0)).current;
 
@@ -78,6 +85,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
     precoAntigo: productData.precoAntigo,
     desconto: productData.desconto,
   };
+  const isCamisasFC = normalizeCategory(productDetails.categoria) === 'camisas fc';
 
   console.log('[ProductCardGlass] image payload', {
     id: productDetails.id,
@@ -115,7 +123,12 @@ export default function ProductCardGlass({ image, title, price, product }) {
   };
 
   const handleAddToCart = () => {
-    addToCart(productDetails);
+    if (isCamisasFC) {
+      handlePress();
+      return;
+    }
+
+    addItem(productDetails);
     Alert.alert('Sucesso', 'Produto adicionado ao carrinho!');
   };
 

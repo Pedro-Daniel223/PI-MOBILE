@@ -143,9 +143,9 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 };
 
 export default function CarrinhosScreen({ navigation }) {
-  const { cartItems, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const { cartItems, updateQuantity, removeItem, clearCart, subtotal } = useCart();
   const { addToPurchaseHistory } = useSubscription();
-  const total = getCartTotal();
+  const total = subtotal;
   const hasItems = cartItems.length > 0;
 
   // ==================== FRONT (CABEÇALHO) ====================
@@ -203,7 +203,7 @@ export default function CarrinhosScreen({ navigation }) {
               key={`${item.id}-${item.tamanho}`}
               item={item}
               onUpdateQuantity={updateQuantity}
-              onRemove={removeFromCart}
+              onRemove={removeItem}
             />
           ))
         ) : (

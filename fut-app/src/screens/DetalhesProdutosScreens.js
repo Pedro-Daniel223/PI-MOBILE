@@ -58,6 +58,15 @@ const resolveImageSource = (value) => {
   return value;
 };
 
+const normalizeCategory = (value) =>
+  String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+const isCamisasFC = (category) => normalizeCategory(category) === 'camisas fc';
+
 const EMPTY_PRODUCT = {
   id: '',
   nome: 'Produto',
@@ -71,7 +80,7 @@ const EMPTY_PRODUCT = {
 };
 
 export default function DetalhesProdutosScreens({ route, navigation }) {
-  const { addToCart, getCartCount } = useCart();
+  const { addItem, totalItems } = useCart();
   const { getProductById } = useProducts();
 
   const produtoEntrada = route.params?.produto ?? null;
@@ -139,15 +148,19 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
     };
   }, [getProductById, produtoEntrada, produtoId]);
 
-  const [tamanhoSelecionado, setTamanhoSelecionado] = useState('M');
+  const [tamanhoSelecionado, setTamanhoSelecionado] = useState(null);
   const [indiceImagem, setIndiceImagem] = useState(0);
   const scrollViewRef = useRef(null);
   const tamanhos = ['P', 'M', 'G', 'GG'];
 
   const imagens = produto.imagens || (produto.imagem ? [produto.imagem] : []);
-  const mostrarTamanhos = produto.categoria && produto.categoria.toLowerCase() !== 'acessório';
+  const mostrarTamanhos = isCamisasFC(produto.categoria ?? produto.category ?? produto.cat);
 
   const slideWidth = width - 40;
+
+  useEffect(() => {
+    setTamanhoSelecionado(null);
+  }, [produto.id, mostrarTamanhos]);
 
   useEffect(() => {
     console.log('[DetalhesProdutosScreens] produto render', {
@@ -184,7 +197,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
           <Ionicons name="chevron-back" size={20} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes</Text>
-        <CartBadge count={getCartCount()} onPress={() => navigation.navigate('Carrinho')} />
+        <CartBadge count={totalItems} onPress={() => navigation.navigate('Carrinho')} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -272,13 +285,20 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             style={styles.cartButton}
             activeOpacity={0.8}
             onPress={() => {
+              if (mostrarTamanhos && !tamanhoSelecionado) {
+                Alert.alert('Selecione um tamanho', 'Escolha um tamanho para continuar.');
+                return;
+              }
+
               const itemToAdd = {
-                ...produto,
-                id: produto.nome,
-                imagens: produto.imagens || (produto.imagem ? [produto.imagem] : []),
+                id: produto.id ?? produto.nome,
+                nome: produto.nome,
+                imagem: produto.imagem ?? produto.image ?? null,
+                preco: produto.preco,
+                quantity: 1,
                 ...(mostrarTamanhos ? { tamanho: tamanhoSelecionado } : {}),
               };
-              addToCart(itemToAdd);
+              addItem(itemToAdd);
               Alert.alert('Sucesso', 'Produto adicionado ao carrinho!');
             }}
           >
