@@ -70,6 +70,38 @@ export const styles = StyleSheet.create({
     backgroundColor: '#A52A2A',
     width: 20,
   },
+  thumbnailRow: {
+    marginTop: 4,
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  thumbnailContent: {
+    gap: 10,
+    paddingRight: 4,
+  },
+  thumbnailButton: {
+    width: 58,
+    height: 58,
+    borderRadius: 14,
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    overflow: 'hidden',
+  },
+  thumbnailButtonActive: {
+    borderColor: '#000',
+    borderWidth: 2,
+  },
+  thumbnailImage: {
+    width: '100%',
+    height: '100%',
+  },
+  thumbnailPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F5F5F5',
+  },
   navButton: {
     position: 'absolute',
     top: '45%',

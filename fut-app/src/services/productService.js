@@ -22,6 +22,30 @@ const extractListPayload = (payload) => {
   return [];
 };
 
+const extractImagePath = (image) => {
+  if (!image) {
+    return null;
+  }
+
+  if (typeof image === 'string') {
+    return image;
+  }
+
+  if (typeof image === 'object') {
+    return (
+      image.url_imagem_produtos ??
+      image.url ??
+      image.imagem ??
+      image.image ??
+      image.path ??
+      image.src ??
+      null
+    );
+  }
+
+  return null;
+};
+
 const buildImageUrl = (path) => {
   if (!path) {
     console.log('[productService] buildImageUrl skipped: empty path');
@@ -80,11 +104,15 @@ const normalizeImages = (produto = {}) => {
   );
 
   if (Array.isArray(produto.imagens) && produto.imagens.length > 0) {
-    return produto.imagens.map((image) => buildImageUrl(image) || image).filter(Boolean);
+    return produto.imagens
+      .map((image) => buildImageUrl(extractImagePath(image)) || extractImagePath(image))
+      .filter(Boolean);
   }
 
   if (Array.isArray(produto.images) && produto.images.length > 0) {
-    return produto.images.map((image) => buildImageUrl(image) || image).filter(Boolean);
+    return produto.images
+      .map((image) => buildImageUrl(extractImagePath(image)) || extractImagePath(image))
+      .filter(Boolean);
   }
 
   return imageFromApi ? [imageFromApi] : [];
@@ -138,6 +166,7 @@ const normalizeProduct = (produto = {}, index = 0) => {
     estoque_produtos: estoque,
     status_produtos: status,
     url_imagem_produtos: produto.url_imagem_produtos ?? produto.imagem_produtos ?? null,
+    imagens,
   };
 };
 

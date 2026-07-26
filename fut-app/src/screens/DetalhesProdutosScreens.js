@@ -30,9 +30,29 @@ const parseCurrencyValue = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const extractImagePath = (image) => {
+  if (!image) {
+    return null;
+  }
+
+  if (typeof image === 'string') {
+    return image;
+  }
+
+  if (typeof image === 'object') {
+    return image.url_imagem_produtos ?? image.url ?? image.imagem ?? image.image ?? image.path ?? image.src ?? null;
+  }
+
+  return null;
+};
+
 const normalizeImages = (produto) => {
+  if (Array.isArray(produto.images) && produto.images.length > 0) {
+    return produto.images.map((image) => extractImagePath(image)).filter(Boolean);
+  }
+
   if (Array.isArray(produto.imagens) && produto.imagens.length > 0) {
-    return produto.imagens;
+    return produto.imagens.map((image) => extractImagePath(image)).filter(Boolean);
   }
 
   if (produto.imagem) {
@@ -153,13 +173,14 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
   const scrollViewRef = useRef(null);
   const tamanhos = ['P', 'M', 'G', 'GG'];
 
-  const imagens = produto.imagens || (produto.imagem ? [produto.imagem] : []);
+  const imagens = normalizeImages(produto);
   const mostrarTamanhos = isCamisasFC(produto.categoria ?? produto.category ?? produto.cat);
 
   const slideWidth = width - 40;
 
   useEffect(() => {
     setTamanhoSelecionado(null);
+    setIndiceImagem(0);
   }, [produto.id, mostrarTamanhos]);
 
   useEffect(() => {
@@ -176,11 +197,12 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
   const scrollToImage = (index) => {
     if (scrollViewRef.current && imagens.length > 0) {
       const offset = index * slideWidth;
+      setIndiceImagem(index);
       scrollViewRef.current.scrollTo({ x: offset, animated: true });
     }
   };
 
-  const handleScroll = (event) => {
+  const handleScrollEnd = (event) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
     const newIndex = Math.round(contentOffsetX / slideWidth);
     if (newIndex !== indiceImagem && newIndex >= 0 && newIndex < imagens.length) {
@@ -214,8 +236,8 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             ref={scrollViewRef}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
+            onMomentumScrollEnd={handleScrollEnd}
+            decelerationRate="fast"
           >
             {imagens.map((img, idx) => (
               <View key={idx} style={[styles.imageSlide, { width: slideWidth }]}>
@@ -247,6 +269,45 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             ))}
           </View>
         </View>
+
+        {imagens.length > 1 && (
+          <View style={styles.thumbnailRow}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.thumbnailContent}
+            >
+              {imagens.map((img, idx) => {
+                const thumbSource = resolveImageSource(img);
+                const isActive = idx === indiceImagem;
+
+                return (
+                  <TouchableOpacity
+                    key={`${idx}-${img}`}
+                    style={[styles.thumbnailButton, isActive && styles.thumbnailButtonActive]}
+                    activeOpacity={0.85}
+                    onPress={() => {
+                      setIndiceImagem(idx);
+                      scrollToImage(idx);
+                    }}
+                  >
+                    {thumbSource ? (
+                      <Image
+                        source={thumbSource}
+                        style={styles.thumbnailImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.thumbnailPlaceholder}>
+                        <Ionicons name="image-outline" size={14} color="#999" />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )}
 
         <View style={styles.infoSection}>
           <View style={styles.priceRow}>
