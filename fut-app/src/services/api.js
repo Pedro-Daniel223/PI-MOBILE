@@ -1,5 +1,5 @@
   // const DEFAULT_BASE_URL = 'http://10.44.236.2:8000'; // Substitua pelo seu endereço IP e porta do backend (do curso)
-  const DEFAULT_BASE_URL = 'http://192.168.1.19:8000'; // IP atual da máquina local
+  const DEFAULT_BASE_URL = 'http://192.168.1.7:8000'; // IP atual da máquina local
 
   const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_BASE_URL;
   console.log('[API] BASE_URL =', BASE_URL);
@@ -107,7 +107,10 @@
     if (!response.ok) {
       const fallbackMessage = response.statusText || `Erro HTTP ${response.status}`;
       console.log('[API] request error payload', payload);
-      throw new Error(normalizeErrorMessage(payload, fallbackMessage));
+      const error = new Error(normalizeErrorMessage(payload, fallbackMessage));
+      error.status = response.status;
+      error.payload = payload;
+      throw error;
     }
 
     console.log('[API] request success', { method, url });

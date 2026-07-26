@@ -197,7 +197,14 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
           <Ionicons name="chevron-back" size={20} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes</Text>
-        <CartBadge count={totalItems} onPress={() => navigation.navigate('Carrinho')} />
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Carrinho')}
+          style={styles.iconButton}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="bag-outline" size={20} color="#333" />
+          <CartBadge count={totalItems} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>

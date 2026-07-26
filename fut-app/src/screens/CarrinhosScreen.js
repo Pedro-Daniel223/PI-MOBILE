@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  Alert,
   Image,
   Animated,
   Platform,
@@ -14,11 +13,26 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
+import CheckoutModal from './CheckoutModal';
 import { theme } from '../data/dataCarrinhos';
 import styles from '../styles/styleCarrinhos/styleCarrinhos';
+import { checkout } from '../services/checkoutService';
 
 // theme moved to src/data/dataCarrinhos.js
+
+const resolveImageSource = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    return { uri: value };
+  }
+
+  return value;
+};
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -73,6 +87,17 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   };
 
   const imageSource = getImageSource();
+  const resolvedImageSource = resolveImageSource(imageSource);
+
+  console.log('[CarrinhosScreen] cart item image payload', {
+    id: item.id,
+    tamanho: item.tamanho ?? null,
+    imagem: item.imagem ?? null,
+    image: item.image ?? null,
+    imagens: item.imagens ?? null,
+    imageSource,
+    resolvedImageSource,
+  });
 
   return (
     <Animated.View
@@ -85,8 +110,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
       >
         <View style={styles.cartItem}>
           <View style={styles.imageWrapper}>
-            {imageSource ? (
-              <Image source={imageSource} style={styles.productImage} resizeMode="cover" />
+            {resolvedImageSource ? (
+              <Image source={resolvedImageSource} style={styles.productImage} resizeMode="cover" />
             ) : (
               <View style={styles.imagePlaceholder}>
                 <Ionicons name="shirt-outline" size={28} color="#D1D1D6" />
@@ -144,31 +169,63 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
 export default function CarrinhosScreen({ navigation }) {
   const { cartItems, updateQuantity, removeItem, clearCart, subtotal } = useCart();
+  const { token } = useAuth();
   const { addToPurchaseHistory } = useSubscription();
   const total = subtotal;
   const hasItems = cartItems.length > 0;
+  const [checkoutVisible, setCheckoutVisible] = useState(false);
+  const [checkoutSnapshot, setCheckoutSnapshot] = useState({ cartItems: [], total: 0 });
 
   // ==================== FRONT (CABEÇALHO) ====================
   // Cabeçalho superior com título MEU CARRINHO e botão Limpar
   // =============================================================
 
   const handleCheckout = () => {
-    Alert.alert(
-      'Finalizar compra',
-      'Deseja realmente enviar seu pedido para o Drakos FC?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Confirmar',
-          onPress: () => {
-            addToPurchaseHistory(cartItems, total);
-            clearCart();
-            Alert.alert('Sucesso!', 'Pedido enviado com sucesso.');
-            navigation.goBack();
-          },
-        },
-      ]
-    );
+    if (!hasItems) {
+      return;
+    }
+
+    setCheckoutSnapshot({
+      cartItems: [...cartItems],
+      total,
+    });
+    setCheckoutVisible(true);
+  };
+
+  const handleCloseCheckout = () => {
+    setCheckoutVisible(false);
+    setCheckoutSnapshot({ cartItems: [], total: 0 });
+  };
+
+  const handleConfirmPurchase = async () => {
+    if (!token) {
+      const error = new Error('Você precisa estar autenticado para finalizar a compra.');
+      error.status = 401;
+      throw error;
+    }
+
+    const payload = {
+      itens: checkoutSnapshot.cartItems.map((item) => ({
+        produto_id: item.id,
+        quantidade: item.quantity,
+        ...(item.tamanho ? { tamanho: item.tamanho } : {}),
+      })),
+    };
+
+    try {
+      const response = await checkout(payload, token);
+      const apiTotal = Number(response?.total ?? checkoutSnapshot.total ?? 0);
+      addToPurchaseHistory(checkoutSnapshot.cartItems, apiTotal);
+      clearCart();
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleGoToShop = () => {
+    setCheckoutVisible(false);
+    navigation.navigate('Loja');
   };
 
   return (
@@ -243,6 +300,15 @@ export default function CarrinhosScreen({ navigation }) {
           </View>
         </View>
       )}
+
+      <CheckoutModal
+        visible={checkoutVisible}
+        cartItems={checkoutSnapshot.cartItems}
+        total={checkoutSnapshot.total}
+        onClose={handleCloseCheckout}
+        onConfirmPurchase={handleConfirmPurchase}
+        onGoToShop={handleGoToShop}
+      />
     </SafeAreaView>
   );
 }

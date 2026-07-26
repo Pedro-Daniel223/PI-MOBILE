@@ -36,6 +36,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useProducts } from '../contexts/ProductContext';
+import { useCart } from '../contexts/CartContext';
+import CartBadge from '../components/CartBadge';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -96,7 +98,7 @@ const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios', 'Ingressos'];
 // Wordmark editorial, sem ruído. Um traço fino separa do conteúdo.
 // Inclui o toggle de tema — um pequeno botão sol/lua ao lado do carrinho.
 // ═══════════════════════════════════════════════════════════════════════════════
-const TopBar = memo(({ onCartPress, isDark, onToggleTheme, DS, s }) => (
+const TopBar = memo(({ onCartPress, isDark, onToggleTheme, DS, s, cartCount }) => (
   <View style={s.topBar}>
     <View>
       <Text style={s.topEyebrow}>DRAKOS FUTEBOL CLUBE</Text>
@@ -108,6 +110,7 @@ const TopBar = memo(({ onCartPress, isDark, onToggleTheme, DS, s }) => (
       </TouchableOpacity>
       <TouchableOpacity onPress={onCartPress} style={s.cartBtn} activeOpacity={0.6}>
         <Ionicons name="bag-outline" size={19} color={DS.ink} />
+        <CartBadge count={cartCount} />
       </TouchableOpacity>
     </View>
   </View>
@@ -502,6 +505,7 @@ function LojaContent({ navigation }) {
   const systemScheme = useColorScheme(); // 'light' | 'dark' | null
   const [themeOverride, setThemeOverride] = useState(null); // null = segue o sistema
   const { products, loadProducts } = useProducts();
+  const { totalItems } = useCart();
 
   const isDark = (themeOverride ?? systemScheme) === 'dark';
   const DS = isDark ? DARK : LIGHT;
@@ -568,6 +572,7 @@ function LojaContent({ navigation }) {
             onToggleTheme={toggleTheme}
             DS={DS}
             s={s}
+            cartCount={totalItems}
           />
 
           <CategoryRail selected={category} onSelect={setCategory} s={s} />
