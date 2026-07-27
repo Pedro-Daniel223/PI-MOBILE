@@ -35,6 +35,7 @@
 
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import {
+  Alert,
   View,
   Text,
   StyleSheet,
@@ -49,10 +50,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from '@react-navigation/native';
 
+import CheckoutModal from './CheckoutModal';
+import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { dadosPlano } from '../data/dataSocios/dataSocios';
 import NavbarGlass from '../components/NavbarGlass';
+import { assinarPlano, getMinhaAssinatura } from '../services/subscriptionService';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -69,6 +74,56 @@ const DS = {
   glassBorder:  'rgba(255,255,255,0.18)',
   radius:       22,
   spacing:      { sm: 12, md: 16, lg: 20, xl: 24 },
+};
+
+const parsePlanoValor = (valor) => {
+  if (typeof valor === 'number') {
+    return valor;
+  }
+
+  const texto = String(valor || '');
+  const match = texto.match(/(\d[\d.]*(?:,\d{2})?)/);
+
+  if (!match) {
+    return 0;
+  }
+
+  return Number(match[1].replace(/\./g, '').replace(',', '.')) || 0;
+};
+
+const buildSubscriptionCheckoutItem = (plan) => ({
+  id: plan?.id,
+  plano_id: plan?.id,
+  nome: plan?.title,
+  nome_plano: plan?.title,
+  title: plan?.title,
+  quantidade: 1,
+  quantity: 1,
+  preco: parsePlanoValor(plan?.price),
+  imagem_plano: plan?.cardImage,
+  imagem: plan?.cardImage,
+  image: plan?.cardImage,
+});
+
+const normalizeAssinaturaResponse = (payload, fallbackPlan = null) => {
+  if (!payload) {
+    return null;
+  }
+
+  const plano = payload.plano || payload.plan || payload.categoria_plano || payload.categoria || fallbackPlan || null;
+  const planoId = payload.plano_id ?? payload.id_plano ?? plano?.id ?? fallbackPlan?.id ?? null;
+  const titulo = payload.title || payload.nome || payload.nome_plano || plano?.title || fallbackPlan?.title || null;
+  const preco = payload.price || payload.valor || payload.preco || plano?.price || fallbackPlan?.price || null;
+
+  return {
+    ...payload,
+    plano_id: planoId,
+    title: titulo,
+    nome_plano: titulo,
+    price: preco,
+    status: payload.status || payload.situacao || 'ativa',
+    plan: plano,
+  };
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -410,7 +465,7 @@ const cardStyles = StyleSheet.create({
 // SUBCOMPONENTE: GlassBottomSheet
 // Modal de detalhes do plano transformado em bottom-sheet de vidro líquido.
 // ═══════════════════════════════════════════════════════════════════════════════
-const GlassBottomSheet = memo(({ visible, plan, onClose }) => (
+const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar }) => (
   <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
     {/* ── Backdrop com blur escuro (não sólido) ─────────────────────────── */}
     <TouchableWithoutFeedback onPress={onClose}>
@@ -476,7 +531,11 @@ const GlassBottomSheet = memo(({ visible, plan, onClose }) => (
               </TouchableOpacity>
 
               {/* Assinar — glass com acento crimson */}
-              <TouchableOpacity style={sheetStyles.assinarButton} activeOpacity={0.85}>
+              <TouchableOpacity
+                style={sheetStyles.assinarButton}
+                activeOpacity={0.85}
+                onPress={() => onAssinar && onAssinar(plan)}
+              >
                 <LinearGradient
                   colors={[DS.accentBright, DS.accent]}
                   style={StyleSheet.absoluteFill}
@@ -694,6 +753,11 @@ export default function SociosScreen({ navigation }) {
   // ── Lógica original — 100% preservada ────────────────────────────────────
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [checkoutVisible, setCheckoutVisible] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState(null);
+
+  const { token } = useAuth();
+  const { setSubscription } = useSubscription();
 
   const openModal = (plan) => {
     setSelectedPlan(plan);
@@ -704,6 +768,84 @@ export default function SociosScreen({ navigation }) {
     setModalVisible(false);
     setSelectedPlan(null);
   };
+  const closeCheckout = useCallback(() => {
+    setCheckoutVisible(false);
+    setCheckoutPlan(null);
+  }, []);
+
+  const startSubscriptionCheckout = useCallback((plan) => {
+    if (!plan) {
+      return;
+    }
+
+    setCheckoutPlan(plan);
+    setModalVisible(false);
+    setSelectedPlan(null);
+    setCheckoutVisible(true);
+  }, []);
+
+  const refreshMinhaAssinatura = useCallback(async () => {
+    if (!token) {
+      setSubscription(null);
+      return null;
+    }
+
+    try {
+      const response = await getMinhaAssinatura(token);
+      const normalized = normalizeAssinaturaResponse(response);
+      setSubscription(normalized);
+      return normalized;
+    } catch (error) {
+      if (error?.status === 404) {
+        setSubscription(null);
+        return null;
+      }
+
+      if (error?.message) {
+        Alert.alert('Não foi possível carregar sua assinatura', error.message);
+      }
+
+      return null;
+    }
+  }, [setSubscription, token]);
+
+  const handleConfirmSubscription = useCallback(async () => {
+    if (!checkoutPlan) {
+      throw new Error('Nenhum plano selecionado.');
+    }
+
+    if (!token) {
+      const error = new Error('Usuário não autenticado.');
+      error.status = 401;
+      throw error;
+    }
+
+    const planoId = Number(checkoutPlan.id);
+
+    if (!Number.isFinite(planoId)) {
+      const error = new Error('Plano inválido.');
+      error.status = 400;
+      throw error;
+    }
+
+    await assinarPlano(planoId, token);
+    const assinatura = await refreshMinhaAssinatura();
+    const checkoutResult = normalizeAssinaturaResponse(
+      assinatura || { plano_id: planoId, status: 'ativa' },
+      checkoutPlan
+    );
+
+    return {
+      ...checkoutResult,
+      total: parsePlanoValor(checkoutPlan.price),
+    };
+  }, [checkoutPlan, refreshMinhaAssinatura, token]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshMinhaAssinatura();
+    }, [refreshMinhaAssinatura])
+  );
   // ── fim lógica original ───────────────────────────────────────────────────
 
   // ── Animações compartilhadas (otimização: 1 loop em vez de N) ────────────
@@ -794,6 +936,17 @@ export default function SociosScreen({ navigation }) {
         visible={modalVisible}
         plan={selectedPlan}
         onClose={closeModal}
+        onAssinar={startSubscriptionCheckout}
+      />
+
+      <CheckoutModal
+        visible={checkoutVisible}
+        onClose={closeCheckout}
+        purchaseType="subscription"
+        items={checkoutPlan ? [buildSubscriptionCheckoutItem(checkoutPlan)] : []}
+        total={parsePlanoValor(checkoutPlan?.price)}
+        onConfirm={handleConfirmSubscription}
+        onSuccessAction={closeCheckout}
       />
     </View>
   );

@@ -41,6 +41,7 @@ export function SubscriptionProvider({ children }) {
 
   const value = {
     subscription,
+    setSubscription,
     purchaseHistory,
     confirmSubscription,
     addToPurchaseHistory,

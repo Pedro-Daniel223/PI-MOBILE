@@ -76,12 +76,40 @@ export const stylesPerfil = StyleSheet.create({
     fontSize: scaleFont(22),
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 10,
   },
   userStatus: {
     color: 'rgba(255,255,255,0.65)',
     fontSize: scaleFont(13),
     textAlign: 'center',
+  },
+
+  // ───────────────────────────────────────────────────────────────────────
+  // STATUS CHIP — identificação premium do plano (substitui "Status atual")
+  // Selo glass compacto, ícone + label dinâmicos vindos de subscription.tier
+  // ───────────────────────────────────────────────────────────────────────
+  statusChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    borderRadius: 30,
+    overflow: 'hidden',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 7,
+  },
+  statusChipBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 30,
+    borderWidth: 1,
+  },
+  statusChipEmoji: {
+    fontSize: scaleFont(14),
+  },
+  statusChipText: {
+    fontSize: scaleFont(12.5),
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
 
   welcomeCard: {
@@ -131,7 +159,7 @@ export const stylesPerfil = StyleSheet.create({
     color: 'rgba(255,255,255,0.75)',
     fontSize: scaleFont(14),
     lineHeight: scaleFont(22),
-    marginBottom: 12,
+    marginBottom: 14,
   },
 
   subBadge: {
@@ -159,6 +187,136 @@ export const stylesPerfil = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     fontSize: scaleFont(11),
     fontWeight: '600',
+  },
+
+  // ───────────────────────────────────────────────────────────────────────
+  // PLAN PANEL — painel funcional dentro do card "Seja bem-vindo"
+  // Dois estados: sócio (plano + benefícios + status) e não-sócio (incentivo)
+  // ───────────────────────────────────────────────────────────────────────
+  planPanel: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    padding: 14,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+  },
+  planPanelBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+  },
+  planPanelHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  planPanelHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 10,
+  },
+  planPanelEmoji: {
+    fontSize: scaleFont(26),
+  },
+  planPanelTitle: {
+    color: '#fff',
+    fontSize: scaleFont(16),
+    fontWeight: '800',
+    letterSpacing: 0.1,
+  },
+  planPanelStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 3,
+  },
+  planPanelStatusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#4ee08a',
+  },
+  planPanelStatusText: {
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: scaleFont(11.5),
+    fontWeight: '600',
+  },
+  planPanelPrice: {
+    color: '#fff',
+    fontSize: scaleFont(15),
+    fontWeight: '800',
+  },
+  planPanelDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    marginVertical: 12,
+  },
+  planPanelBenefits: {
+    gap: 8,
+    marginBottom: 14,
+  },
+  planPanelBenefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  planPanelBenefitText: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: scaleFont(12.5),
+    fontWeight: '500',
+    flex: 1,
+  },
+  planPanelManageBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+    gap: 6,
+  },
+  planPanelManageBtnText: {
+    color: '#fff',
+    fontSize: scaleFont(13),
+    fontWeight: '700',
+  },
+  planPanelPromoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  planPanelPromoTitle: {
+    color: '#fff',
+    fontSize: scaleFont(15.5),
+    fontWeight: '800',
+  },
+  planPanelPromoBody: {
+    color: 'rgba(255,255,255,0.62)',
+    fontSize: scaleFont(12.5),
+    lineHeight: scaleFont(18),
+    fontWeight: '400',
+    marginBottom: 14,
+  },
+  planPanelCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 42,
+    borderRadius: 12,
+    overflow: 'hidden',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
+  },
+  planPanelCtaText: {
+    color: '#fff',
+    fontSize: scaleFont(13.5),
+    fontWeight: '800',
+    letterSpacing: 0.2,
   },
 
   actionsRow: {
@@ -326,6 +484,9 @@ export const stylesPerfil = StyleSheet.create({
     borderColor: 'rgba(255,215,0,0.25)',
     marginBottom: 14,
     gap: 8,
+  },
+  historySubEmoji: {
+    fontSize: scaleFont(13),
   },
   historySubText: {
     color: '#ffd700',

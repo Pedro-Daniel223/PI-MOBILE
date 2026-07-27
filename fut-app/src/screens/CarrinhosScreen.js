@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,16 +9,15 @@ import {
   Image,
   Animated,
   Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
-import { useSubscription } from '../contexts/SubscriptionContext';
-import CheckoutModal from './CheckoutModal';
-import { theme } from '../data/dataCarrinhos';
-import styles from '../styles/styleCarrinhos/styleCarrinhos';
-import { checkout } from '../services/checkoutService';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useCart } from "../contexts/CartContext";
+import { useAuth } from "../contexts/AuthContext";
+import CheckoutModal from "./CheckoutModal";
+import { theme } from "../data/dataCarrinhos";
+import styles from "../styles/styleCarrinhos/styleCarrinhos";
+import { checkout } from "../services/checkoutService";
 
 // theme moved to src/data/dataCarrinhos.js
 
@@ -27,7 +26,7 @@ const resolveImageSource = (value) => {
     return null;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return { uri: value };
   }
 
@@ -63,9 +62,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
     });
   };
 
-  const handleIncrement = () => onUpdateQuantity(item.id, item.tamanho, item.quantity + 1);
+  const handleIncrement = () =>
+    onUpdateQuantity(item.id, item.tamanho, item.quantity + 1);
   const handleDecrement = () => {
-    if (item.quantity > 1) onUpdateQuantity(item.id, item.tamanho, item.quantity - 1);
+    if (item.quantity > 1)
+      onUpdateQuantity(item.id, item.tamanho, item.quantity - 1);
   };
 
   const getImageSource = () => {
@@ -77,7 +78,10 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
     if (item.imageUrl) return item.imageUrl;
     if (item.url) return item.url;
     if (item.produto) {
-      if (Array.isArray(item.produto.imagens) && item.produto.imagens.length > 0) {
+      if (
+        Array.isArray(item.produto.imagens) &&
+        item.produto.imagens.length > 0
+      ) {
         return item.produto.imagens[0];
       }
       if (item.produto.imagem) return item.produto.imagem;
@@ -89,7 +93,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   const imageSource = getImageSource();
   const resolvedImageSource = resolveImageSource(imageSource);
 
-  console.log('[CarrinhosScreen] cart item image payload', {
+  console.log("[CarrinhosScreen] cart item image payload", {
     id: item.id,
     tamanho: item.tamanho ?? null,
     imagem: item.imagem ?? null,
@@ -101,7 +105,10 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
   return (
     <Animated.View
-      style={[styles.cartItemContainer, { transform: [{ scale: scaleAnim }], opacity: itemOpacity }]}
+      style={[
+        styles.cartItemContainer,
+        { transform: [{ scale: scaleAnim }], opacity: itemOpacity },
+      ]}
     >
       <TouchableOpacity
         activeOpacity={1}
@@ -111,7 +118,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         <View style={styles.cartItem}>
           <View style={styles.imageWrapper}>
             {resolvedImageSource ? (
-              <Image source={resolvedImageSource} style={styles.productImage} resizeMode="cover" />
+              <Image
+                source={resolvedImageSource}
+                style={styles.productImage}
+                resizeMode="cover"
+              />
             ) : (
               <View style={styles.imagePlaceholder}>
                 <Ionicons name="shirt-outline" size={28} color="#D1D1D6" />
@@ -122,22 +133,29 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           <View style={styles.infoContainer}>
             <Text style={styles.sectionLabel}>Descrição do pedido</Text>
             <Text style={styles.productName} numberOfLines={2}>
-              {item.nome || 'Produto sem nome'}
+              {item.nome || "Produto sem nome"}
             </Text>
 
             <View style={styles.detailsRow}>
               <Text style={styles.detailText}>
-                Tamanho: <Text style={styles.detailValue}>{item.tamanho || '#'}</Text>
+                Tamanho:{" "}
+                <Text style={styles.detailValue}>{item.tamanho || "#"}</Text>
               </Text>
               <Text style={styles.detailText}>
-                Qtd: <Text style={styles.detailValue}>{item.quantity.toString().padStart(2, '0')}</Text>
+                Qtd:{" "}
+                <Text style={styles.detailValue}>
+                  {item.quantity.toString().padStart(2, "0")}
+                </Text>
               </Text>
             </View>
 
             <View style={styles.priceRow}>
               <Text style={styles.priceLabel}>Preço unitário</Text>
               <Text style={styles.priceValue}>
-                {item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                {item.preco.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
               </Text>
             </View>
 
@@ -145,18 +163,36 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
               <View style={styles.quantityControls}>
                 <TouchableOpacity
                   onPress={handleDecrement}
-                  style={[styles.qtyBtn, item.quantity <= 1 && styles.qtyBtnDisabled]}
+                  style={[
+                    styles.qtyBtn,
+                    item.quantity <= 1 && styles.qtyBtnDisabled,
+                  ]}
                   disabled={item.quantity <= 1}
                 >
-                  <Text style={[styles.qtySymbol, item.quantity <= 1 && { color: '#D1D1D6' }]}>−</Text>
+                  <Text
+                    style={[
+                      styles.qtySymbol,
+                      item.quantity <= 1 && { color: "#D1D1D6" },
+                    ]}
+                  >
+                    −
+                  </Text>
                 </TouchableOpacity>
-                <Text style={styles.qtyNumber}>{item.quantity.toString().padStart(2, '0')}</Text>
-                <TouchableOpacity onPress={handleIncrement} style={styles.qtyBtn}>
+                <Text style={styles.qtyNumber}>
+                  {item.quantity.toString().padStart(2, "0")}
+                </Text>
+                <TouchableOpacity
+                  onPress={handleIncrement}
+                  style={styles.qtyBtn}
+                >
                   <Text style={styles.qtySymbol}>+</Text>
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.deleteButton} onPress={handleRemoveAnimation}>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleRemoveAnimation}
+              >
                 <Ionicons name="trash-outline" size={18} color={theme.accent} />
               </TouchableOpacity>
             </View>
@@ -168,13 +204,16 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 };
 
 export default function CarrinhosScreen({ navigation }) {
-  const { cartItems, updateQuantity, removeItem, clearCart, subtotal } = useCart();
+  const { cartItems, updateQuantity, removeItem, clearCart, subtotal } =
+    useCart();
   const { token } = useAuth();
-  const { addToPurchaseHistory } = useSubscription();
   const total = subtotal;
   const hasItems = cartItems.length > 0;
   const [checkoutVisible, setCheckoutVisible] = useState(false);
-  const [checkoutSnapshot, setCheckoutSnapshot] = useState({ cartItems: [], total: 0 });
+  const [checkoutSnapshot, setCheckoutSnapshot] = useState({
+    cartItems: [],
+    total: 0,
+  });
 
   // ==================== FRONT (CABEÇALHO) ====================
   // Cabeçalho superior com título MEU CARRINHO e botão Limpar
@@ -199,7 +238,9 @@ export default function CarrinhosScreen({ navigation }) {
 
   const handleConfirmPurchase = async () => {
     if (!token) {
-      const error = new Error('Você precisa estar autenticado para finalizar a compra.');
+      const error = new Error(
+        "Você precisa estar autenticado para finalizar a compra.",
+      );
       error.status = 401;
       throw error;
     }
@@ -214,8 +255,6 @@ export default function CarrinhosScreen({ navigation }) {
 
     try {
       const response = await checkout(payload, token);
-      const apiTotal = Number(response?.total ?? checkoutSnapshot.total ?? 0);
-      addToPurchaseHistory(checkoutSnapshot.cartItems, apiTotal);
       clearCart();
       return response;
     } catch (error) {
@@ -225,7 +264,7 @@ export default function CarrinhosScreen({ navigation }) {
 
   const handleGoToShop = () => {
     setCheckoutVisible(false);
-    navigation.navigate('Loja');
+    navigation.navigate("Loja");
   };
 
   return (
@@ -235,14 +274,21 @@ export default function CarrinhosScreen({ navigation }) {
       {/* ==================== FRONT (CABEÇALHO) ==================== */}
       {/* Cabeçalho superior com botão voltar, título MEU CARRINHO e botão Limpar */}
       {/* ============================================================= */}
-      
+
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Ionicons name="chevron-back" size={24} color={theme.black} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>MEU CARRINHO</Text>
         <TouchableOpacity onPress={() => hasItems && clearCart()}>
-          <Text style={[styles.clearText, !hasItems && styles.clearTextDisabled]}>Limpar</Text>
+          <Text
+            style={[styles.clearText, !hasItems && styles.clearTextDisabled]}
+          >
+            Limpar
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -252,7 +298,9 @@ export default function CarrinhosScreen({ navigation }) {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={hasItems ? styles.scrollContent : styles.emptyScrollContent}
+        contentContainerStyle={
+          hasItems ? styles.scrollContent : styles.emptyScrollContent
+        }
       >
         {hasItems ? (
           cartItems.map((item) => (
@@ -266,11 +314,20 @@ export default function CarrinhosScreen({ navigation }) {
         ) : (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconCircle}>
-              <Ionicons name="bag-handle-outline" size={60} color={theme.accent} />
+              <Ionicons
+                name="bag-handle-outline"
+                size={60}
+                color={theme.accent}
+              />
             </View>
             <Text style={styles.emptyTitle}>Sacola vazia</Text>
-            <Text style={styles.emptySubtitle}>Parece que você ainda não escolheu seu manto.</Text>
-            <TouchableOpacity style={styles.shopButton} onPress={() => navigation.navigate('Loja')}>
+            <Text style={styles.emptySubtitle}>
+              Parece que você ainda não escolheu seu manto.
+            </Text>
+            <TouchableOpacity
+              style={styles.shopButton}
+              onPress={() => navigation.navigate("Loja")}
+            >
               <Text style={styles.shopButtonText}>Explorar Loja</Text>
             </TouchableOpacity>
           </View>
@@ -287,11 +344,18 @@ export default function CarrinhosScreen({ navigation }) {
             <View>
               <Text style={styles.totalLabel}>Total geral</Text>
               <Text style={styles.totalAmount}>
-                {total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                {total.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout} activeOpacity={0.9}>
+            <TouchableOpacity
+              style={styles.checkoutButton}
+              onPress={handleCheckout}
+              activeOpacity={0.9}
+            >
               <Text style={styles.checkoutText}>Comprar</Text>
               <View style={styles.checkoutIcon}>
                 <Ionicons name="arrow-forward" size={18} color={theme.black} />

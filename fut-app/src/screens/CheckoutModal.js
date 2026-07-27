@@ -7,7 +7,7 @@
  * um fluxo completo dentro do próprio app:
  *
  *   1. RESUMO   → lista os itens do carrinho (reaproveita cartItems/subtotal)
- *   2. PAGAMENTO → Cartão de crédito (com cartão 3D ao vivo) ou PIX (QR simulado)
+ *   2. PAGAMENTO → {resolveCopyValue(checkoutCopy.paymentMethodCard, { purchaseType })} (com cartão 3D ao vivo) ou PIX (QR simulado)
  *   3. SUCESSO   → estado de confirmação após addToPurchaseHistory + clearCart
  *
  * Este componente é AUTÔNOMO: não depende de nenhum arquivo de estilo/tema
@@ -117,6 +117,64 @@ const generatePixCode = (total) => {
 // ─── Sub-componente: Superfície de vidro genérica ──────────────────────────
 // Segue a regra crítica do projeto: container externo (sombra) sem
 // overflow:hidden + container interno (clip) só para BlurView/gradientes.
+const DEFAULT_CHECKOUT_COPY = {
+  product: {
+    headerTitleResumo: 'RESUMO DO PEDIDO',
+    headerTitlePagamento: 'PAGAMENTO',
+    headerTitleSucesso: 'PEDIDO CONFIRMADO',
+    summaryCta: 'Ir para pagamento',
+    paymentMethodCard: 'CartÃ£o de crÃ©dito',
+    paymentMethodPix: 'PIX',
+    confirmBtnText: 'Confirmar pagamento',
+    successTitle: 'Pagamento confirmado',
+    successSubtitle: ({ checkoutResult }) =>
+      `Pedido #${checkoutResult?.pedido_id ?? '-'} - ${checkoutResult?.status || 'a caminho'}\nSeu pedido foi enviado ao Drakos FC e jÃ¡ estÃ¡ sendo preparado.`,
+    successTotalLabel: 'Total pago',
+    successActionText: 'Voltar para a loja',
+    successGhostText: 'Fechar',
+    summaryItemsLabel: 'Itens',
+    summaryShippingLabel: 'Frete',
+    summaryShippingValue: 'GrÃ¡tis',
+    summaryTotalLabel: 'Total',
+    summaryPlaceholderName: 'Produto sem nome',
+    summaryQuantityPrefix: 'Qtd',
+    summarySizePrefix: 'Tam',
+    confirmationErrorTitle: 'NÃ£o foi possÃ­vel concluir a compra',
+    genericErrorTitle: 'Erro no checkout',
+  },
+  subscription: {
+    headerTitleResumo: 'RESUMO DA ASSINATURA',
+    headerTitlePagamento: 'PAGAMENTO',
+    headerTitleSucesso: 'ASSINATURA CONFIRMADA',
+    summaryCta: 'Ir para pagamento',
+    paymentMethodCard: 'CartÃ£o de crÃ©dito',
+    paymentMethodPix: 'PIX',
+    confirmBtnText: 'Confirmar assinatura',
+    successTitle: 'Assinatura confirmada',
+    successSubtitle: ({ checkoutResult }) =>
+      `Plano #${checkoutResult?.plano_id ?? '-'} - ${checkoutResult?.status || 'ativa'}\nSua assinatura foi ativada com sucesso.`,
+    successTotalLabel: 'Total pago',
+    successActionText: 'Voltar para os sÃ³cios',
+    successGhostText: 'Fechar',
+    summaryItemsLabel: 'Itens',
+    summaryShippingLabel: 'Taxa',
+    summaryShippingValue: 'Inclusa',
+    summaryTotalLabel: 'Total',
+    summaryPlaceholderName: 'Plano sem nome',
+    summaryQuantityPrefix: 'Qtd',
+    summarySizePrefix: 'Tam',
+    confirmationErrorTitle: 'NÃ£o foi possÃ­vel concluir a assinatura',
+    genericErrorTitle: 'Erro no checkout',
+  },
+};
+
+const resolveCheckoutCopy = (purchaseType, overrides = {}) => ({
+  ...(DEFAULT_CHECKOUT_COPY[purchaseType] || DEFAULT_CHECKOUT_COPY.product),
+  ...(overrides || {}),
+});
+
+const resolveCopyValue = (value, context) => (typeof value === 'function' ? value(context) : value);
+
 const GlassSurface = ({ style, innerStyle, intensity = 42, tint = 'dark', children }) => (
   <View style={[stylesGlass.outer, style]}>
     <View style={[stylesGlass.inner, innerStyle]}>
@@ -382,10 +440,19 @@ const CheckoutModal = ({
   visible,
   onClose,
   cartItems = [],
+  items,
   total = 0,
   onConfirmPurchase,
+  onConfirm,
   onGoToShop,
+  onSuccessAction,
+  purchaseType = 'product',
+  texts = {},
 }) => {
+  const resolvedItems = Array.isArray(items) ? items : cartItems;
+  const checkoutCopy = resolveCheckoutCopy(purchaseType, texts);
+  const confirmAction = onConfirm || onConfirmPurchase;
+  const successAction = onSuccessAction || onGoToShop;
   const [step, setStep] = useState('resumo'); // 'resumo' | 'pagamento' | 'sucesso'
   const [method, setMethod] = useState('cartao'); // 'cartao' | 'pix'
   const [processing, setProcessing] = useState(false);
@@ -485,21 +552,21 @@ const CheckoutModal = ({
 
     setProcessing(true);
     try {
-      const response = onConfirmPurchase ? await onConfirmPurchase() : null;
+      const response = confirmAction ? await confirmAction() : null;
       setCheckoutResult(response || null);
       setProcessing(false);
       setStep('sucesso');
     } catch (error) {
       setProcessing(false);
       if (error?.status === 400 || error?.status === 404) {
-        Alert.alert('Não foi possível concluir a compra', error.message);
+        Alert.alert(resolveCopyValue(checkoutCopy.confirmationErrorTitle, { purchaseType }), error.message);
       } else if (error?.message) {
-        Alert.alert('Erro no checkout', error.message);
+        Alert.alert(resolveCopyValue(checkoutCopy.genericErrorTitle, { purchaseType }), error.message);
       }
     }
-  }, [processing, method, cardValid, onConfirmPurchase]);
+  }, [processing, method, cardValid, confirmAction, checkoutCopy, purchaseType]);
 
-  const itemsCount = cartItems.reduce((acc, it) => acc + (it.quantity || 1), 0);
+  const itemsCount = resolvedItems.reduce((acc, it) => acc + (it.quantity || it.quantidade || 1), 0);
 
   if (!visible) return null;
 
@@ -528,9 +595,9 @@ const CheckoutModal = ({
               <View style={s.headerRow}>
                 <View style={{ width: 34 }} />
                 <Text style={s.headerTitle}>
-                  {step === 'resumo' && 'RESUMO DO PEDIDO'}
-                  {step === 'pagamento' && 'PAGAMENTO'}
-                  {step === 'sucesso' && 'PEDIDO CONFIRMADO'}
+                  {step === 'resumo' && resolveCopyValue(checkoutCopy.headerTitleResumo, { purchaseType })}
+                  {step === 'pagamento' && resolveCopyValue(checkoutCopy.headerTitlePagamento, { purchaseType })}
+                  {step === 'sucesso' && resolveCopyValue(checkoutCopy.headerTitleSucesso, { purchaseType })}
                 </Text>
                 <TouchableOpacity
                   onPress={handleRequestClose}
@@ -552,13 +619,13 @@ const CheckoutModal = ({
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={{ paddingBottom: 6 }}
                 >
-                  {cartItems.map((item) => {
+                  {resolvedItems.map((item) => {
                     const img = Array.isArray(item.imagens) && item.imagens.length > 0
                       ? item.imagens[0]
-                      : item.imagem || item.image || null;
+                      : item.imagem || item.image || item.capa || item.foto || item.imagem_plano || null;
                     const imgSource = typeof img === 'string' ? { uri: img } : img;
                     return (
-                      <View key={`${item.id}-${item.tamanho}`} style={s.summaryRow}>
+                      <View key={`${item.id || item.plano_id || item.nome}-${item.tamanho || item.size || item.quantidade || item.quantity || 0}`} style={s.summaryRow}>
                         <View style={s.summaryImgWrap}>
                           {imgSource ? (
                             <Image source={imgSource} style={s.summaryImg} resizeMode="cover" />
@@ -570,14 +637,14 @@ const CheckoutModal = ({
                         </View>
                         <View style={{ flex: 1 }}>
                           <Text style={s.summaryName} numberOfLines={1}>
-                            {item.nome || 'Produto sem nome'}
+                            {item.nome || item.nome_plano || item.title || checkoutCopy.summaryPlaceholderName}
                           </Text>
                           <Text style={s.summaryMeta}>
-                            {item.tamanho ? `Tam ${item.tamanho} · ` : ''}Qtd {item.quantity}
+                            {(item.tamanho || item.size) ? `${checkoutCopy.summarySizePrefix} ${item.tamanho || item.size} · ` : ""}{checkoutCopy.summaryQuantityPrefix} {item.quantity || item.quantidade || 1}
                           </Text>
                         </View>
                         <Text style={s.summaryPrice}>
-                          {formatBRL((item.preco || 0) * (item.quantity || 1))}
+                          {formatBRL((item.preco ?? item.valor ?? item.total ?? 0) * (item.quantity || item.quantidade || 1))}
                         </Text>
                       </View>
                     );
@@ -588,15 +655,15 @@ const CheckoutModal = ({
 
                 <View style={s.totalsBlock}>
                   <View style={s.totalsLine}>
-                    <Text style={s.totalsLabel}>Itens ({itemsCount})</Text>
+                    <Text style={s.totalsLabel}>{checkoutCopy.summaryItemsLabel} ({itemsCount})</Text>
                     <Text style={s.totalsValue}>{formatBRL(total)}</Text>
                   </View>
                   <View style={s.totalsLine}>
-                    <Text style={s.totalsLabel}>Frete</Text>
-                    <Text style={[s.totalsValue, { color: DS.success }]}>Grátis</Text>
+                    <Text style={s.totalsLabel}>{checkoutCopy.summaryShippingLabel}</Text>
+                    <Text style={[s.totalsValue, { color: DS.success }]}>{checkoutCopy.summaryShippingValue}</Text>
                   </View>
                   <View style={[s.totalsLine, { marginTop: 6 }]}>
-                    <Text style={s.grandLabel}>Total</Text>
+                    <Text style={s.grandLabel}>{checkoutCopy.summaryTotalLabel}</Text>
                     <Text style={s.grandValue}>{formatBRL(total)}</Text>
                   </View>
                 </View>
@@ -612,7 +679,7 @@ const CheckoutModal = ({
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                   />
-                  <Text style={s.primaryBtnText}>Ir para pagamento</Text>
+                  <Text style={s.primaryBtnText}>{resolveCopyValue(checkoutCopy.summaryCta, { purchaseType })}</Text>
                   <Ionicons name="arrow-forward" size={17} color="#fff" />
                 </TouchableOpacity>
               </View>
@@ -639,7 +706,7 @@ const CheckoutModal = ({
                       color={method === 'cartao' ? '#fff' : DS.textSecondary}
                     />
                     <Text style={[s.methodBtnText, method === 'cartao' && s.methodBtnTextActive]}>
-                      Cartão de crédito
+                      {resolveCopyValue(checkoutCopy.paymentMethodCard, { purchaseType })}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -653,7 +720,7 @@ const CheckoutModal = ({
                       color={method === 'pix' ? '#fff' : DS.textSecondary}
                     />
                     <Text style={[s.methodBtnText, method === 'pix' && s.methodBtnTextActive]}>
-                      PIX
+                      {resolveCopyValue(checkoutCopy.paymentMethodPix, { purchaseType })}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -790,7 +857,7 @@ const CheckoutModal = ({
                     <Text style={s.primaryBtnText}>Processando…</Text>
                   ) : (
                     <>
-                      <Text style={s.primaryBtnText}>Confirmar pagamento</Text>
+                      <Text style={s.primaryBtnText}>{resolveCopyValue(checkoutCopy.confirmBtnText, { purchaseType })}</Text>
                       <Text style={s.primaryBtnTotal}>{formatBRL(total)}</Text>
                     </>
                   )}
@@ -834,15 +901,19 @@ const CheckoutModal = ({
                   <Ionicons name="checkmark" size={40} color={DS.success} />
                 </Animated.View>
 
-                <Text style={s.successTitle}>Pagamento confirmado</Text>
+                <Text style={s.successTitle}>{resolveCopyValue(checkoutCopy.successTitle, { purchaseType })}</Text>
                 <Text style={s.successSubtitle}>
-                  Pedido #{checkoutResult?.pedido_id ?? '-'} - {checkoutResult?.status || 'a caminho'}
-                  {'\n'}
-                  Seu pedido foi enviado ao Drakos FC e já está sendo preparado.
+                  {resolveCopyValue(checkoutCopy.successSubtitle, {
+                    purchaseType,
+                    checkoutResult,
+                    total,
+                    items: resolvedItems,
+                    itemsCount,
+                  })}
                 </Text>
 
                 <View style={s.successTotalPill}>
-                  <Text style={s.successTotalLabel}>Total pago</Text>
+                  <Text style={s.successTotalLabel}>{resolveCopyValue(checkoutCopy.successTotalLabel, { purchaseType })}</Text>
                   <Text style={s.successTotalValue}>
                     {formatBRL(checkoutResult?.total ?? total)}
                   </Text>
@@ -853,7 +924,7 @@ const CheckoutModal = ({
                   activeOpacity={0.88}
                   onPress={() => {
                     handleRequestClose();
-                    onGoToShop && onGoToShop();
+                    successAction && successAction();
                   }}
                 >
                   <LinearGradient
@@ -862,11 +933,11 @@ const CheckoutModal = ({
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                   />
-                  <Text style={s.primaryBtnText}>Voltar para a loja</Text>
+                  <Text style={s.primaryBtnText}>{resolveCopyValue(checkoutCopy.successActionText, { purchaseType })}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={s.ghostBtn} onPress={handleRequestClose} activeOpacity={0.7}>
-                  <Text style={s.ghostBtnText}>Fechar</Text>
+                  <Text style={s.ghostBtnText}>{resolveCopyValue(checkoutCopy.successGhostText, { purchaseType })}</Text>
                 </TouchableOpacity>
               </View>
             )}
