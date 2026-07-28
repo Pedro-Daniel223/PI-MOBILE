@@ -647,6 +647,12 @@ export default function PerfilScreen({ navigation }) {
           </View>
           <Text style={stylesPerfil.username}>{currentUser.name}</Text>
 
+          {currentUser.category && (
+            <Text style={stylesPerfil.categoryText}>
+              {currentUser.category}
+            </Text>
+          )}
+
           {/* ── IDENTIFICAÇÃO PREMIUM DO PLANO (substitui "Status atual: ...") ── */}
           <View style={stylesPerfil.statusChip}>
             <BlurView

@@ -78,6 +78,12 @@ export const stylesPerfil = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
+  categoryText: {
+    color: 'rgba(255,255,255,0.65)',
+    fontSize: scaleFont(13),
+    textAlign: 'center',
+    marginBottom: 10,
+  },
   userStatus: {
     color: 'rgba(255,255,255,0.65)',
     fontSize: scaleFont(13),
