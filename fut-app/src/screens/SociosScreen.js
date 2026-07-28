@@ -505,7 +505,7 @@ const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar }) => (
           {/* Benefícios */}
           <Text style={sheetStyles.beneficiosTitle}>Benefícios</Text>
           <View style={sheetStyles.beneficiosList}>
-            {plan?.beneficios?.map((beneficio, index) => (
+            {(Array.isArray(plan?.beneficios) ? plan.beneficios : []).map((beneficio, index) => (
               <View key={index} style={sheetStyles.beneficioItem}>
                 <View style={sheetStyles.bulletDot} />
                 <Text style={sheetStyles.beneficioText}>{beneficio}</Text>
@@ -910,7 +910,7 @@ export default function SociosScreen({ navigation }) {
         </View>
 
         {/* ─────────── Lista de cards de planos (Liquid Glass) ─────────── */}
-        {dadosPlano.map((plan) => (
+        {(Array.isArray(dadosPlano) ? dadosPlano : []).map((plan) => (
           <PlanGlassCard
             key={plan.id}
             plan={plan}

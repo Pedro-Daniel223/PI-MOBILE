@@ -237,15 +237,16 @@ const stylesGlass = StyleSheet.create({
 // ─── Sub-componente: Step indicator ─────────────────────────────────────────
 const StepDots = ({ step }) => {
   const steps = ['resumo', 'pagamento', 'sucesso'];
+  const safeSteps = Array.isArray(steps) ? steps : [];
   return (
     <View style={s.stepRow} pointerEvents="none">
-      {steps.map((key, idx) => {
-        const active = steps.indexOf(step) >= idx;
+      {safeSteps.map((key, idx) => {
+        const active = safeSteps.indexOf(step) >= idx;
         return (
           <React.Fragment key={key}>
             <View style={[s.stepDot, active && s.stepDotActive]} />
-            {idx < steps.length - 1 && (
-              <View style={[s.stepLine, steps.indexOf(step) > idx && s.stepLineActive]} />
+            {idx < safeSteps.length - 1 && (
+              <View style={[s.stepLine, safeSteps.indexOf(step) > idx && s.stepLineActive]} />
             )}
           </React.Fragment>
         );
@@ -410,15 +411,16 @@ const SimulatedQRCode = ({ seed = 'drakos' }) => {
     drawEye(GRID - 5, 0);
     return grid;
   }, [seed]);
+  const safeCells = Array.isArray(cells) ? cells : [];
 
   const cellSize = 168 / GRID;
 
   return (
     <View style={s.qrWrap}>
       <View style={{ width: 168, height: 168 }}>
-        {cells.map((row, r) => (
+        {safeCells.map((row, r) => (
           <View key={r} style={{ flexDirection: 'row' }}>
-            {row.map((on, c) => (
+            {(Array.isArray(row) ? row : []).map((on, c) => (
               <View
                 key={c}
                 style={{
@@ -450,6 +452,7 @@ const CheckoutModal = ({
   texts = {},
 }) => {
   const resolvedItems = Array.isArray(items) ? items : cartItems;
+  const safeResolvedItems = Array.isArray(resolvedItems) ? resolvedItems : [];
   const checkoutCopy = resolveCheckoutCopy(purchaseType, texts);
   const confirmAction = onConfirm || onConfirmPurchase;
   const successAction = onSuccessAction || onGoToShop;
@@ -566,7 +569,7 @@ const CheckoutModal = ({
     }
   }, [processing, method, cardValid, confirmAction, checkoutCopy, purchaseType]);
 
-  const itemsCount = resolvedItems.reduce((acc, it) => acc + (it.quantity || it.quantidade || 1), 0);
+  const itemsCount = safeResolvedItems.reduce((acc, it) => acc + (it.quantity || it.quantidade || 1), 0);
 
   if (!visible) return null;
 
@@ -619,7 +622,7 @@ const CheckoutModal = ({
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={{ paddingBottom: 6 }}
                 >
-                  {resolvedItems.map((item) => {
+                  {safeResolvedItems.map((item) => {
                     const img = Array.isArray(item.imagens) && item.imagens.length > 0
                       ? item.imagens[0]
                       : item.imagem || item.image || item.capa || item.foto || item.imagem_plano || null;
@@ -907,7 +910,7 @@ const CheckoutModal = ({
                     purchaseType,
                     checkoutResult,
                     total,
-                    items: resolvedItems,
+                    items: safeResolvedItems,
                     itemsCount,
                   })}
                 </Text>

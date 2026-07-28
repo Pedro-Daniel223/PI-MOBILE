@@ -111,6 +111,7 @@ const BUBBLE_RATIO = 0.82;
 export default function NavbarGlass({ state, descriptors, navigation }) {
   const activeIndex = state?.index ?? 0;
   const [containerWidth, setContainerWidth] = useState(0);
+  const navTabs = Array.isArray(TABS) ? TABS : [];
 
   // ── Layout ref ───────────────────────────────────────────────────────────
   // Mantém tabW/bubW frescos sem re-criar o PanResponder.
@@ -119,10 +120,10 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
 
   useEffect(() => {
     if (containerWidth > 0) {
-      L.current.tabW = containerWidth / TABS.length;
+      L.current.tabW = containerWidth / navTabs.length;
       L.current.bubW = L.current.tabW * BUBBLE_RATIO;
     }
-  }, [containerWidth]);
+  }, [containerWidth, navTabs.length]);
 
   useEffect(() => {
     L.current.activeIdx = activeIndex;
@@ -160,10 +161,10 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
   const nearestIdx = useCallback((bx) => {
     const { tabW, bubW } = L.current;
     const center = bx + bubW / 2;
-    return Math.max(0, Math.min(TABS.length - 1,
+    return Math.max(0, Math.min(navTabs.length - 1,
       Math.round((center - tabW / 2) / tabW)
     ));
-  }, []);
+  }, [navTabs.length]);
 
   // ── Sync da bolha com activeIndex ────────────────────────────────────────
   // Roda quando a rota muda por navegação externa (deep link, back button etc.)
@@ -171,12 +172,12 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
     if (containerWidth <= 0) return;
     // Calcula inline (não via xForIdx) para garantir que L.current está atualizado
     // pelos dois effects terem a mesma dep containerWidth.
-    const tW = containerWidth / TABS.length;
+    const tW = containerWidth / navTabs.length;
     const bW = tW * BUBBLE_RATIO;
     const tx = activeIndex * tW + (tW - bW) / 2;
     cX.current = tx;
     Animated.spring(bubX, { toValue: tx, ...SP.GLOW, useNativeDriver: true }).start();
-  }, [activeIndex, containerWidth]);
+  }, [activeIndex, containerWidth, navTabs.length]);
 
   // ── Glow breathing loop ───────────────────────────────────────────────────
   useEffect(() => {
@@ -232,7 +233,7 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
 
         // Limites: posição da bolha para tab 0 e tab último
         const minX = (tabW - bubW) / 2;
-        const maxX = (TABS.length - 1) * tabW + (tabW - bubW) / 2;
+        const maxX = (navTabs.length - 1) * tabW + (tabW - bubW) / 2;
 
         // Posição alvo = onde a bolha estava ao ser pega + quanto o dedo andou
         const rawTarget = cX.current + g.dx;
@@ -258,7 +259,7 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
       onPanResponderRelease: (_, g) => {
         const { tabW, bubW } = L.current;
         const minX = (tabW - bubW) / 2;
-        const maxX = (TABS.length - 1) * tabW + (tabW - bubW) / 2;
+        const maxX = (navTabs.length - 1) * tabW + (tabW - bubW) / 2;
 
         // Merge offset + value → value único (posição final real)
         bubX.flattenOffset();
@@ -273,8 +274,8 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
         // FIX #7: velocity flick — avança na direção se rápido o suficiente
         if (Math.abs(g.vx) > 0.65) {
           snapI = g.vx > 0
-            ? Math.min(snapI + 1, TABS.length - 1)
-            : Math.max(snapI - 1, 0);
+          ? Math.min(snapI + 1, navTabs.length - 1)
+          : Math.max(snapI - 1, 0);
         }
 
         const snapX = xForIdx(snapI);
@@ -296,7 +297,7 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
 
         // Navega somente se mudou de tab
         if (snapI !== L.current.activeIdx) {
-          navigation.navigate(TABS[snapI].route);
+          navigation.navigate(navTabs[snapI].route);
         }
       },
 
@@ -347,7 +348,7 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
     ]).start(triggerWobble); // FIX #5: wobble DEPOIS que o spring chega
 
     navigation.navigate(tab.route);
-  }, [xForIdx, triggerWobble, navigation]);
+  }, [xForIdx, triggerWobble, navigation, navTabs.length]);
 
   // ── Haptic press feedback do bar inteiro ─────────────────────────────────
   // FIX #10: encolhe (0.972) ao invés de expandir, padrão iOS
@@ -360,7 +361,8 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
   const glowOpacity = glwP.interpolate({ inputRange: [0, 1], outputRange: [0.18, 0.52] });
 
   // Dimensões para render (dependem de containerWidth, atualizam normalmente)
-  const tabW = containerWidth > 0 ? containerWidth / TABS.length : 0;
+  const tabCount = navTabs.length;
+  const tabW = containerWidth > 0 ? containerWidth / tabCount : 0;
   const bubW = tabW * BUBBLE_RATIO;
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -509,7 +511,7 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
           {/* ────────────────────────────────────────────────────────
               TABS — Ícones e Labels
           ──────────────────────────────────────────────────────── */}
-          {TABS.map((tab, idx) => {
+          {navTabs.map((tab, idx) => {
             const isActive = (state?.routes?.[activeIndex]?.name ?? '') === tab.route;
             return (
               <TouchableOpacity

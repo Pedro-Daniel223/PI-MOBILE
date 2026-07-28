@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useCallback,
   useEffect,
   useMemo,
@@ -28,11 +28,11 @@ import { styleSocioModal } from "../styles/styleSocios/styleSociosModal";
 import { stylesPerfil } from "../styles/stylePerfil/stylePerfil";
 import { escudoDrakos, user as defaultUser } from "../data/dataPerfil";
 import { fetchPurchaseHistory } from "../services/purchaseService";
+import { getMinhaAssinatura } from "../services/subscriptionService";
 
 import { useSubscription } from "../contexts/SubscriptionContext";
 import { useAuth } from "../contexts/AuthContext";
 
-const user = defaultUser;
 const DEFAULT_AVATAR = defaultUser.avatar;
 const EDITABLE_PROFILE_FIELDS = [
   "url_foto_clientes",
@@ -174,8 +174,10 @@ const getPlanIdentity = (subscription) => {
       title: null,
       price: null,
       colors: ["rgba(255,255,255,0.14)", "rgba(255,255,255,0.05)"],
+      cardColors: ["rgba(255,255,255,0.14)", "rgba(255,255,255,0.05)"],
       borderColor: "rgba(255,255,255,0.18)",
       glowColor: "rgba(255,255,255,0.08)",
+      accent: "#e8000f",
       textColor: "#ffffff",
     };
   }
@@ -191,9 +193,54 @@ const getPlanIdentity = (subscription) => {
     title: subscription.title || null,
     price: subscription.price || null,
     colors: meta.colors,
+    cardColors: meta.colors,
     borderColor: meta.borderColor,
     glowColor: meta.glowColor,
+    accent: meta.colors?.[1] || meta.colors?.[0] || "#e8000f",
     textColor: meta.textColor,
+  };
+};
+
+const normalizeAssinaturaResponse = (payload, fallbackPlan = null) => {
+  if (!payload) {
+    return null;
+  }
+
+  const plano =
+    payload.plano ||
+    payload.plan ||
+    payload.categoria_plano ||
+    payload.categoria ||
+    fallbackPlan ||
+    null;
+
+  const planoId =
+    payload.plano_id ?? payload.id_plano ?? plano?.id ?? fallbackPlan?.id ?? null;
+  const titulo =
+    payload.title ||
+    payload.nome ||
+    payload.nome_plano ||
+    plano?.title ||
+    fallbackPlan?.title ||
+    null;
+  const preco =
+    payload.price ||
+    payload.valor ||
+    payload.preco ||
+    plano?.price ||
+    fallbackPlan?.price ||
+    null;
+
+  return {
+    ...payload,
+    plano_id: planoId,
+    id: payload.id ?? planoId,
+    title: titulo,
+    nome: titulo,
+    nome_plano: titulo,
+    price: preco,
+    valor: preco,
+    plano,
   };
 };
 
@@ -390,7 +437,7 @@ export default function PerfilScreen({ navigation }) {
   const [editingField, setEditingField] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const { subscription } = useSubscription();
+  const { subscription, setSubscription } = useSubscription();
   const { cliente, token, signOut, updateCliente } = useAuth();
   const [purchaseHistory, setPurchaseHistory] = useState([]);
 
@@ -403,7 +450,7 @@ export default function PerfilScreen({ navigation }) {
     cpf: currentCliente.cpf,
     id: currentCliente.id_clientes,
     category: currentCliente.categoria_clientes,
-    status: currentCliente.categoria_clientes || user.status,
+    status: currentCliente.categoria_clientes || "",
   };
 
   const planIdentity = useMemo(
@@ -438,6 +485,35 @@ export default function PerfilScreen({ navigation }) {
     useCallback(() => {
       let isActive = true;
 
+      const loadSubscription = async () => {
+        if (!token) {
+          if (isActive) {
+            setSubscription(null);
+          }
+          return;
+        }
+
+        try {
+          const response = await getMinhaAssinatura(token);
+          const normalized = normalizeAssinaturaResponse(response);
+
+          if (isActive) {
+            setSubscription(normalized);
+          }
+        } catch (error) {
+          if (error?.status === 404) {
+            if (isActive) {
+              setSubscription(null);
+            }
+            return;
+          }
+
+          if (isActive) {
+            setSubscription(null);
+          }
+        }
+      };
+
       const loadPurchaseHistory = async () => {
         if (!token) {
           setPurchaseHistory([]);
@@ -456,12 +532,13 @@ export default function PerfilScreen({ navigation }) {
         }
       };
 
+      loadSubscription();
       loadPurchaseHistory();
 
       return () => {
         isActive = false;
       };
-    }, [token]),
+    }, [setSubscription, token]),
   );
 
   useEffect(() => {
@@ -615,9 +692,9 @@ export default function PerfilScreen({ navigation }) {
 
   return (
     <View style={stylesPerfil.container}>
-      {/* BACKGROUND GRADIENT */}
+      {/* BACKGROUND */}
       <LinearGradient
-        colors={["#b30000", "#5a0000", "#1a0000"]}
+        colors={["#150000", "#0a0a0a", "#050505"]}
         style={StyleSheet.absoluteFill}
       />
 
@@ -625,32 +702,58 @@ export default function PerfilScreen({ navigation }) {
         contentContainerStyle={stylesPerfil.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── HEADER COM AVATAR ── */}
-        <View style={stylesPerfil.header}>
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            HERO â€” Avatar cinematogrÃ¡fico + identificaÃ§Ã£o do sÃ³cio
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        <View style={stylesPerfil.hero}>
           <Image
             source={escudoDrakos}
-            style={stylesPerfil.drakosBg}
+            style={stylesPerfil.heroWatermark}
             resizeMode="contain"
           />
-          <View style={stylesPerfil.avatarWrapper}>
-            <Image
-              source={{ uri: currentAvatarUri }}
-              style={stylesPerfil.avatar}
+          <LinearGradient
+            colors={["transparent", "rgba(5,5,5,0.4)", "#050505"]}
+            style={stylesPerfil.heroFade}
+          />
+
+          <View style={stylesPerfil.avatarStage}>
+            <View
+              style={[
+                stylesPerfil.avatarGlow,
+                { backgroundColor: planIdentity.glowColor },
+              ]}
             />
+            <View
+              style={[
+                stylesPerfil.avatarRing,
+                { borderColor: planIdentity.borderColor },
+              ]}
+            >
+              <Image
+                source={{ uri: currentAvatarUri }}
+                style={stylesPerfil.avatar}
+              />
+            </View>
             <TouchableOpacity
               style={stylesPerfil.editAvatarBtn}
               activeOpacity={0.8}
               onPress={pickProfileImage}
             >
-              <Ionicons name="camera" size={14} color="#fff" />
+              <BlurView
+                intensity={30}
+                tint="dark"
+                style={StyleSheet.absoluteFill}
+              />
+              <Ionicons name="camera" size={13} color="#fff" />
             </TouchableOpacity>
           </View>
+
           <Text style={stylesPerfil.username}>{currentUser.name}</Text>
 
-          {/* ── IDENTIFICAÇÃO PREMIUM DO PLANO (substitui "Status atual: ...") ── */}
+          {/* Chip de status â€” identificaÃ§Ã£o premium do plano */}
           <View style={stylesPerfil.statusChip}>
             <BlurView
-              intensity={30}
+              intensity={34}
               tint="dark"
               style={StyleSheet.absoluteFill}
             />
@@ -682,231 +785,244 @@ export default function PerfilScreen({ navigation }) {
           </View>
         </View>
 
-        {/* ── CARD DE BOAS-VINDAS / PAINEL DE ASSINATURA ── */}
-        <View style={stylesPerfil.welcomeCard}>
-          <BlurView
-            intensity={40}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
-          <LinearGradient
-            colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={stylesPerfil.welcomeBorder} />
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            MEMBERSHIP CARD â€” cartÃ£o de sÃ³cio independente
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        {subscription ? (
+          <View style={stylesPerfil.membershipCard}>
+            <LinearGradient
+              colors={planIdentity.cardColors}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0.1, y: 0 }}
+              end={{ x: 0.9, y: 1 }}
+            />
+            <BlurView
+              intensity={16}
+              tint="dark"
+              style={[StyleSheet.absoluteFill, { opacity: 0.4 }]}
+            />
+            <View
+              style={[
+                stylesPerfil.membershipBorder,
+                { borderColor: planIdentity.borderColor },
+              ]}
+            />
+            <View style={stylesPerfil.membershipSpecularTop} />
 
-          <View style={stylesPerfil.welcomeHeader}>
-            <Text style={stylesPerfil.welcomeTitle}>Seja bem-vindo</Text>
-            <TouchableOpacity
-              style={stylesPerfil.notifBadge}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="notifications-outline" size={22} color="#fff" />
-              <View style={stylesPerfil.notifDot} />
-            </TouchableOpacity>
-          </View>
-
-          <Text style={stylesPerfil.welcomeBody}>
-            Olá, {currentUser.name}
-            {"\n"}Explore as novidades, confira seus dados e aproveite ao máximo
-            sua experiência com a gente!
-          </Text>
-
-          {subscription ? (
-            /* ── ESTADO SÓCIO: painel com plano, benefícios e status ── */
-            <View style={stylesPerfil.planPanel}>
-              <LinearGradient
-                colors={[planIdentity.glowColor, "transparent"]}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              />
-              <View
-                style={[
-                  stylesPerfil.planPanelBorder,
-                  { borderColor: planIdentity.borderColor },
-                ]}
-              />
-
-              <View style={stylesPerfil.planPanelHeader}>
-                <View style={stylesPerfil.planPanelHeaderLeft}>
-                  <Text style={stylesPerfil.planPanelEmoji}>
-                    {planIdentity.emoji}
-                  </Text>
-                  <View>
-                    <Text style={stylesPerfil.planPanelTitle}>
-                      {planIdentity.title || planIdentity.label}
-                    </Text>
-                    <View style={stylesPerfil.planPanelStatusRow}>
-                      <View style={stylesPerfil.planPanelStatusDot} />
-                      <Text style={stylesPerfil.planPanelStatusText}>
-                        Assinatura ativa
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                {planIdentity.price ? (
-                  <Text style={stylesPerfil.planPanelPrice}>
-                    {planIdentity.price}
-                  </Text>
-                ) : null}
+            <View style={stylesPerfil.membershipTopRow}>
+              <View style={stylesPerfil.membershipBadge}>
+                <Ionicons
+                  name="shield-checkmark"
+                  size={12}
+                  color={planIdentity.accent}
+                />
+                <Text
+                  style={[
+                    stylesPerfil.membershipBadgeText,
+                    { color: planIdentity.accent },
+                  ]}
+                >
+                  MEMBRO ATIVO
+                </Text>
               </View>
+              <Text style={stylesPerfil.membershipEmoji}>
+                {planIdentity.emoji}
+              </Text>
+            </View>
 
-              <View style={stylesPerfil.planPanelDivider} />
+            <Text style={stylesPerfil.membershipTitle}>
+              {planIdentity.title || planIdentity.label}
+            </Text>
+            <Text style={stylesPerfil.membershipSubtitle}>
+              SÃ³cio-torcedor Drakos FC
+            </Text>
 
-              <View style={stylesPerfil.planPanelBenefits}>
-                <View style={stylesPerfil.planPanelBenefitItem}>
-                  <Ionicons name="checkmark-circle" size={15} color="#4ee08a" />
-                  <Text style={stylesPerfil.planPanelBenefitText}>
-                    Acesso aos benefícios do seu plano
+            <View style={stylesPerfil.membershipDivider} />
+
+            <View style={stylesPerfil.membershipFooterRow}>
+              <View style={stylesPerfil.membershipBenefits}>
+                <View style={stylesPerfil.membershipBenefitItem}>
+                  <View style={stylesPerfil.membershipBenefitDot} />
+                  <Text style={stylesPerfil.membershipBenefitText}>
+                    BenefÃ­cios ativos do plano
                   </Text>
                 </View>
-                <View style={stylesPerfil.planPanelBenefitItem}>
-                  <Ionicons name="checkmark-circle" size={15} color="#4ee08a" />
-                  <Text style={stylesPerfil.planPanelBenefitText}>
+                <View style={stylesPerfil.membershipBenefitItem}>
+                  <View style={stylesPerfil.membershipBenefitDot} />
+                  <Text style={stylesPerfil.membershipBenefitText}>
                     Prioridade em compras e ingressos
                   </Text>
                 </View>
               </View>
-
-              <TouchableOpacity
-                style={stylesPerfil.planPanelManageBtn}
-                activeOpacity={0.85}
-                onPress={() => navigation.navigate("Socio")}
-              >
-                <Text style={stylesPerfil.planPanelManageBtnText}>
-                  Gerenciar assinatura
+              {planIdentity.price ? (
+                <Text style={stylesPerfil.membershipPrice}>
+                  {planIdentity.price}
                 </Text>
-                <Ionicons name="chevron-forward" size={14} color="#fff" />
-              </TouchableOpacity>
+              ) : null}
             </View>
-          ) : (
-            /* ── ESTADO NÃO-SÓCIO: incentivo à assinatura ── */
-            <View style={stylesPerfil.planPanel}>
-              <LinearGradient
-                colors={["rgba(232,0,15,0.14)", "transparent"]}
+
+            <TouchableOpacity
+              style={stylesPerfil.membershipManageBtn}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate("Socio")}
+            >
+              <BlurView
+                intensity={24}
+                tint="dark"
                 style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
               />
-              <View style={stylesPerfil.planPanelBorder} />
-
-              <View style={stylesPerfil.planPanelPromoHeader}>
-                <Ionicons name="star-outline" size={20} color="#ffd166" />
-                <Text style={stylesPerfil.planPanelPromoTitle}>
-                  Torne-se Sócio Drakos
-                </Text>
-              </View>
-              <Text style={stylesPerfil.planPanelPromoBody}>
-                Descontos exclusivos, prioridade em ingressos e experiências
-                only para sócios.
+              <View style={stylesPerfil.membershipManageBorder} />
+              <Text style={stylesPerfil.membershipManageBtnText}>
+                Gerenciar assinatura
               </Text>
+              <Ionicons name="chevron-forward" size={14} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={stylesPerfil.membershipPromo}
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate("Socio")}
+          >
+            <LinearGradient
+              colors={["#2a0004", "#150002", "#0a0a0a"]}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0.1, y: 0 }}
+              end={{ x: 0.9, y: 1 }}
+            />
+            <View style={stylesPerfil.membershipBorder} />
+            <View style={stylesPerfil.membershipSpecularTop} />
 
-              <TouchableOpacity
-                style={stylesPerfil.planPanelCta}
-                activeOpacity={0.85}
-                onPress={() => navigation.navigate("Socio")}
-              >
-                <LinearGradient
-                  colors={["#e8000f", "#a3000a"]}
-                  style={StyleSheet.absoluteFill}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                />
-                <Text style={stylesPerfil.planPanelCtaText}>Ver planos</Text>
-                <Ionicons name="arrow-forward" size={14} color="#fff" />
-              </TouchableOpacity>
+            <View style={stylesPerfil.membershipPromoIconWrap}>
+              <Ionicons name="shield-outline" size={22} color="#e8000f" />
             </View>
-          )}
+            <View style={stylesPerfil.membershipPromoTextGroup}>
+              <Text style={stylesPerfil.membershipPromoTitle}>
+                Torne-se SÃ³cio Drakos
+              </Text>
+              <Text style={stylesPerfil.membershipPromoBody}>
+                Descontos exclusivos, prioridade em ingressos e experiÃªncias
+                only para sÃ³cios.
+              </Text>
+            </View>
+            <View style={stylesPerfil.membershipPromoCta}>
+              <Text style={stylesPerfil.membershipPromoCtaText}>Ver planos</Text>
+              <Ionicons name="arrow-forward" size={15} color="#e8000f" />
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            BOAS-VINDAS â€” mensagem leve
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        <View style={stylesPerfil.welcomeCard}>
+          <BlurView
+            intensity={36}
+            tint="dark"
+            style={StyleSheet.absoluteFill}
+          />
+          <LinearGradient
+            colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={stylesPerfil.welcomeBorder} />
+
+          <View style={stylesPerfil.welcomeIconWrap}>
+            <Ionicons name="sparkles-outline" size={16} color="#e8000f" />
+          </View>
+          <Text style={stylesPerfil.welcomeBody}>
+            OlÃ¡, {currentUser.name.split(" ")[0]}. Explore as novidades,
+            confira seus dados e aproveite ao mÃ¡ximo sua experiÃªncia com a
+            gente.
+          </Text>
+          <TouchableOpacity
+            style={stylesPerfil.notifBadge}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="notifications-outline" size={19} color="#fff" />
+            <View style={stylesPerfil.notifDot} />
+          </TouchableOpacity>
         </View>
 
-        {/* ── AÇÕES RÁPIDAS COM BACKGROUND SUAVE ── */}
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            AÃ‡Ã•ES RÃPIDAS
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        <Text style={stylesPerfil.groupLabel}>Acesso rÃ¡pido</Text>
         <View style={stylesPerfil.actionsRow}>
-          <TouchableOpacity style={stylesPerfil.actionCard}>
+          <TouchableOpacity style={stylesPerfil.actionCard} activeOpacity={0.85}>
             <BlurView
-              intensity={40}
+              intensity={34}
               tint="dark"
               style={StyleSheet.absoluteFill}
             />
-            <LinearGradient
-              colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
-              style={StyleSheet.absoluteFill}
-            />
             <View style={stylesPerfil.actionBorder} />
-            <View style={stylesPerfil.actionContent}>
-              <Ionicons name="card-outline" size={28} color="#fff" />
-              <Text style={stylesPerfil.actionLabel}>Meu Cartão</Text>
+            <View style={stylesPerfil.actionIconWrap}>
+              <Ionicons name="card-outline" size={20} color="#fff" />
             </View>
+            <Text style={stylesPerfil.actionLabel}>Meu CartÃ£o</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={stylesPerfil.actionCard}
+            activeOpacity={0.85}
             onPress={() => setShowHistory((prev) => !prev)}
           >
             <BlurView
-              intensity={40}
+              intensity={34}
               tint="dark"
               style={StyleSheet.absoluteFill}
             />
-            <LinearGradient
-              colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
-              style={StyleSheet.absoluteFill}
-            />
             <View style={stylesPerfil.actionBorder} />
-            <View style={stylesPerfil.actionContent}>
-              <Ionicons name="receipt-outline" size={28} color="#fff" />
-              <Text style={stylesPerfil.actionLabel}>Minhas Compras</Text>
+            <View style={stylesPerfil.actionIconWrap}>
+              <Ionicons name="receipt-outline" size={20} color="#fff" />
             </View>
+            <Text style={stylesPerfil.actionLabel}>Compras</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={stylesPerfil.actionCard}
+            activeOpacity={0.85}
             onPress={() => navigation.navigate("Socio")}
           >
             <BlurView
-              intensity={40}
+              intensity={34}
               tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
-            <LinearGradient
-              colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
               style={StyleSheet.absoluteFill}
             />
             <View style={stylesPerfil.actionBorder} />
-            <View style={stylesPerfil.actionContent}>
-              <Ionicons name="people-outline" size={28} color="#fff" />
-              <Text style={stylesPerfil.actionLabel} numberOfLines={2}>
-                {planIdentity.isSocio
-                  ? `${planIdentity.emoji} ${planIdentity.label}`
-                  : "Sócio"}
-              </Text>
+            <View style={stylesPerfil.actionIconWrap}>
+              <Ionicons name="people-outline" size={20} color="#fff" />
             </View>
+            <Text style={stylesPerfil.actionLabel}>SÃ³cio</Text>
           </TouchableOpacity>
         </View>
 
-        {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS COM BACKGROUND SUAVE ── */}
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            HISTÃ“RICO
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
         {showHistory && (
           <View style={stylesPerfil.historySection}>
             <BlurView
-              intensity={40}
+              intensity={36}
               tint="dark"
               style={StyleSheet.absoluteFill}
             />
             <LinearGradient
-              colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
+              colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
               style={StyleSheet.absoluteFill}
             />
             <View style={stylesPerfil.historyBorder} />
 
             <View style={stylesPerfil.historyHeader}>
               <Text style={stylesPerfil.historyTitle}>
-                Minhas Compras e Assinaturas
+                Compras e assinaturas
               </Text>
               <TouchableOpacity
                 onPress={() => setShowHistory(false)}
                 activeOpacity={0.7}
+                style={stylesPerfil.historyCloseBtn}
               >
-                <Ionicons name="close" size={20} color="#fff" />
+                <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
             </View>
 
@@ -926,21 +1042,34 @@ export default function PerfilScreen({ navigation }) {
               </View>
             )}
 
-            <Text style={stylesPerfil.historyListTitle}>Histórico</Text>
+            <Text style={stylesPerfil.historyListTitle}>HistÃ³rico</Text>
 
-            {purchaseHistory && purchaseHistory.length > 0 ? (
-              purchaseHistory.map((item, idx) => (
+            {(() => {
+              const historyList = Array.isArray(purchaseHistory)
+                ? purchaseHistory
+                : [];
+
+              return historyList.length > 0 ? (
+                historyList.map((item, idx) => (
                 <React.Fragment key={item.id}>
                   <View style={stylesPerfil.historyRow}>
                     {item.type === "subscription" ? (
-                      <Ionicons name="star-outline" size={22} color="#ffd700" />
+                      <View style={stylesPerfil.historyIconWrap}>
+                        <Ionicons
+                          name="shield-checkmark-outline"
+                          size={16}
+                          color="#e8000f"
+                        />
+                      </View>
                     ) : item.itemImages && item.itemImages[0] ? (
                       <Image
                         source={item.itemImages[0]}
                         style={stylesPerfil.historyProductImage}
                       />
                     ) : (
-                      <Ionicons name="bag-outline" size={18} color="#ff2b2b" />
+                      <View style={stylesPerfil.historyIconWrap}>
+                        <Ionicons name="bag-outline" size={16} color="#e8000f" />
+                      </View>
                     )}
                     <View style={stylesPerfil.historyInfo}>
                       <Text style={stylesPerfil.historyPlan}>
@@ -956,27 +1085,30 @@ export default function PerfilScreen({ navigation }) {
                     </View>
                     <Text style={stylesPerfil.historyPrice}>{item.price}</Text>
                   </View>
-                  {idx < purchaseHistory.length - 1 && (
+                  {idx < historyList.length - 1 && (
                     <View style={stylesPerfil.historyDivider} />
                   )}
                 </React.Fragment>
-              ))
-            ) : (
+                ))
+              ) : (
               <View style={stylesPerfil.historyEmpty}>
                 <Ionicons
                   name="document-text-outline"
-                  size={36}
-                  color="rgba(255,255,255,0.3)"
+                  size={32}
+                  color="rgba(255,255,255,0.25)"
                 />
                 <Text style={stylesPerfil.historyEmptyText}>
                   Nenhuma compra ou assinatura ainda
                 </Text>
               </View>
-            )}
+              );
+            })()}
           </View>
         )}
 
-        {/* ── DIVISOR DADOS PESSOAIS ── */}
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            DADOS PESSOAIS
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
         <View style={stylesPerfil.sectionHeaderCustom}>
           <Text style={stylesPerfil.sectionTitle}>Dados pessoais</Text>
           <TouchableOpacity
@@ -984,26 +1116,27 @@ export default function PerfilScreen({ navigation }) {
             onPress={() => setEditModalVisible(true)}
             activeOpacity={0.7}
           >
-            <Ionicons name="pencil-outline" size={20} color="#fff" />
+            <Ionicons name="pencil-outline" size={16} color="#fff" />
           </TouchableOpacity>
         </View>
 
-        {/* ── CARD DADOS PESSOAIS ── */}
         <View style={stylesPerfil.infoCard}>
           <BlurView
-            intensity={40}
+            intensity={36}
             tint="dark"
             style={StyleSheet.absoluteFill}
           />
           <LinearGradient
-            colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
+            colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
             style={StyleSheet.absoluteFill}
           />
           <View style={stylesPerfil.infoBorder} />
 
           <View style={stylesPerfil.infoRow}>
             <View style={stylesPerfil.infoLeft}>
-              <Ionicons name="person-outline" size={20} color="#ffffff" />
+              <View style={stylesPerfil.infoIconWrap}>
+                <Ionicons name="person-outline" size={16} color="#fff" />
+              </View>
               <View style={stylesPerfil.infoTextGroup}>
                 <Text style={stylesPerfil.infoLabel}>Nome completo</Text>
                 <Text style={stylesPerfil.infoValue}>{currentUser.name}</Text>
@@ -1015,7 +1148,9 @@ export default function PerfilScreen({ navigation }) {
 
           <View style={stylesPerfil.infoRow}>
             <View style={stylesPerfil.infoLeft}>
-              <Ionicons name="mail-outline" size={20} color="#ffffff" />
+              <View style={stylesPerfil.infoIconWrap}>
+                <Ionicons name="mail-outline" size={16} color="#fff" />
+              </View>
               <View style={stylesPerfil.infoTextGroup}>
                 <Text style={stylesPerfil.infoLabel}>Email</Text>
                 <Text style={stylesPerfil.infoValue}>{currentUser.email}</Text>
@@ -1027,7 +1162,9 @@ export default function PerfilScreen({ navigation }) {
 
           <View style={stylesPerfil.infoRow}>
             <View style={stylesPerfil.infoLeft}>
-              <Ionicons name="call-outline" size={20} color="#ffffff" />
+              <View style={stylesPerfil.infoIconWrap}>
+                <Ionicons name="call-outline" size={16} color="#fff" />
+              </View>
               <View style={stylesPerfil.infoTextGroup}>
                 <Text style={stylesPerfil.infoLabel}>Telefone</Text>
                 <Text style={stylesPerfil.infoValue}>{currentUser.phone}</Text>
@@ -1036,27 +1173,22 @@ export default function PerfilScreen({ navigation }) {
           </View>
         </View>
 
-        {/* BOTÃO SAIR */}
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            SAIR
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
         <TouchableOpacity
           style={stylesPerfil.logoutBtn}
           activeOpacity={0.8}
           onPress={handleLogout}
         >
-          <LinearGradient
-            colors={["rgba(255,0,0,0.2)", "rgba(255,0,0,0.1)"]}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
           <BlurView
-            intensity={20}
+            intensity={22}
             tint="dark"
             style={StyleSheet.absoluteFill}
           />
           <View style={stylesPerfil.logoutBorder} />
-          <Ionicons name="log-out-outline" size={22} color="#ff6b6b" />
+          <Ionicons name="log-out-outline" size={18} color="#ff6b6b" />
           <Text style={stylesPerfil.logoutText}>Sair da conta</Text>
-          <Ionicons name="chevron-forward-outline" size={18} color="#ff6b6b" />
         </TouchableOpacity>
 
         <View style={{ height: 20 }} />
@@ -1314,7 +1446,7 @@ export default function PerfilScreen({ navigation }) {
                 <ReadOnlyField
                   label="Categoria"
                   icon="ribbon-outline"
-                  value={currentUser.category || currentUser.status}
+                  value={currentUser.category || currentUser.status || ""}
                 />
               </ScrollView>
 

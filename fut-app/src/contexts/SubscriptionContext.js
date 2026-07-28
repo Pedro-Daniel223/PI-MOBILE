@@ -20,13 +20,14 @@ export function SubscriptionProvider({ children }) {
   };
 
   const addToPurchaseHistory = (items, total) => {
+    const safeItems = Array.isArray(items) ? items : [];
     const now = new Date();
     const entry = {
       id: Date.now() + Math.random(),
       type: 'purchase',
-      title: items.length > 1 ? `${items.length} produtos` : '1 produto',
-      items: items.map(item => item.nome || 'Produto'),
-      itemImages: items.map(item => {
+      title: safeItems.length > 1 ? `${safeItems.length} produtos` : '1 produto',
+      items: safeItems.map(item => item.nome || 'Produto'),
+      itemImages: safeItems.map(item => {
         if (Array.isArray(item.imagens) && item.imagens.length > 0) return item.imagens[0];
         if (item.imagem) return item.imagem;
         if (item.image) return item.image;
