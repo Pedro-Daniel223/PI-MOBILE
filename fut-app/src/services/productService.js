@@ -59,43 +59,17 @@ const buildImageUrl = (path) => {
     return null;
   }
 
-  if (/^https?:\/\//i.test(rawPath)) {
-    console.log('[productService] image url already absolute', {
+  if (/^https?:\/\//i.test(rawPath) || rawPath.startsWith('data:')) {
+    console.log('[productService] image url preserved as absolute', {
       rawPath,
-      finalUrl: rawPath,
     });
     return rawPath;
   }
 
-  const normalizedPath = rawPath.replace(/^\/+/, '');
-  let finalPath = normalizedPath;
-
-  if (normalizedPath.startsWith('static/')) {
-    finalPath = normalizedPath;
-  } else if (normalizedPath.startsWith('media/')) {
-    finalPath = normalizedPath;
-  } else {
-    finalPath = `media/${normalizedPath}`;
-  }
-
-  try {
-    const finalUrl = new URL(`/${finalPath}`, BASE_URL).toString();
-    console.log('[productService] image url resolved', {
-      rawPath,
-      finalPath,
-      finalUrl,
-    });
-    return finalUrl;
-  } catch {
-    const normalizedBaseUrl = String(BASE_URL || '').replace(/\/+$/, '');
-    const finalUrl = `${normalizedBaseUrl}/${finalPath}`;
-    console.log('[productService] image url resolved via fallback join', {
-      rawPath,
-      finalPath,
-      finalUrl,
-    });
-    return finalUrl;
-  }
+  console.log('[productService] image url preserved as raw value', {
+    rawPath,
+  });
+  return rawPath;
 };
 
 const normalizeImages = (produto = {}) => {
