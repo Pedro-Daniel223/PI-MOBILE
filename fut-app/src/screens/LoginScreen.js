@@ -155,12 +155,12 @@ export default function LoginScreen({ navigation }) {
                   textStyle={stylesLogin.buttonTitle}
                 />
 
-                {isBiometricSupported && (
+                {/* {isBiometricSupported && (
                   <TouchableOpacity onPress={handleBiometricAuth} style={stylesLogin.biometricBtn}>
                     <Ionicons name="finger-print" size={24} color={colors.primary} />
                     <Text style={stylesLogin.biometricText}>Entrar com Biometria</Text>
                   </TouchableOpacity>
-                )}
+                )} */}
               </View>
             </View>
 
