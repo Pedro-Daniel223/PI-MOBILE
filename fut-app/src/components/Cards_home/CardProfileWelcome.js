@@ -1,19 +1,19 @@
-/**
- * CardProfileWelcome — Premium Liquid Glass Edition
- * ─────────────────────────────────────────────────────────────────────────────
- * Lógica original 100% preservada.
+﻿/**
+ * CardProfileWelcome â€” Premium Liquid Glass Edition
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ * LÃ³gica original 100% preservada.
  * Apenas a camada visual foi reescrita com a engenharia do PremiumGlassCard.
  *
- * Arquitetura de camadas (baixo → cima):
+ * Arquitetura de camadas (baixo â†’ cima):
  *
- *  [outerContainer] — sem overflow:hidden, ancora camadas especulares
+ *  [outerContainer] â€” sem overflow:hidden, ancora camadas especulares
  *   C0. Glow de respiro vermelho (Animated, vaza para fora)
- *   S1. Sombra de levitação (grande, difusa)
- *   S2. Sombra de contato (próxima, sharp)
+ *   S1. Sombra de levitaÃ§Ã£o (grande, difusa)
+ *   S2. Sombra de contato (prÃ³xima, sharp)
  *
- *  [wrapper] — overflow:hidden (clip do shimmer e blurs)
- *   G1. BlurView primário (base fosca, intensity 90)
- *   G2. BlurView secundário (profundidade, intensity 22)
+ *  [wrapper] â€” overflow:hidden (clip do shimmer e blurs)
+ *   G1. BlurView primÃ¡rio (base fosca, intensity 90)
+ *   G2. BlurView secundÃ¡rio (profundidade, intensity 22)
  *   G3. Tom base escuro diagonal
  *   G4. Reflexo ambiental superior-esquerdo
  *   G5. Highlight de volume central (curvatura 3D)
@@ -21,16 +21,16 @@
  *   G7. Tint vermelho sutil (identidade da marca)
  *   G8. Shimmer diagonal animado (Animated)
  *   G9. glowOverlay vermelho (preservado do original)
- *   ── Conteúdo original intacto ──
+ *   â”€â”€ ConteÃºdo original intacto â”€â”€
  *
- *  [specular — fora do clip]
+ *  [specular â€” fora do clip]
  *   E1. Barra especular superior (1px)
  *   E2. Rim light esquerdo (1px vertical)
- *   E3. Franja cromática inferior (tom quente/vermelho)
- *   E4. Franja âmbar superior-direita
+ *   E3. Franja cromÃ¡tica inferior (tom quente/vermelho)
+ *   E4. Franja Ã¢mbar superior-direita
  *   E5. Anel externo (0.75px branco)
  *   E6. Anel interno inset (0.5px branco recuado)
- * ─────────────────────────────────────────────────────────────────────────────
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  */
 
 import { Ionicons } from '@expo/vector-icons';
@@ -49,6 +49,7 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const { Value, timing, loop, sequence, delay } = Animated;
@@ -61,13 +62,18 @@ export default function CardProfileWelcome({
   // const [isDarkMode, setIsDarkMode] = useState(true);
   const navigation = useNavigation();
   const { cliente } = useAuth();
+  const { subscription } = useSubscription();
   const avatarUri = cliente?.url_foto_clientes?.trim() || 'https://i.pravatar.cc/150?img=12';
 
-  // ── Lógica original — intacta ─────────────────────────────────────────────
+  // â”€â”€ LÃ³gica original â€” intacta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const nomeCompleto = [
     cliente?.nome_clientes?.trim(),
     cliente?.sobrenome_clientes?.trim(),
-  ].filter(Boolean).join(' ').trim() || 'Usuário';
+  ].filter(Boolean).join(' ').trim() || 'UsuÃ¡rio';
+  const statusAssinatura = subscription?.title
+    || subscription?.nome_plano
+    || subscription?.plan?.title
+    || 'Não sócio';
 
   const fullText = [
     'Seja bem-vindo',
@@ -110,9 +116,9 @@ export default function CardProfileWelcome({
 
     return () => clearInterval(interval);
   }, [charIndex, lineIndex]);
-  // ── fim lógica original ───────────────────────────────────────────────────
+  // â”€â”€ fim lÃ³gica original â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  // ── Animações visuais (novas — não interferem na lógica existente) ────────
+  // â”€â”€ AnimaÃ§Ãµes visuais (novas â€” nÃ£o interferem na lÃ³gica existente) â”€â”€â”€â”€â”€â”€â”€â”€
   const shimmerAnim = useRef(new Value(0)).current;
   const breatheAnim = useRef(new Value(0)).current;
 
@@ -141,7 +147,7 @@ export default function CardProfileWelcome({
     return () => anim.stop();
   }, []);
 
-  // Valores derivados das animações
+  // Valores derivados das animaÃ§Ãµes
   const shimmerX = shimmerAnim.interpolate({
     inputRange:  [0, 1],
     outputRange: [-(SCREEN_WIDTH * 1.3), SCREEN_WIDTH * 1.3],
@@ -151,16 +157,16 @@ export default function CardProfileWelcome({
     inputRange:  [0, 1],
     outputRange: [0, 0.18],
   });
-  // ── fim animações ─────────────────────────────────────────────────────────
+  // â”€â”€ fim animaÃ§Ãµes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <View style={styles.outerContainer}>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          CAMADA 0 — Glow de respiro vermelho
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          CAMADA 0 â€” Glow de respiro vermelho
           Halo de luz crimson que pulsa ao redor do card, identidade
-          da marca preservada e elevada ao nível de emissão física.
-      ════════════════════════════════════════════════════════════════════ */}
+          da marca preservada e elevada ao nÃ­vel de emissÃ£o fÃ­sica.
+      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <Animated.View
         pointerEvents="none"
         style={{
@@ -183,14 +189,14 @@ export default function CardProfileWelcome({
         />
       </Animated.View>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          CORPO DE VIDRO — overflow:hidden (clip do shimmer)
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          CORPO DE VIDRO â€” overflow:hidden (clip do shimmer)
           As sombras ficam no outerContainer (sem overflow) para renderizar
-          corretamente no iOS — melhoria implícita da arquitetura original.
-      ════════════════════════════════════════════════════════════════════ */}
+          corretamente no iOS â€” melhoria implÃ­cita da arquitetura original.
+      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <View style={styles.wrapper}>
 
-        {/* Botão de configurações — zIndex 10, preservado integralmente */}
+        {/* BotÃ£o de configuraÃ§Ãµes â€” zIndex 10, preservado integralmente */}
         <TouchableOpacity
           style={styles.editButton}
           onPress={() => navigation.navigate('Loja', { screen: 'Carrinho' })}
@@ -213,21 +219,21 @@ export default function CardProfileWelcome({
           </BlurView>
         </TouchableOpacity>
 
-        {/* G1: BlurView primário — base fosca principal */}
+        {/* G1: BlurView primÃ¡rio â€” base fosca principal */}
         <BlurView
           intensity={90}
           tint="dark"
           style={StyleSheet.absoluteFill}
         />
 
-        {/* G2: BlurView secundário — profundidade adicional */}
+        {/* G2: BlurView secundÃ¡rio â€” profundidade adicional */}
         <BlurView
           intensity={22}
           tint="dark"
           style={[StyleSheet.absoluteFill, { opacity: 0.55 }]}
         />
 
-        {/* G3: Tom base escuro — diagonal para dinamismo */}
+        {/* G3: Tom base escuro â€” diagonal para dinamismo */}
         <LinearGradient
           colors={[
             'rgba(192, 192, 192, 0.07)',
@@ -240,7 +246,7 @@ export default function CardProfileWelcome({
         />
 
         {/* G4: Reflexo ambiental superior-esquerdo
-            Fonte de luz de estúdio — efeito visionOS clássico */}
+            Fonte de luz de estÃºdio â€” efeito visionOS clÃ¡ssico */}
         <LinearGradient
           colors={[
             'rgba(255, 255, 255, 0.12)',
@@ -253,7 +259,7 @@ export default function CardProfileWelcome({
         />
 
         {/* G5: Highlight de volume central
-            Centro levemente mais brilhante — curvatura ilusória 3D */}
+            Centro levemente mais brilhante â€” curvatura ilusÃ³ria 3D */}
         <LinearGradient
           colors={[
             'transparent',
@@ -268,7 +274,7 @@ export default function CardProfileWelcome({
         />
 
         {/* G6: Vignette de profundidade inferior
-            Parte inferior mais densa — reforça espessura do material */}
+            Parte inferior mais densa â€” reforÃ§a espessura do material */}
         <LinearGradient
           colors={[
             'transparent',
@@ -281,7 +287,7 @@ export default function CardProfileWelcome({
           end={{ x: 0.5, y: 1 }}
         />
 
-        {/* G7: Tint vermelho sutil — identidade da marca no material */}
+        {/* G7: Tint vermelho sutil â€” identidade da marca no material */}
           <LinearGradient
             colors={[
               'transparent',
@@ -293,7 +299,7 @@ export default function CardProfileWelcome({
           />
 
         {/* G8: Shimmer diagonal
-            Faixa de luz percorrendo o card — reflexo de luz ambiente */}
+            Faixa de luz percorrendo o card â€” reflexo de luz ambiente */}
         <Animated.View
           pointerEvents="none"
           style={{
@@ -323,10 +329,10 @@ export default function CardProfileWelcome({
           />
         </Animated.View>
 
-        {/* G9: glowOverlay vermelho — preservado do original */}
+        {/* G9: glowOverlay vermelho â€” preservado do original */}
         <View style={styles.glowOverlay} />
 
-        {/* ── CONTEÚDO — preservado integralmente ──────────────────────── */}
+        {/* â”€â”€ CONTEÃšDO â€” preservado integralmente â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 
         {/* HEADER */}
         <View style={styles.topRow}>
@@ -348,12 +354,12 @@ export default function CardProfileWelcome({
           <View>
             <Text style={styles.statusTitle}>Status atual:</Text>
             <View style={styles.statusChip}>
-              <Text style={styles.statusText}>Não-sócio</Text>
+              <Text style={styles.statusText}>{statusAssinatura}</Text>
             </View>
           </View>
         </View>
 
-        {/* TEXTO ANIMADO — states e lógica 100% intactos */}
+        {/* TEXTO ANIMADO â€” states e lÃ³gica 100% intactos */}
         <View style={styles.textContainer}>
           <Text style={styles.text}>{displayedText[0]}</Text>
 
@@ -364,11 +370,11 @@ export default function CardProfileWelcome({
           <Text style={styles.text}>{displayedText[2]}</Text>
         </View>
 
-        {/* AÇÕES — eventos e estrutura preservados */}
+        {/* AÃ‡Ã•ES â€” eventos e estrutura preservados */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity style={styles.actionButton}>
             <BlurView intensity={30} tint="dark" style={styles.actionBlur}>
-              {/* Linha especular interna do botão */}
+              {/* Linha especular interna do botÃ£o */}
               <View style={styles.actionBlurSpecular} />
               <Ionicons name="card-outline" size={16} color="#fff" />
               <Text style={styles.actionText}>Plano</Text>
@@ -377,14 +383,14 @@ export default function CardProfileWelcome({
         </View>
 
       </View>
-      {/* ── fim wrapper ───────────────────────────────────────────────────── */}
+      {/* â”€â”€ fim wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 
-      {/* ════════════════════════════════════════════════════════════════════
-          CAMADA ESPECULAR — fora do overflow:hidden
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          CAMADA ESPECULAR â€” fora do overflow:hidden
           Renderizadas sobre o vidro, sem serem recortadas pelo clip.
-      ════════════════════════════════════════════════════════════════════ */}
+      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
 
-      {/* E1: Barra especular superior — a "linha diagnóstica" do vidro real */}
+      {/* E1: Barra especular superior â€” a "linha diagnÃ³stica" do vidro real */}
       <View
         pointerEvents="none"
         style={{
@@ -413,7 +419,7 @@ export default function CardProfileWelcome({
         />
       </View>
 
-      {/* E2: Rim light esquerdo — iluminação de estúdio lateral */}
+      {/* E2: Rim light esquerdo â€” iluminaÃ§Ã£o de estÃºdio lateral */}
       <View
         pointerEvents="none"
         style={{
@@ -440,7 +446,7 @@ export default function CardProfileWelcome({
         />
       </View>
 
-      {/* E3: Franja cromática inferior — refração de ondas curtas (tom quente) */}
+      {/* E3: Franja cromÃ¡tica inferior â€” refraÃ§Ã£o de ondas curtas (tom quente) */}
       <View
         pointerEvents="none"
         style={{
@@ -467,7 +473,7 @@ export default function CardProfileWelcome({
         />
       </View>
 
-      {/* E4: Franja âmbar — borda superior-direita (refração de ondas longas) */}
+      {/* E4: Franja Ã¢mbar â€” borda superior-direita (refraÃ§Ã£o de ondas longas) */}
       <View
         pointerEvents="none"
         style={{
@@ -493,7 +499,7 @@ export default function CardProfileWelcome({
         />
       </View>
 
-      {/* E5: Anel externo — envelope do vidro (0.75px) */}
+      {/* E5: Anel externo â€” envelope do vidro (0.75px) */}
       <View
         pointerEvents="none"
         style={{
@@ -504,8 +510,8 @@ export default function CardProfileWelcome({
         }}
       />
 
-      {/* E6: Anel interno inset — espessura do vidro (0.5px, recuado 1.5px)
-          Detalhe que separa o premium do comum: as duas superfícies do material */}
+      {/* E6: Anel interno inset â€” espessura do vidro (0.5px, recuado 1.5px)
+          Detalhe que separa o premium do comum: as duas superfÃ­cies do material */}
       <View
         pointerEvents="none"
         style={{
@@ -524,16 +530,16 @@ export default function CardProfileWelcome({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const styles = StyleSheet.create({
 
-  // Container externo — sem overflow:hidden para receber camadas especulares.
-  // Sombras movidas para cá pois overflow:hidden as anula no iOS.
+  // Container externo â€” sem overflow:hidden para receber camadas especulares.
+  // Sombras movidas para cÃ¡ pois overflow:hidden as anula no iOS.
   outerContainer: {
     marginTop:  50,
     borderRadius: 28,
 
-    // S1: Sombra de levitação — grande, difusa
+    // S1: Sombra de levitaÃ§Ã£o â€” grande, difusa
     shadowColor:   '#1a0a0a',
     shadowOpacity: 0.42,
     shadowRadius:  36,
@@ -541,7 +547,7 @@ const styles = StyleSheet.create({
     elevation:     18,
   },
 
-  // Corpo do vidro — overflow:hidden necessário para clicar o shimmer e blurs
+  // Corpo do vidro â€” overflow:hidden necessÃ¡rio para clicar o shimmer e blurs
   wrapper: {
     padding:         20,
     borderRadius:    28,
@@ -549,7 +555,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 
-  // ── Conteúdo ─────────────────────────────────────────────────────────────
+  // â”€â”€ ConteÃºdo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   topRow: {
     flexDirection:  'row',
@@ -584,7 +590,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Chip de status — refinado visualmente
+  // Chip de status â€” refinado visualmente
   statusChip: {
     marginTop:       3,
     paddingVertical: 2,
@@ -604,7 +610,7 @@ const styles = StyleSheet.create({
   },
 
   textContainer: {
-    // preservado — sem alterações
+    // preservado â€” sem alteraÃ§Ãµes
   },
 
   text: {
@@ -614,7 +620,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
 
-  // Nome em vermelho — preservado integralmente
+  // Nome em vermelho â€” preservado integralmente
   name: {
     color:           '#ff2b2b',
     textShadowColor:  'rgba(255,0,0,0.8)',
@@ -622,7 +628,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
   },
 
-  // glowOverlay vermelho — preservado
+  // glowOverlay vermelho â€” preservado
   glowOverlay: {
     position:        'absolute',
     top:             0,
@@ -633,7 +639,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 
-  // Botão de settings — preservado
+  // BotÃ£o de settings â€” preservado
   editButton: {
     position: 'absolute',
     top:      16,
@@ -656,7 +662,7 @@ const styles = StyleSheet.create({
     borderColor:  'rgba(255,255,255,0.18)',
   },
 
-  // ── Ações ────────────────────────────────────────────────────────────────
+  // â”€â”€ AÃ§Ãµes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   actionsContainer: {
     marginTop:  20,
@@ -678,7 +684,7 @@ const styles = StyleSheet.create({
     borderColor:     'rgba(255,255,255,0.16)',
   },
 
-  // Linha especular interna do botão — aresta de vidro
+  // Linha especular interna do botÃ£o â€” aresta de vidro
   actionBlurSpecular: {
     position:        'absolute',
     top:             0,
@@ -698,3 +704,4 @@ const styles = StyleSheet.create({
   },
 
 });
+

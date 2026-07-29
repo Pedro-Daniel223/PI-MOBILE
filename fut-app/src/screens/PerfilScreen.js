@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useCallback,
   useEffect,
   useMemo,
@@ -25,7 +25,6 @@ import { BlurView } from "expo-blur";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect } from "@react-navigation/native";
 import { styleSocioModal } from "../styles/styleSocios/styleSociosModal";
-import { stylesPerfil } from "../styles/stylePerfil/stylePerfil";
 import { escudoDrakos, user as defaultUser } from "../data/dataPerfil";
 import { fetchPurchaseHistory } from "../services/purchaseService";
 
@@ -86,12 +85,12 @@ const buildDisplayName = (cliente = {}) => {
     .join(" ")
     .trim();
 
-  return name || "Usuário";
+  return name || "UsuÃ¡rio";
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPERS — Máscaras e validação (apenas apresentação/entrada, não afeta payload)
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// HELPERS â€” MÃ¡scaras e validaÃ§Ã£o (apenas apresentaÃ§Ã£o/entrada, nÃ£o afeta payload)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const onlyDigits = (value) => String(value ?? "").replace(/\D/g, "");
 
 const formatPhoneBR = (value) => {
@@ -123,60 +122,67 @@ const SEXO_OPTIONS = [
   { value: "Feminino", label: "Feminino", icon: "female" },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER — Identidade visual do plano de sócio (apenas apresentação)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// HELPER â€” Identidade visual do plano de sÃ³cio (apenas apresentaÃ§Ã£o)
 // Deriva emoji/label/cores a partir de subscription.tier (API) + title/price
-// já existentes no objeto subscription. Não introduz novos campos de dados.
-// ─────────────────────────────────────────────────────────────────────────────
+// jÃ¡ existentes no objeto subscription. NÃ£o introduz novos campos de dados,
+// nÃ£o cria estado, nÃ£o toca em contexts. Paleta 100% crimson/neutra â€” sem
+// dourado â€” para manter consistÃªncia com o resto do app.
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const TIER_META = {
   diamante: {
-    emoji: "💎",
+    emoji: "ðŸ‘‘",
     label: "Sócio Diamante",
-    colors: ["#dff3ff", "#8fd4f7", "#4fa8d8"],
-    borderColor: "rgba(143,212,247,0.45)",
-    glowColor: "rgba(143,212,247,0.25)",
-    textColor: "#eaf8ff",
+    accent: "#ffffff",
+    cardColors: ["#2c2c2e", "#161616", "#0a0a0a"],
+    borderColor: "rgba(255,255,255,0.30)",
+    glowColor: "rgba(255,255,255,0.12)",
+    textColor: "#ffffff",
   },
   ouro: {
-    emoji: "👑",
+    emoji: "💛",
     label: "Sócio Ouro",
-    colors: ["#fff2c9", "#f0c866", "#c99a2e"],
-    borderColor: "rgba(240,200,102,0.45)",
-    glowColor: "rgba(240,200,102,0.25)",
-    textColor: "#fff8e6",
+    accent: "#ff3b30",
+    cardColors: ["#3a0006", "#1c0002", "#0a0a0a"],
+    borderColor: "rgba(232,0,15,0.42)",
+    glowColor: "rgba(232,0,15,0.20)",
+    textColor: "#ffece9",
   },
   prata: {
-    emoji: "🛡",
+    emoji: "💍",
     label: "Sócio Prata",
-    colors: ["#f4f6f8", "#c9d1da", "#98a4b0"],
-    borderColor: "rgba(201,209,218,0.45)",
-    glowColor: "rgba(201,209,218,0.22)",
-    textColor: "#f6f8fa",
+    accent: "#c7c9cc",
+    cardColors: ["#2a2a2c", "#18181a", "#0a0a0a"],
+    borderColor: "rgba(199,201,204,0.32)",
+    glowColor: "rgba(199,201,204,0.14)",
+    textColor: "#f0f0f2",
   },
 };
 
 const DEFAULT_TIER_META = {
-  emoji: "⭐",
+  emoji: "",
   label: null,
-  colors: ["#fff2c9", "#f0c866", "#c99a2e"],
-  borderColor: "rgba(240,200,102,0.45)",
-  glowColor: "rgba(240,200,102,0.25)",
-  textColor: "#fff8e6",
+  accent: "#e8000f",
+  cardColors: ["#3a0006", "#1c0002", "#0a0a0a"],
+  borderColor: "rgba(232,0,15,0.42)",
+  glowColor: "rgba(232,0,15,0.20)",
+  textColor: "#ffece9",
 };
 
 const getPlanIdentity = (subscription) => {
   if (!subscription) {
     return {
       isSocio: false,
-      emoji: "🔓",
+      emoji: null,
       label: "Ainda não é Sócio Drakos",
       sublabel: "Torne-se Sócio Drakos",
       title: null,
       price: null,
-      colors: ["rgba(255,255,255,0.14)", "rgba(255,255,255,0.05)"],
-      borderColor: "rgba(255,255,255,0.18)",
-      glowColor: "rgba(255,255,255,0.08)",
-      textColor: "#ffffff",
+      accent: "rgba(255,255,255,0.55)",
+      cardColors: ["rgba(255,255,255,0.07)", "rgba(255,255,255,0.02)"],
+      borderColor: "rgba(255,255,255,0.14)",
+      glowColor: "rgba(255,255,255,0.05)",
+      textColor: "rgba(255,255,255,0.75)",
     };
   }
 
@@ -190,16 +196,17 @@ const getPlanIdentity = (subscription) => {
     sublabel: subscription.title || null,
     title: subscription.title || null,
     price: subscription.price || null,
-    colors: meta.colors,
+    accent: meta.accent,
+    cardColors: meta.cardColors,
     borderColor: meta.borderColor,
     glowColor: meta.glowColor,
     textColor: meta.textColor,
   };
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SUBCOMPONENTES DO POPUP "EDITAR PERFIL" — apenas UI, sem lógica de negócio
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// SUBCOMPONENTES DO POPUP "EDITAR PERFIL" â€” apenas UI, sem lÃ³gica de negÃ³cio
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const formatHistoryDate = (value) => {
   if (!value) {
     return "";
@@ -232,7 +239,7 @@ const buildPurchaseSummary = (item = {}) => {
   }
 
   const baseDate = formatHistoryDate(item.date);
-  return parts.length > 0 ? `${baseDate} • ${parts.join(" • ")}` : baseDate;
+  return parts.length > 0 ? `${baseDate} â€¢ ${parts.join(" â€¢ ")}` : baseDate;
 };
 
 const GlassField = React.memo(function GlassField({
@@ -327,7 +334,7 @@ const ReadOnlyField = React.memo(function ReadOnlyField({
           style={editStyles.fieldIcon}
         />
         <Text style={editStyles.readOnlyText} numberOfLines={1}>
-          {value || "Não informado"}
+          {value || "NÃ£o informado"}
         </Text>
         <Ionicons
           name="lock-closed"
@@ -406,17 +413,38 @@ export default function PerfilScreen({ navigation }) {
     status: currentCliente.categoria_clientes || user.status,
   };
 
+  // â”€â”€ DerivaÃ§Ãµes puras de apresentaÃ§Ã£o (nÃ£o criam estado nem tocam contexts) â”€â”€
   const planIdentity = useMemo(
     () => getPlanIdentity(subscription),
     [subscription],
   );
+  const planStatusLabel = planIdentity.isSocio
+    ? `Status atual: ${planIdentity.label}`
+    : 'Status atual: Não sócio';
+  const sociosSummaryLabel = planIdentity.isSocio
+    ? `Plano ativo: ${planIdentity.label}`
+    : 'Plano ativo: Não possui assinatura';
 
   const [profileDraft, setProfileDraft] = useState(currentCliente);
   const originalProfileRef = useRef(currentCliente);
 
-  // ── Estado exclusivo da experiência do popup "Editar Perfil" (apenas UI) ──
+  // Foto pendente: verdadeiro quando o rascunho da foto difere da foto salva.
+  // Puramente derivado do estado jÃ¡ existente (profileDraft) â€” nÃ£o Ã© um novo
+  // estado de negÃ³cio, apenas uma comparaÃ§Ã£o para controlar a UI.
+  const hasPendingPhoto = useMemo(() => {
+    const draftPhoto = trimValue(profileDraft.url_foto_clientes);
+    const savedPhoto = trimValue(
+      originalProfileRef.current?.url_foto_clientes,
+    );
+    return draftPhoto.length > 0 && draftPhoto !== savedPhoto;
+  }, [profileDraft.url_foto_clientes]);
+
+  // â”€â”€ Estado exclusivo da experiÃªncia do popup "Editar Perfil" (apenas UI) â”€â”€
   const [touchedFields, setTouchedFields] = useState({});
   const modalAnim = useRef(new Animated.Value(0)).current;
+
+  // â”€â”€ Estado exclusivo do botÃ£o "Salvar alteraÃ§Ãµes" da foto (apenas UI) â”€â”€â”€â”€â”€
+  const [isSavingPhoto, setIsSavingPhoto] = useState(false);
 
   const nomeRef = useRef(null);
   const sobrenomeRef = useRef(null);
@@ -471,7 +499,7 @@ export default function PerfilScreen({ navigation }) {
     }
   }, [cliente, editModalVisible]);
 
-  // ── Animação de abertura/fechamento do popup (apenas visual) ──────────────
+  // â”€â”€ AnimaÃ§Ã£o de abertura/fechamento do popup (apenas visual) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (editModalVisible) {
       setTouchedFields({});
@@ -494,7 +522,7 @@ export default function PerfilScreen({ navigation }) {
     });
   };
 
-  // ── Atualização de campos do formulário (mesmo shape de estado original) ──
+  // â”€â”€ AtualizaÃ§Ã£o de campos do formulÃ¡rio (mesmo shape de estado original) â”€â”€
   const updateProfileField = (field, value) => {
     setProfileDraft((prev) => ({ ...prev, [field]: value }));
     setTouchedFields((prev) =>
@@ -518,7 +546,7 @@ export default function PerfilScreen({ navigation }) {
     updateProfileField("complemento", text);
   const handleSexoChange = (value) => updateProfileField("sexo", value);
 
-  // ── Validação discreta (não bloqueia nada além do botão Salvar) ───────────
+  // â”€â”€ ValidaÃ§Ã£o discreta (nÃ£o bloqueia nada alÃ©m do botÃ£o Salvar) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const fieldValidity = useMemo(() => {
     const nome = trimValue(profileDraft.nome_clientes);
     const email = trimValue(profileDraft.email);
@@ -543,8 +571,8 @@ export default function PerfilScreen({ navigation }) {
 
     if (!permissionResult.granted) {
       Alert.alert(
-        "Permissão necessária",
-        "Precisamos de acesso à galeria para escolher uma foto de perfil.",
+        "PermissÃ£o necessÃ¡ria",
+        "Precisamos de acesso Ã  galeria para escolher uma foto de perfil.",
       );
       return;
     }
@@ -595,7 +623,7 @@ export default function PerfilScreen({ navigation }) {
     } catch (error) {
       Alert.alert(
         "Erro",
-        error?.message || "Não foi possível salvar os dados.",
+        error?.message || "NÃ£o foi possÃ­vel salvar os dados.",
       );
     }
   };
@@ -604,7 +632,19 @@ export default function PerfilScreen({ navigation }) {
     try {
       await signOut();
     } catch (error) {
-      Alert.alert("Erro", error?.message || "Não foi possível sair da conta.");
+      Alert.alert("Erro", error?.message || "NÃ£o foi possÃ­vel sair da conta.");
+    }
+  };
+
+  // â”€â”€ Wrapper apenas de UI: reutiliza handleSaveProfile (sem alterÃ¡-la) para
+  // acionar o salvamento a partir do botÃ£o flutuante da foto, com feedback
+  // visual de carregamento (isSavingPhoto). â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const handleSavePendingPhoto = async () => {
+    setIsSavingPhoto(true);
+    try {
+      await handleSaveProfile();
+    } finally {
+      setIsSavingPhoto(false);
     }
   };
 
@@ -614,52 +654,64 @@ export default function PerfilScreen({ navigation }) {
     DEFAULT_AVATAR;
 
   return (
-    <View style={stylesPerfil.container}>
-      {/* BACKGROUND GRADIENT */}
+    <View style={ps.container}>
+      {/* BACKGROUND */}
       <LinearGradient
-        colors={["#b30000", "#5a0000", "#1a0000"]}
+        colors={["#160000", "#0a0a0a", "#050505"]}
         style={StyleSheet.absoluteFill}
       />
 
       <ScrollView
-        contentContainerStyle={stylesPerfil.content}
+        contentContainerStyle={ps.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── HEADER COM AVATAR ── */}
-        <View style={stylesPerfil.header}>
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            HERO CARD â€” foto, nome, categoria, status premium do sÃ³cio
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        <View style={ps.hero}>
           <Image
             source={escudoDrakos}
-            style={stylesPerfil.drakosBg}
+            style={ps.heroWatermark}
             resizeMode="contain"
           />
-          <View style={stylesPerfil.avatarWrapper}>
-            <Image
-              source={{ uri: currentAvatarUri }}
-              style={stylesPerfil.avatar}
+          <LinearGradient
+            colors={["transparent", "rgba(5,5,5,0.55)", "#050505"]}
+            style={ps.heroFade}
+            pointerEvents="none"
+          />
+
+          <View style={ps.avatarStage}>
+            <View
+              style={[ps.avatarGlow, { backgroundColor: planIdentity.glowColor }]}
+              pointerEvents="none"
             />
+            <View
+              style={[ps.avatarRing, { borderColor: planIdentity.borderColor }]}
+            >
+              <Image
+                source={{ uri: currentAvatarUri }}
+                style={ps.avatar}
+              />
+            </View>
             <TouchableOpacity
-              style={stylesPerfil.editAvatarBtn}
+              style={ps.editAvatarBtn}
               activeOpacity={0.8}
               onPress={pickProfileImage}
             >
-              <Ionicons name="camera" size={14} color="#fff" />
+              <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+              <View style={ps.editAvatarBorder} />
+              <Ionicons name="camera" size={13} color="#fff" />
             </TouchableOpacity>
           </View>
-          <Text style={stylesPerfil.username}>{currentUser.name}</Text>
 
-          {currentUser.category && (
-            <Text style={stylesPerfil.categoryText}>
-              {currentUser.category}
-            </Text>
-          )}
+          <Text style={ps.username}>{currentUser.name}</Text>
+          {currentUser.category ? (
+            <Text style={ps.categoryText}>{currentUser.category}</Text>
+          ) : null}
 
-          {/* ── IDENTIFICAÇÃO PREMIUM DO PLANO (substitui "Status atual: ...") ── */}
-          <View style={stylesPerfil.statusChip}>
-            <BlurView
-              intensity={30}
-              tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
+          {/* Chip de status â€” identificaÃ§Ã£o premium do plano do sÃ³cio */}
+          <View style={ps.statusChip}>
+            <BlurView intensity={34} tint="dark" style={StyleSheet.absoluteFill} />
             <LinearGradient
               colors={[planIdentity.glowColor, "transparent"]}
               style={StyleSheet.absoluteFill}
@@ -667,314 +719,294 @@ export default function PerfilScreen({ navigation }) {
               end={{ x: 1, y: 1 }}
             />
             <View
-              style={[
-                stylesPerfil.statusChipBorder,
-                { borderColor: planIdentity.borderColor },
-              ]}
+              style={[ps.statusChipBorder, { borderColor: planIdentity.borderColor }]}
             />
             {planIdentity.isSocio && (
-              <Text style={stylesPerfil.statusChipEmoji}>
-                {planIdentity.emoji}
-              </Text>
+              <Text style={ps.statusChipEmoji}>{planIdentity.emoji}</Text>
             )}
-            <Text
-              style={[
-                stylesPerfil.statusChipText,
-                { color: planIdentity.textColor },
-              ]}
-            >
-              {planIdentity.label}
+            <Text style={[ps.statusChipText, { color: planIdentity.textColor }]}>
+              {planStatusLabel}
             </Text>
           </View>
-        </View>
 
-        {/* ── CARD DE BOAS-VINDAS / PAINEL DE ASSINATURA ── */}
-        <View style={stylesPerfil.welcomeCard}>
-          <BlurView
-            intensity={40}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
-          <LinearGradient
-            colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={stylesPerfil.welcomeBorder} />
-
-          <View style={stylesPerfil.welcomeHeader}>
-            <Text style={stylesPerfil.welcomeTitle}>Seja bem-vindo</Text>
+          {/* BotÃ£o "Salvar alteraÃ§Ãµes" â€” aparece sÃ³ com foto pendente */}
+          {hasPendingPhoto && (
             <TouchableOpacity
-              style={stylesPerfil.notifBadge}
-              activeOpacity={0.8}
+              style={ps.savePhotoBtn}
+              activeOpacity={0.85}
+              onPress={handleSavePendingPhoto}
+              disabled={isSavingPhoto}
             >
-              <Ionicons name="notifications-outline" size={22} color="#fff" />
-              <View style={stylesPerfil.notifDot} />
-            </TouchableOpacity>
-          </View>
-
-          <Text style={stylesPerfil.welcomeBody}>
-            Olá, {currentUser.name}
-            {"\n"}Explore as novidades, confira seus dados e aproveite ao máximo
-            sua experiência com a gente!
-          </Text>
-
-          {subscription ? (
-            /* ── ESTADO SÓCIO: painel com plano, benefícios e status ── */
-            <View style={stylesPerfil.planPanel}>
               <LinearGradient
-                colors={[planIdentity.glowColor, "transparent"]}
+                colors={["#e8000f", "#a3000a"]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               />
-              <View
-                style={[
-                  stylesPerfil.planPanelBorder,
-                  { borderColor: planIdentity.borderColor },
-                ]}
+              <View style={ps.savePhotoBorder} />
+              <Ionicons
+                name={isSavingPhoto ? "sync" : "checkmark-circle"}
+                size={15}
+                color="#fff"
               />
+              <Text style={ps.savePhotoText}>
+                {isSavingPhoto ? "Salvando..." : "Salvar alterações"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
-              <View style={stylesPerfil.planPanelHeader}>
-                <View style={stylesPerfil.planPanelHeaderLeft}>
-                  <Text style={stylesPerfil.planPanelEmoji}>
-                    {planIdentity.emoji}
-                  </Text>
-                  <View>
-                    <Text style={stylesPerfil.planPanelTitle}>
-                      {planIdentity.title || planIdentity.label}
-                    </Text>
-                    <View style={stylesPerfil.planPanelStatusRow}>
-                      <View style={stylesPerfil.planPanelStatusDot} />
-                      <Text style={stylesPerfil.planPanelStatusText}>
-                        Assinatura ativa
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                {planIdentity.price ? (
-                  <Text style={stylesPerfil.planPanelPrice}>
-                    {planIdentity.price}
-                  </Text>
-                ) : null}
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            MEMBERSHIP CARD â€” cartÃ£o de sÃ³cio premium independente
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        {subscription ? (
+          <View style={ps.membershipCard}>
+            <LinearGradient
+              colors={planIdentity.cardColors}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0.1, y: 0 }}
+              end={{ x: 0.9, y: 1 }}
+            />
+            <BlurView
+              intensity={16}
+              tint="dark"
+              style={[StyleSheet.absoluteFill, { opacity: 0.35 }]}
+            />
+            <View
+              style={[ps.membershipBorder, { borderColor: planIdentity.borderColor }]}
+            />
+            <View style={ps.membershipSpecularTop} />
+
+            <View style={ps.membershipTopRow}>
+              <View style={ps.membershipBadge}>
+                <Ionicons name="shield-checkmark" size={11} color={planIdentity.accent} />
+                <Text style={[ps.membershipBadgeText, { color: planIdentity.accent }]}>
+                  MEMBRO ATIVO
+                </Text>
               </View>
+              <Text style={ps.membershipEmoji}>{planIdentity.emoji}</Text>
+            </View>
 
-              <View style={stylesPerfil.planPanelDivider} />
+            <Text style={ps.membershipTitle}>
+              {planIdentity.title || planIdentity.label}
+            </Text>
+            <Text style={ps.membershipSubtitle}>{sociosSummaryLabel}</Text>
 
-              <View style={stylesPerfil.planPanelBenefits}>
-                <View style={stylesPerfil.planPanelBenefitItem}>
-                  <Ionicons name="checkmark-circle" size={15} color="#4ee08a" />
-                  <Text style={stylesPerfil.planPanelBenefitText}>
-                    Acesso aos benefícios do seu plano
+            <View style={ps.membershipDivider} />
+
+            <View style={ps.membershipFooterRow}>
+              <View style={ps.membershipBenefits}>
+                <View style={ps.membershipBenefitItem}>
+                  <View style={ps.membershipBenefitDot} />
+                  <Text style={ps.membershipBenefitText}>
+                    Beneficios ativos do plano
                   </Text>
                 </View>
-                <View style={stylesPerfil.planPanelBenefitItem}>
-                  <Ionicons name="checkmark-circle" size={15} color="#4ee08a" />
-                  <Text style={stylesPerfil.planPanelBenefitText}>
+                <View style={ps.membershipBenefitItem}>
+                  <View style={ps.membershipBenefitDot} />
+                  <Text style={ps.membershipBenefitText}>
                     Prioridade em compras e ingressos
                   </Text>
                 </View>
               </View>
-
-              <TouchableOpacity
-                style={stylesPerfil.planPanelManageBtn}
-                activeOpacity={0.85}
-                onPress={() => navigation.navigate("Socio")}
-              >
-                <Text style={stylesPerfil.planPanelManageBtnText}>
-                  Gerenciar assinatura
-                </Text>
-                <Ionicons name="chevron-forward" size={14} color="#fff" />
-              </TouchableOpacity>
+              {planIdentity.price ? (
+                <Text style={ps.membershipPrice}>{planIdentity.price}</Text>
+              ) : null}
             </View>
-          ) : (
-            /* ── ESTADO NÃO-SÓCIO: incentivo à assinatura ── */
-            <View style={stylesPerfil.planPanel}>
-              <LinearGradient
-                colors={["rgba(232,0,15,0.14)", "transparent"]}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              />
-              <View style={stylesPerfil.planPanelBorder} />
 
-              <View style={stylesPerfil.planPanelPromoHeader}>
-                <Ionicons name="star-outline" size={20} color="#ffd166" />
-                <Text style={stylesPerfil.planPanelPromoTitle}>
-                  Torne-se Sócio Drakos
-                </Text>
-              </View>
-              <Text style={stylesPerfil.planPanelPromoBody}>
+            <TouchableOpacity
+              style={ps.membershipManageBtn}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate("Socio")}
+            >
+              <BlurView intensity={24} tint="dark" style={StyleSheet.absoluteFill} />
+              <View style={ps.membershipManageBorder} />
+              <Text style={ps.membershipManageBtnText}>Gerenciar assinatura</Text>
+              <Ionicons name="chevron-forward" size={14} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={ps.membershipPromo}
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate("Socio")}
+          >
+            <LinearGradient
+              colors={["#2a0004", "#150002", "#0a0a0a"]}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0.1, y: 0 }}
+              end={{ x: 0.9, y: 1 }}
+            />
+            <View style={ps.membershipBorder} />
+            <View style={ps.membershipSpecularTop} />
+
+            <View style={ps.membershipPromoIconWrap}>
+              <Ionicons name="shield-outline" size={22} color="#e8000f" />
+            </View>
+            <View style={ps.membershipPromoTextGroup}>
+              <Text style={ps.membershipPromoTitle}>Torne-se Sócio Drakos</Text>
+              <Text style={ps.membershipPromoBody}>
                 Descontos exclusivos, prioridade em ingressos e experiências
                 only para sócios.
               </Text>
-
-              <TouchableOpacity
-                style={stylesPerfil.planPanelCta}
-                activeOpacity={0.85}
-                onPress={() => navigation.navigate("Socio")}
-              >
-                <LinearGradient
-                  colors={["#e8000f", "#a3000a"]}
-                  style={StyleSheet.absoluteFill}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                />
-                <Text style={stylesPerfil.planPanelCtaText}>Ver planos</Text>
-                <Ionicons name="arrow-forward" size={14} color="#fff" />
-              </TouchableOpacity>
             </View>
-          )}
+            <View style={ps.membershipPromoCta}>
+              <Text style={ps.membershipPromoCtaText}>Ver planos</Text>
+              <Ionicons name="arrow-forward" size={15} color="#e8000f" />
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            BOAS-VINDAS â€” mensagem leve com notificaÃ§Ã£o
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        <View style={ps.welcomeCard}>
+          <BlurView intensity={32} tint="dark" style={StyleSheet.absoluteFill} />
+          <LinearGradient
+            colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={ps.welcomeBorder} />
+
+          <View style={ps.welcomeIconWrap}>
+            <Ionicons name="sparkles-outline" size={16} color="#e8000f" />
+          </View>
+          <Text style={ps.welcomeBody}>
+            Olá, {currentUser.name.split(" ")[0]}. Explore as novidades,
+            confira seus dados e aproveite ao máximo sua experiência com a
+            gente.
+          </Text>
+          <TouchableOpacity style={ps.notifBadge} activeOpacity={0.8}>
+            <Ionicons name="notifications-outline" size={18} color="#fff" />
+            <View style={ps.notifDot} />
+          </TouchableOpacity>
         </View>
 
-        {/* ── AÇÕES RÁPIDAS COM BACKGROUND SUAVE ── */}
-        <View style={stylesPerfil.actionsRow}>
-          <TouchableOpacity style={stylesPerfil.actionCard}>
-            <BlurView
-              intensity={40}
-              tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
-            <LinearGradient
-              colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={stylesPerfil.actionBorder} />
-            <View style={stylesPerfil.actionContent}>
-              <Ionicons name="card-outline" size={28} color="#fff" />
-              <Text style={stylesPerfil.actionLabel}>Meu Cartão</Text>
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            AÃ‡Ã•ES RÃPIDAS
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        <Text style={ps.groupLabel}>Acesso rÃ¡pido</Text>
+        <View style={ps.actionsRow}>
+          <TouchableOpacity style={ps.actionCard} activeOpacity={0.85}>
+            <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+            <View style={ps.actionBorder} />
+            <View style={ps.actionIconWrap}>
+              <Ionicons name="card-outline" size={19} color="#fff" />
             </View>
+            <Text style={ps.actionLabel}>Meu CartÃ£o</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={stylesPerfil.actionCard}
+            style={ps.actionCard}
+            activeOpacity={0.85}
             onPress={() => setShowHistory((prev) => !prev)}
           >
-            <BlurView
-              intensity={40}
-              tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
-            <LinearGradient
-              colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={stylesPerfil.actionBorder} />
-            <View style={stylesPerfil.actionContent}>
-              <Ionicons name="receipt-outline" size={28} color="#fff" />
-              <Text style={stylesPerfil.actionLabel}>Minhas Compras</Text>
+            <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+            <View style={ps.actionBorder} />
+            <View style={ps.actionIconWrap}>
+              <Ionicons name="receipt-outline" size={19} color="#fff" />
             </View>
+            <Text style={ps.actionLabel}>Compras</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={stylesPerfil.actionCard}
+            style={ps.actionCard}
+            activeOpacity={0.85}
             onPress={() => navigation.navigate("Socio")}
           >
-            <BlurView
-              intensity={40}
-              tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
-            <LinearGradient
-              colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={stylesPerfil.actionBorder} />
-            <View style={stylesPerfil.actionContent}>
-              <Ionicons name="people-outline" size={28} color="#fff" />
-              <Text style={stylesPerfil.actionLabel} numberOfLines={2}>
-                {planIdentity.isSocio
-                  ? `${planIdentity.emoji} ${planIdentity.label}`
-                  : "Sócio"}
-              </Text>
+            <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+            <View style={ps.actionBorder} />
+            <View style={ps.actionIconWrap}>
+              <Ionicons name="people-outline" size={19} color="#fff" />
             </View>
+            <Text style={ps.actionLabel}>sócios</Text>
           </TouchableOpacity>
         </View>
 
-        {/* ── HISTÓRICO DE COMPRAS E ASSINATURAS COM BACKGROUND SUAVE ── */}
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            HISTÃ“RICO â€” mesmo funcionamento, cartÃµes renovados
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
         {showHistory && (
-          <View style={stylesPerfil.historySection}>
-            <BlurView
-              intensity={40}
-              tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
+          <View style={ps.historySection}>
+            <BlurView intensity={32} tint="dark" style={StyleSheet.absoluteFill} />
             <LinearGradient
-              colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
+              colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
               style={StyleSheet.absoluteFill}
             />
-            <View style={stylesPerfil.historyBorder} />
+            <View style={ps.historyBorder} />
 
-            <View style={stylesPerfil.historyHeader}>
-              <Text style={stylesPerfil.historyTitle}>
-                Minhas Compras e Assinaturas
-              </Text>
+            <View style={ps.historyHeader}>
+              <Text style={ps.historyTitle}>Compras e assinaturas</Text>
               <TouchableOpacity
                 onPress={() => setShowHistory(false)}
                 activeOpacity={0.7}
+                style={ps.historyCloseBtn}
               >
-                <Ionicons name="close" size={20} color="#fff" />
+                <Ionicons name="close" size={15} color="#fff" />
               </TouchableOpacity>
             </View>
 
             {subscription && (
-              <View style={stylesPerfil.historySubBadge}>
+              <View style={ps.historySubBadge}>
                 {planIdentity.isSocio && (
-                  <Text style={stylesPerfil.historySubEmoji}>
-                    {planIdentity.emoji}
-                  </Text>
+                  <Text style={ps.historySubEmoji}>{planIdentity.emoji}</Text>
                 )}
-                <Text style={stylesPerfil.historySubText}>
-                  Assinatura ativa: {subscription.title}
-                </Text>
-                <Text style={stylesPerfil.historySubPrice}>
-                  {subscription.price}
-                </Text>
+                <Text style={ps.historySubText}>{sociosSummaryLabel}</Text>
+                <Text style={ps.historySubPrice}>{subscription.price}</Text>
               </View>
             )}
 
-            <Text style={stylesPerfil.historyListTitle}>Histórico</Text>
+            <Text style={ps.historyListTitle}>HistÃ³rico</Text>
 
             {purchaseHistory && purchaseHistory.length > 0 ? (
               purchaseHistory.map((item, idx) => (
                 <React.Fragment key={item.id}>
-                  <View style={stylesPerfil.historyRow}>
+                  <View style={ps.historyRow}>
                     {item.type === "subscription" ? (
-                      <Ionicons name="star-outline" size={22} color="#ffd700" />
+                      <View style={ps.historyIconWrap}>
+                        <Ionicons
+                          name="shield-checkmark-outline"
+                          size={15}
+                          color="#e8000f"
+                        />
+                      </View>
                     ) : item.itemImages && item.itemImages[0] ? (
                       <Image
                         source={item.itemImages[0]}
-                        style={stylesPerfil.historyProductImage}
+                        style={ps.historyProductImage}
                       />
                     ) : (
-                      <Ionicons name="bag-outline" size={18} color="#ff2b2b" />
+                      <View style={ps.historyIconWrap}>
+                        <Ionicons name="bag-outline" size={15} color="#e8000f" />
+                      </View>
                     )}
-                    <View style={stylesPerfil.historyInfo}>
-                      <Text style={stylesPerfil.historyPlan}>
+                    <View style={ps.historyInfo}>
+                      <Text style={ps.historyPlan}>
                         {item.type === "subscription"
                           ? item.planTitle
                           : item.productName || item.items?.[0] || "Produto"}
                       </Text>
-                      <Text style={stylesPerfil.historyDate}>
+                      <Text style={ps.historyDate}>
                         {item.type === "subscription"
                           ? formatHistoryDate(item.date)
                           : buildPurchaseSummary(item)}
                       </Text>
                     </View>
-                    <Text style={stylesPerfil.historyPrice}>{item.price}</Text>
+                    <Text style={ps.historyPrice}>{item.price}</Text>
                   </View>
                   {idx < purchaseHistory.length - 1 && (
-                    <View style={stylesPerfil.historyDivider} />
+                    <View style={ps.historyDivider} />
                   )}
                 </React.Fragment>
               ))
             ) : (
-              <View style={stylesPerfil.historyEmpty}>
+              <View style={ps.historyEmpty}>
                 <Ionicons
                   name="document-text-outline"
-                  size={36}
-                  color="rgba(255,255,255,0.3)"
+                  size={30}
+                  color="rgba(255,255,255,0.22)"
                 />
-                <Text style={stylesPerfil.historyEmptyText}>
+                <Text style={ps.historyEmptyText}>
                   Nenhuma compra ou assinatura ainda
                 </Text>
               </View>
@@ -982,93 +1014,88 @@ export default function PerfilScreen({ navigation }) {
           </View>
         )}
 
-        {/* ── DIVISOR DADOS PESSOAIS ── */}
-        <View style={stylesPerfil.sectionHeaderCustom}>
-          <Text style={stylesPerfil.sectionTitle}>Dados pessoais</Text>
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            DADOS PESSOAIS
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+        <View style={ps.sectionHeaderCustom}>
+          <Text style={ps.sectionTitle}>Dados pessoais</Text>
           <TouchableOpacity
-            style={stylesPerfil.sectionEditBtn}
+            style={ps.sectionEditBtn}
             onPress={() => setEditModalVisible(true)}
             activeOpacity={0.7}
           >
-            <Ionicons name="pencil-outline" size={20} color="#fff" />
+            <Ionicons name="pencil-outline" size={15} color="#fff" />
           </TouchableOpacity>
         </View>
 
-        {/* ── CARD DADOS PESSOAIS ── */}
-        <View style={stylesPerfil.infoCard}>
-          <BlurView
-            intensity={40}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
+        <View style={ps.infoCard}>
+          <BlurView intensity={32} tint="dark" style={StyleSheet.absoluteFill} />
           <LinearGradient
-            colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
+            colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
             style={StyleSheet.absoluteFill}
           />
-          <View style={stylesPerfil.infoBorder} />
+          <View style={ps.infoBorder} />
 
-          <View style={stylesPerfil.infoRow}>
-            <View style={stylesPerfil.infoLeft}>
-              <Ionicons name="person-outline" size={20} color="#ffffff" />
-              <View style={stylesPerfil.infoTextGroup}>
-                <Text style={stylesPerfil.infoLabel}>Nome completo</Text>
-                <Text style={stylesPerfil.infoValue}>{currentUser.name}</Text>
+          <View style={ps.infoRow}>
+            <View style={ps.infoLeft}>
+              <View style={ps.infoIconWrap}>
+                <Ionicons name="person-outline" size={15} color="#fff" />
+              </View>
+              <View style={ps.infoTextGroup}>
+                <Text style={ps.infoLabel}>Nome completo</Text>
+                <Text style={ps.infoValue}>{currentUser.name}</Text>
               </View>
             </View>
           </View>
 
-          <View style={stylesPerfil.infoDivider} />
+          <View style={ps.infoDivider} />
 
-          <View style={stylesPerfil.infoRow}>
-            <View style={stylesPerfil.infoLeft}>
-              <Ionicons name="mail-outline" size={20} color="#ffffff" />
-              <View style={stylesPerfil.infoTextGroup}>
-                <Text style={stylesPerfil.infoLabel}>Email</Text>
-                <Text style={stylesPerfil.infoValue}>{currentUser.email}</Text>
+          <View style={ps.infoRow}>
+            <View style={ps.infoLeft}>
+              <View style={ps.infoIconWrap}>
+                <Ionicons name="mail-outline" size={15} color="#fff" />
+              </View>
+              <View style={ps.infoTextGroup}>
+                <Text style={ps.infoLabel}>Email</Text>
+                <Text style={ps.infoValue}>{currentUser.email}</Text>
               </View>
             </View>
           </View>
 
-          <View style={stylesPerfil.infoDivider} />
+          <View style={ps.infoDivider} />
 
-          <View style={stylesPerfil.infoRow}>
-            <View style={stylesPerfil.infoLeft}>
-              <Ionicons name="call-outline" size={20} color="#ffffff" />
-              <View style={stylesPerfil.infoTextGroup}>
-                <Text style={stylesPerfil.infoLabel}>Telefone</Text>
-                <Text style={stylesPerfil.infoValue}>{currentUser.phone}</Text>
+          <View style={ps.infoRow}>
+            <View style={ps.infoLeft}>
+              <View style={ps.infoIconWrap}>
+                <Ionicons name="call-outline" size={15} color="#fff" />
+              </View>
+              <View style={ps.infoTextGroup}>
+                <Text style={ps.infoLabel}>Telefone</Text>
+                <Text style={ps.infoValue}>{currentUser.phone}</Text>
               </View>
             </View>
           </View>
         </View>
 
-        {/* BOTÃO SAIR */}
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            SAIR
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
         <TouchableOpacity
-          style={stylesPerfil.logoutBtn}
+          style={ps.logoutBtn}
           activeOpacity={0.8}
           onPress={handleLogout}
         >
-          <LinearGradient
-            colors={["rgba(255,0,0,0.2)", "rgba(255,0,0,0.1)"]}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
-          <BlurView
-            intensity={20}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={stylesPerfil.logoutBorder} />
-          <Ionicons name="log-out-outline" size={22} color="#ff6b6b" />
-          <Text style={stylesPerfil.logoutText}>Sair da conta</Text>
-          <Ionicons name="chevron-forward-outline" size={18} color="#ff6b6b" />
+          <BlurView intensity={22} tint="dark" style={StyleSheet.absoluteFill} />
+          <View style={ps.logoutBorder} />
+          <Ionicons name="log-out-outline" size={17} color="#ff6b6b" />
+          <Text style={ps.logoutText}>Sair da conta</Text>
         </TouchableOpacity>
 
         <View style={{ height: 20 }} />
       </ScrollView>
 
-      {/* MODAL EDITAR PERFIL — Liquid Glass */}
+
+      {/* MODAL EDITAR PERFIL â€” Liquid Glass */}
       <Modal
         animationType="none"
         transparent
@@ -1132,7 +1159,7 @@ export default function PerfilScreen({ navigation }) {
               <View style={editStyles.specularTop} />
               <View style={editStyles.modalBorder} />
 
-              {/* Cabeçalho */}
+              {/* CabeÃ§alho */}
               <View style={editStyles.headerRow}>
                 <View style={{ flex: 1 }}>
                   <Text style={editStyles.modalTitle}>Editar Perfil</Text>
@@ -1169,7 +1196,7 @@ export default function PerfilScreen({ navigation }) {
                   onSubmitEditing={() => nomeRef.current?.focus()}
                 />
 
-                <Text style={editStyles.sectionLabel}>Informações básicas</Text>
+                <Text style={editStyles.sectionLabel}>InformaÃ§Ãµes bÃ¡sicas</Text>
 
                 <GlassField
                   label="Nome"
@@ -1232,7 +1259,7 @@ export default function PerfilScreen({ navigation }) {
                   onChange={handleSexoChange}
                 />
 
-                <Text style={editStyles.sectionLabel}>Endereço</Text>
+                <Text style={editStyles.sectionLabel}>EndereÃ§o</Text>
 
                 <GlassField
                   label="Rua"
@@ -1249,11 +1276,11 @@ export default function PerfilScreen({ navigation }) {
                 <View style={editStyles.rowTwo}>
                   <View style={{ flex: 1 }}>
                     <GlassField
-                      label="Número"
+                      label="NÃºmero"
                       icon="pin-outline"
                       value={profileDraft.casa_numero}
                       onChangeText={handleNumeroChange}
-                      placeholder="Nº"
+                      placeholder="NÂº"
                       keyboardType="numeric"
                       maxLength={10}
                       returnKeyType="next"
@@ -1297,7 +1324,7 @@ export default function PerfilScreen({ navigation }) {
                   icon="add-circle-outline"
                   value={profileDraft.complemento}
                   onChangeText={handleComplementoChange}
-                  placeholder="Apartamento, bloco, referência..."
+                  placeholder="Apartamento, bloco, referÃªncia..."
                   maxLength={120}
                   returnKeyType="done"
                   blurOnSubmit
@@ -1324,7 +1351,7 @@ export default function PerfilScreen({ navigation }) {
                 />
               </ScrollView>
 
-              {/* Rodapé com ações */}
+              {/* RodapÃ© com aÃ§Ãµes */}
               <View style={editStyles.footerRow}>
                 <TouchableOpacity
                   style={editStyles.cancelBtn}
@@ -1363,7 +1390,7 @@ export default function PerfilScreen({ navigation }) {
                       !isProfileFormValid && editStyles.saveTextDisabled,
                     ]}
                   >
-                    Salvar alterações
+                    Salvar alteraÃ§Ãµes
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1374,10 +1401,617 @@ export default function PerfilScreen({ navigation }) {
     </View>
   );
 }
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ESTILOS â€” PerfilScreen (Liquid Glass Premium, 100% local a este arquivo)
+// Hero cinematogrÃ¡fico + Membership Card + cartÃµes renovados.
+// Regra de sombra iOS: containers com shadow* NÃƒO usam overflow:'hidden';
+// um wrapper interno separado faz o clip de blur/gradiente.
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const ps = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 56,
+    paddingBottom: 40,
+    gap: 18,
+  },
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ESTILOS — Popup "Editar Perfil" (Liquid Glass, escopo local ao componente)
-// ─────────────────────────────────────────────────────────────────────────────
+  // â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  hero: {
+    alignItems: "center",
+    paddingBottom: 6,
+    position: "relative",
+  },
+  heroWatermark: {
+    position: "absolute",
+    width: 260,
+    height: 260,
+    top: -70,
+    alignSelf: "center",
+    opacity: 0.05,
+  },
+  heroFade: {
+    position: "absolute",
+    top: -40,
+    left: -20,
+    right: -20,
+    height: 180,
+  },
+  avatarStage: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  avatarGlow: {
+    position: "absolute",
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+  },
+  avatarRing: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 4,
+  },
+  avatar: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+  },
+  editAvatarBtn: {
+    position: "absolute",
+    bottom: 0,
+    right: 4,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(232,0,15,0.9)",
+  },
+  editAvatarBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.35)",
+  },
+  username: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "800",
+    letterSpacing: -0.3,
+    textAlign: "center",
+  },
+  categoryText: {
+    color: "rgba(255,255,255,0.45)",
+    fontSize: 12.5,
+    fontWeight: "500",
+    marginTop: 3,
+    textAlign: "center",
+  },
+
+  statusChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
+    borderRadius: 30,
+    overflow: "hidden",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 7,
+    marginTop: 14,
+  },
+  statusChipBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 30,
+    borderWidth: 1,
+  },
+  statusChipEmoji: {
+    fontSize: 13,
+  },
+  statusChipText: {
+    fontSize: 12.5,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+
+  savePhotoBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    height: 40,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    overflow: "hidden",
+    gap: 7,
+    marginTop: 14,
+  },
+  savePhotoBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.25)",
+  },
+  savePhotoText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+
+  // â”€â”€ MEMBERSHIP CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  membershipCard: {
+    borderRadius: 22,
+    overflow: "hidden",
+    padding: 18,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  membershipBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(232,0,15,0.42)",
+  },
+  membershipSpecularTop: {
+    position: "absolute",
+    top: 0,
+    left: "14%",
+    right: "14%",
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.35)",
+  },
+  membershipTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  membershipBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  membershipBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1,
+  },
+  membershipEmoji: {
+    fontSize: 22,
+  },
+  membershipTitle: {
+    color: "#fff",
+    fontSize: 21,
+    fontWeight: "900",
+    letterSpacing: -0.4,
+    marginTop: 14,
+  },
+  membershipSubtitle: {
+    color: "rgba(255,255,255,0.5)",
+    fontSize: 12,
+    fontWeight: "500",
+    marginTop: 3,
+  },
+  membershipDivider: {
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.10)",
+    marginVertical: 16,
+  },
+  membershipFooterRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+  membershipBenefits: {
+    gap: 7,
+    flex: 1,
+  },
+  membershipBenefitItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  membershipBenefitDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "rgba(255,255,255,0.5)",
+  },
+  membershipBenefitText: {
+    color: "rgba(255,255,255,0.65)",
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  membershipPrice: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  membershipManageBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 42,
+    borderRadius: 13,
+    overflow: "hidden",
+    gap: 6,
+    marginTop: 16,
+  },
+  membershipManageBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
+  },
+  membershipManageBtnText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+
+  membershipPromo: {
+    borderRadius: 22,
+    overflow: "hidden",
+    padding: 18,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  membershipPromoIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(232,0,15,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  membershipPromoTextGroup: {
+    marginBottom: 16,
+  },
+  membershipPromoTitle: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "800",
+    marginBottom: 6,
+  },
+  membershipPromoBody: {
+    color: "rgba(255,255,255,0.55)",
+    fontSize: 12.5,
+    lineHeight: 18,
+    fontWeight: "400",
+  },
+  membershipPromoCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  membershipPromoCtaText: {
+    color: "#e8000f",
+    fontSize: 13.5,
+    fontWeight: "800",
+  },
+
+  // â”€â”€ BOAS-VINDAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  welcomeCard: {
+    borderRadius: 18,
+    overflow: "hidden",
+    padding: 16,
+    paddingRight: 52,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  welcomeBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+  },
+  welcomeIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "rgba(232,0,15,0.14)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  welcomeBody: {
+    flex: 1,
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 12.5,
+    lineHeight: 18,
+    fontWeight: "400",
+  },
+  notifBadge: {
+    position: "absolute",
+    top: 14,
+    right: 14,
+    padding: 4,
+  },
+  notifDot: {
+    position: "absolute",
+    top: 2,
+    right: 2,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: "#ff2b2b",
+    borderWidth: 1.5,
+    borderColor: "#0a0a0a",
+  },
+
+  // â”€â”€ AÃ‡Ã•ES RÃPIDAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  groupLabel: {
+    color: "rgba(255,255,255,0.4)",
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: -6,
+  },
+  actionsRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  actionCard: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: "hidden",
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  actionBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.09)",
+  },
+  actionIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionLabel: {
+    color: "#fff",
+    fontSize: 11.5,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+
+  // â”€â”€ HISTÃ“RICO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  historySection: {
+    borderRadius: 18,
+    overflow: "hidden",
+    padding: 16,
+  },
+  historyBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+  },
+  historyHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  historyTitle: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  historyCloseBtn: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  historySubBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(232,0,15,0.10)",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(232,0,15,0.20)",
+    marginBottom: 14,
+    gap: 8,
+  },
+  historySubEmoji: {
+    fontSize: 13,
+  },
+  historySubText: {
+    color: "#fff",
+    fontSize: 12.5,
+    fontWeight: "600",
+    flex: 1,
+  },
+  historySubPrice: {
+    color: "#fff",
+    fontSize: 12.5,
+    fontWeight: "700",
+  },
+  historyListTitle: {
+    color: "rgba(255,255,255,0.5)",
+    fontSize: 11.5,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+    marginBottom: 8,
+  },
+  historyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  historyIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "rgba(232,0,15,0.10)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  historyInfo: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  historyPlan: {
+    color: "#fff",
+    fontSize: 13.5,
+    fontWeight: "600",
+  },
+  historyDate: {
+    color: "rgba(255,255,255,0.45)",
+    fontSize: 11,
+    marginTop: 1,
+  },
+  historyPrice: {
+    color: "#fff",
+    fontSize: 13.5,
+    fontWeight: "700",
+  },
+  historyDivider: {
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.07)",
+  },
+  historyProductImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+  },
+  historyEmpty: {
+    alignItems: "center",
+    paddingVertical: 22,
+    gap: 8,
+  },
+  historyEmptyText: {
+    color: "rgba(255,255,255,0.35)",
+    fontSize: 12.5,
+    textAlign: "center",
+  },
+
+  // â”€â”€ DADOS PESSOAIS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  sectionHeaderCustom: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: 0.2,
+  },
+  sectionEditBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "rgba(255,255,255,0.07)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  infoCard: {
+    borderRadius: 18,
+    overflow: "hidden",
+  },
+  infoBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  infoLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 12,
+  },
+  infoIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  infoTextGroup: {
+    flex: 1,
+  },
+  infoLabel: {
+    color: "rgba(255,255,255,0.42)",
+    fontSize: 10.5,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 3,
+  },
+  infoValue: {
+    color: "#fff",
+    fontSize: 14.5,
+    fontWeight: "600",
+  },
+  infoDivider: {
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.07)",
+    marginHorizontal: 16,
+  },
+
+  // â”€â”€ SAIR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  logoutBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 16,
+    paddingVertical: 15,
+    gap: 10,
+    overflow: "hidden",
+  },
+  logoutBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255,107,107,0.25)",
+  },
+  logoutText: {
+    color: "#ff6b6b",
+    fontSize: 14.5,
+    fontWeight: "600",
+    letterSpacing: 0.3,
+  },
+});
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ESTILOS â€” Popup "Editar Perfil" (Liquid Glass, escopo local ao componente)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const editStyles = StyleSheet.create({
   overlay: {
     flex: 1,
@@ -1580,3 +2214,4 @@ const editStyles = StyleSheet.create({
     color: "rgba(255,255,255,0.35)",
   },
 });
+

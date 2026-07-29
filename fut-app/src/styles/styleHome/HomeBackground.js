@@ -40,7 +40,7 @@ const HomeBackground = ({ isDarkMode = true }) => {
     : ['#ac0707', '#8c0505', '#6e0004'];
 
   const glowTop = isDarkMode
-    ? ['rgba(224, 20, 30, 0.47)', 'rgba(160, 10, 20, 0.10)', 'transparent']
+    ? ['rgba(224, 20, 30, 0.47)', 'rgba(160, 10, 20,0.10)', 'transparent']
     : ['rgba(240, 236, 236, 0.63)', 'rgba(255, 80, 80, 0.12)', 'transparent'];
 
   const glowBottom = isDarkMode
