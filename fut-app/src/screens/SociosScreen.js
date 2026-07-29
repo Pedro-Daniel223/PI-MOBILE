@@ -57,7 +57,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { dadosPlano } from '../data/dataSocios/dataSocios';
 import NavbarGlass from '../components/NavbarGlass';
-import { assinarPlano, getMinhaAssinatura } from '../services/subscriptionService';
+import { assinarPlano } from '../services/subscriptionService';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -757,7 +757,7 @@ export default function SociosScreen({ navigation }) {
   const [checkoutPlan, setCheckoutPlan] = useState(null);
 
   const { token } = useAuth();
-  const { setSubscription } = useSubscription();
+  const { syncSubscription } = useSubscription();
 
   const openModal = (plan) => {
     setSelectedPlan(plan);
@@ -786,28 +786,22 @@ export default function SociosScreen({ navigation }) {
 
   const refreshMinhaAssinatura = useCallback(async () => {
     if (!token) {
-      setSubscription(null);
       return null;
     }
 
     try {
-      const response = await getMinhaAssinatura(token);
-      const normalized = normalizeAssinaturaResponse(response);
-      setSubscription(normalized);
-      return normalized;
+      return await syncSubscription({
+        providedToken: token,
+        retries: 2,
+      });
     } catch (error) {
-      if (error?.status === 404) {
-        setSubscription(null);
-        return null;
-      }
-
       if (error?.message) {
         Alert.alert('Não foi possível carregar sua assinatura', error.message);
       }
 
       return null;
     }
-  }, [setSubscription, token]);
+  }, [syncSubscription, token]);
 
   const handleConfirmSubscription = useCallback(async () => {
     if (!checkoutPlan) {
@@ -829,9 +823,14 @@ export default function SociosScreen({ navigation }) {
     }
 
     await assinarPlano(planoId, token);
-    const assinatura = await refreshMinhaAssinatura();
+    const assinaturaFinal = await syncSubscription({
+      providedToken: token,
+      expectedPlanId: planoId,
+      retries: 4,
+    });
+
     const checkoutResult = normalizeAssinaturaResponse(
-      assinatura || { plano_id: planoId, status: 'ativa' },
+      assinaturaFinal || { plano_id: planoId, status: 'ativa' },
       checkoutPlan
     );
 
@@ -839,7 +838,7 @@ export default function SociosScreen({ navigation }) {
       ...checkoutResult,
       total: parsePlanoValor(checkoutPlan.price),
     };
-  }, [checkoutPlan, refreshMinhaAssinatura, token]);
+  }, [checkoutPlan, syncSubscription, token]);
 
   useFocusEffect(
     useCallback(() => {

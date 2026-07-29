@@ -1,6 +1,6 @@
 export const dadosPlano = [
     {
-      id: '1',
+      id: '4',
       title: 'PRATA',
       description: 'Tenha ótimos benefícios de acordo com seu plano de torcedor fiel',
       price: 'R$ 49,99 Mensal',
@@ -21,7 +21,7 @@ export const dadosPlano = [
       ],
     },
     {
-      id: '2',
+      id: '3',
       title: 'OURO',
       description: 'Benefícios premium para você viver a melhor experiência Drakos',
       price: 'R$ 99,99 Mensal',
@@ -42,7 +42,7 @@ export const dadosPlano = [
       ],
     },
     {
-      id: '3',
+      id: '2',
       title: 'DIAMANTE',
       description: 'O plano mais completo com acesso total e vantagens exclusivas',
       price: 'R$ 199,99 Mensal',

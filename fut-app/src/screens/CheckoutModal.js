@@ -857,7 +857,9 @@ const CheckoutModal = ({
                     />
                   )}
                   {processing ? (
-                    <Text style={s.primaryBtnText}>Processando…</Text>
+                    <Text style={s.primaryBtnText}>
+                      {purchaseType === 'subscription' ? 'Atualizando assinatura…' : 'Processando…'}
+                    </Text>
                   ) : (
                     <>
                       <Text style={s.primaryBtnText}>{resolveCopyValue(checkoutCopy.confirmBtnText, { purchaseType })}</Text>

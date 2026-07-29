@@ -1,9 +1,5 @@
   // const DEFAULT_BASE_URL = 'http://10.44.236.2:8000'; // Substitua pelo seu endereço IP e porta do backend (do curso)
-<<<<<<< HEAD
-  const DEFAULT_BASE_URL = 'http://172.20.10.4:8000'; // IP atual da máquina local
-=======
-  const DEFAULT_BASE_URL = 'http://192.168.1.10:8000'; // IP atual da máquina local
->>>>>>> 82103e06decf51444de41bfdbfc8b1c9db377254
+  const DEFAULT_BASE_URL = 'http://10.186.246.2:8000'; // IP atual da máquina local
 
   const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_BASE_URL;
   console.log('[API] BASE_URL =', BASE_URL);

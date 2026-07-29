@@ -62,7 +62,7 @@ export default function CardProfileWelcome({
   // const [isDarkMode, setIsDarkMode] = useState(true);
   const navigation = useNavigation();
   const { cliente } = useAuth();
-  const { subscription } = useSubscription();
+  const { subscription, loadingSubscription } = useSubscription();
   const avatarUri = cliente?.url_foto_clientes?.trim() || 'https://i.pravatar.cc/150?img=12';
 
   // â”€â”€ LÃ³gica original â€” intacta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -70,10 +70,12 @@ export default function CardProfileWelcome({
     cliente?.nome_clientes?.trim(),
     cliente?.sobrenome_clientes?.trim(),
   ].filter(Boolean).join(' ').trim() || 'UsuÃ¡rio';
-  const statusAssinatura = subscription?.title
-    || subscription?.nome_plano
-    || subscription?.plan?.title
-    || 'Não sócio';
+  const statusAssinatura = loadingSubscription
+    ? ''
+    : subscription?.title
+      || subscription?.nome_plano
+      || subscription?.plan?.title
+      || 'Não sócio';
 
   const fullText = [
     'Seja bem-vindo',
