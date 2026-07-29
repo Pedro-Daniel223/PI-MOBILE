@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "expo start",
-    "start:wifi": "set REACT_NATIVE_PACKAGER_HOSTNAME=10.183.35.22 && npx expo start",
+    "start:wifi": "set REACT_NATIVE_PACKAGER_HOSTNAME=10.162.119.22 && npx expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web"

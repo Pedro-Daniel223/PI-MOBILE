@@ -1,41 +1,41 @@
-/**
- * CardSocioGlass — Premium Liquid Glass Neutral Edition
- * ─────────────────────────────────────────────────────────────────────────────
- * Lógica original 100% preservada:
- *   – Props: onPress, flatLeft, flatRight, style
- *   – floatAnim  (flutuação da imagem, loop 2000ms, 0 → -5 → 0)
- *   – pressAnim  (scale spring, 1 → 0.96 → 1)
- *   – handlePressIn / handlePressOut
- *   – useEffect do loop flutuante
- *   – Imagem local: require('../../assets/img/card_branco.png')
- *   – Ícone: "people-outline"
- *   – Textos: "Seja Sócio" / "Tenha benefícios exclusivos"
- *   – flatLeftBorderFix / flatRightBorderFix mantidos
+﻿/**
+ * CardSocioGlass â€” Premium Liquid Glass Neutral Edition
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ * LÃ³gica original 100% preservada:
+ *   â€“ Props: onPress, flatLeft, flatRight, style
+ *   â€“ floatAnim  (flutuaÃ§Ã£o da imagem, loop 2000ms, 0 â†’ -5 â†’ 0)
+ *   â€“ pressAnim  (scale spring, 1 â†’ 0.96 â†’ 1)
+ *   â€“ handlePressIn / handlePressOut
+ *   â€“ useEffect do loop flutuante
+ *   â€“ Imagem local: require('../../assets/img/card_branco.png')
+ *   â€“ Ãcone: "people-outline"
+ *   â€“ Textos: "Seja SÃ³cio" / "Tenha benefÃ­cios exclusivos"
+ *   â€“ flatLeftBorderFix / flatRightBorderFix mantidos
  *
- * Arquitetura de camadas — Liquid Glass Neutro (baixo → cima):
+ * Arquitetura de camadas â€” Liquid Glass Neutro (baixo â†’ cima):
  *
- *  [Animated.View — outerContainer]
+ *  [Animated.View â€” outerContainer]
  *   Recebe: scale transform, flatLeft/flatRight, shadows premium
- *   Sem overflow:hidden → sombras renderizam corretamente no iOS.
+ *   Sem overflow:hidden â†’ sombras renderizam corretamente no iOS.
  *
- *   [View — glassBody]  ← overflow:hidden (clip de blur + shimmer)
- *    G1. BlurView primário    (tint="light", intensity 52)
- *    G2. BlurView secundário  (tint="light", intensity 14, opacity 0.42)
- *    G3. Tom base do vidro    (branco frio, opacidade mínima)
- *    G4. Reflexo ambiental    (superior-esquerdo, estúdio de luz)
- *    G5. Volume central       (curvatura 3D ilusória)
- *    G6. Vignette inferior    (levíssima, espessura do material)
- *    G7. Shimmer diagonal     (Animated, varredura periódica)
- *    G8. Conteúdo original    (icon, image, title, desc, button)
+ *   [View â€” glassBody]  â† overflow:hidden (clip de blur + shimmer)
+ *    G1. BlurView primÃ¡rio    (tint="light", intensity 52)
+ *    G2. BlurView secundÃ¡rio  (tint="light", intensity 14, opacity 0.42)
+ *    G3. Tom base do vidro    (branco frio, opacidade mÃ­nima)
+ *    G4. Reflexo ambiental    (superior-esquerdo, estÃºdio de luz)
+ *    G5. Volume central       (curvatura 3D ilusÃ³ria)
+ *    G6. Vignette inferior    (levÃ­ssima, espessura do material)
+ *    G7. Shimmer diagonal     (Animated, varredura periÃ³dica)
+ *    G8. ConteÃºdo original    (icon, image, title, desc, button)
  *
- *  [Camada Especular — fora do overflow:hidden]
+ *  [Camada Especular â€” fora do overflow:hidden]
  *   E1. Barra especular superior  (1px, gradiente branco)
  *   E2. Rim light esquerdo        (1px vertical, ocultado com flatLeft)
- *   E3. Franja cromática inferior (0.75px, azul-índigo sutil)
- *   E4. Franja âmbar superior-dir (0.75px, ocultada com flatRight)
+ *   E3. Franja cromÃ¡tica inferior (0.75px, azul-Ã­ndigo sutil)
+ *   E4. Franja Ã¢mbar superior-dir (0.75px, ocultada com flatRight)
  *   E5. Anel externo              (0.75px branco, adapta flat edges)
  *   E6. Anel interno inset        (0.5px branco recuado, espessura do vidro)
- * ─────────────────────────────────────────────────────────────────────────────
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  */
 
 import React, { useRef, useEffect } from 'react';
@@ -52,18 +52,29 @@ import {
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const { Value, timing, loop, sequence, delay } = Animated;
 
 export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) {
 
-  // ── Lógica original — intacta ─────────────────────────────────────────────
+  // â”€â”€ LÃ³gica original â€” intacta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+  const { subscription } = useSubscription();
   const floatAnim = useRef(new Animated.Value(0)).current;
   const pressAnim = useRef(new Animated.Value(1)).current;
+  const planoAtivo = subscription?.title
+    || subscription?.nome_plano
+    || subscription?.plan?.title
+    || null;
+  const isSocio = Boolean(planoAtivo);
+  const socioCardTitle = isSocio ? 'Plano ativo' : 'Seja Sócio';
+  const socioCardDesc = isSocio
+    ? `${planoAtivo}\nSua assinatura está ativa.`
+    : 'Tenha benefícios exclusivos';
 
-  // 🔥 animação flutuante
+  // ðŸ”¥ animaÃ§Ã£o flutuante
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
@@ -81,7 +92,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
     ).start();
   }, []);
 
-  // 🔥 animação toque
+  // ðŸ”¥ animaÃ§Ã£o toque
   const handlePressIn = () => {
     Animated.spring(pressAnim, {
       toValue: 0.96,
@@ -97,9 +108,9 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
     }).start();
   };
 
-  // ── fim lógica original ───────────────────────────────────────────────────
+  // â”€â”€ fim lÃ³gica original â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  // ── Shimmer (visual only — não altera nenhuma lógica existente) ──────────
+  // â”€â”€ Shimmer (visual only â€” nÃ£o altera nenhuma lÃ³gica existente) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const shimmerAnim = useRef(new Value(0)).current;
 
   useEffect(() => {
@@ -118,7 +129,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
     inputRange:  [0, 1],
     outputRange: [-(SCREEN_WIDTH * 1.2), SCREEN_WIDTH * 1.2],
   });
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <TouchableOpacity
@@ -130,9 +141,9 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
     >
 
       {/*
-        outerContainer — Animated.View
+        outerContainer â€” Animated.View
         Recebe scale transform e flat-edge styles.
-        Sem overflow:hidden → sombras iOS funcionam + camadas especulares visíveis.
+        Sem overflow:hidden â†’ sombras iOS funcionam + camadas especulares visÃ­veis.
       */}
       <Animated.View
         style={[
@@ -143,10 +154,10 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
         ]}
       >
 
-        {/* ════════════════════════════════════════════════════════════════
-            CORPO DE VIDRO — overflow:hidden
-            Clip necessário para conter BlurViews e varredura de shimmer.
-        ════════════════════════════════════════════════════════════════ */}
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            CORPO DE VIDRO â€” overflow:hidden
+            Clip necessÃ¡rio para conter BlurViews e varredura de shimmer.
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
         <View
           style={[
             styles.glassBody,
@@ -155,23 +166,23 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
           ]}
         >
 
-          {/* G1: BlurView primário — translúcido neutro */}
+          {/* G1: BlurView primÃ¡rio â€” translÃºcido neutro */}
           <BlurView
             intensity={50}
             tint="dark"
             style={StyleSheet.absoluteFill}
           />
 
-          {/* G2: BlurView secundário — profundidade, mínimo */}
+          {/* G2: BlurView secundÃ¡rio â€” profundidade, mÃ­nimo */}
           <BlurView
             intensity={0}
             tint="dark"
             style={[StyleSheet.absoluteFill, { opacity: 0.42 }]}
           />
 
-          {/* G3: Tom base do vidro — branco-frio, opacidade mínima
+          {/* G3: Tom base do vidro â€” branco-frio, opacidade mÃ­nima
               Neutro puro: sem amarelos, vermelhos ou acinzentados pesados.
-              O fundo fica visível através do blur. */}
+              O fundo fica visÃ­vel atravÃ©s do blur. */}
           <LinearGradient
             colors={[
               'rgba(255,255,255,0.06)',
@@ -184,7 +195,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
           />
 
           {/* G4: Reflexo ambiental superior-esquerdo
-              Fonte de luz de estúdio — efeito visionOS / Apple */}
+              Fonte de luz de estÃºdio â€” efeito visionOS / Apple */}
           <LinearGradient
             colors={[
               'rgba(255, 255, 255, 0.18)',
@@ -197,7 +208,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
           />
 
           {/* G5: Highlight de volume central
-              Centro levemente mais luminoso — curvatura 3D ilusória */}
+              Centro levemente mais luminoso â€” curvatura 3D ilusÃ³ria */}
           <LinearGradient
             colors={[
               'transparent',
@@ -211,9 +222,9 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
             end={{ x: 0.88, y: 0.5 }}
           />
 
-          {/* G6: Vignette de profundidade inferior — levíssima
-              Densidade mínima na base; reforça espessura do material
-              sem escurecer nem criar coloração própria */}
+          {/* G6: Vignette de profundidade inferior â€” levÃ­ssima
+              Densidade mÃ­nima na base; reforÃ§a espessura do material
+              sem escurecer nem criar coloraÃ§Ã£o prÃ³pria */}
           <LinearGradient
             colors={[
               'transparent',
@@ -227,7 +238,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
           />
 
           {/* G7: Shimmer diagonal
-              Faixa de luz percorrendo o card em diagonal periódica.
+              Faixa de luz percorrendo o card em diagonal periÃ³dica.
               Simula reflexo de ambiente em movimento sobre vidro real. */}
           <Animated.View
             pointerEvents="none"
@@ -258,10 +269,10 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
             />
           </Animated.View>
 
-          {/* ── G8: CONTEÚDO — preservado integralmente ──────────────── */}
+          {/* â”€â”€ G8: CONTEÃšDO â€” preservado integralmente â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <View style={styles.content}>
 
-            {/* ÍCONE — preservado */}
+            {/* ÃCONE â€” preservado */}
             <Ionicons
               name="people-outline"
               size={18}
@@ -269,7 +280,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
               style={{ marginBottom: 6 }}
             />
 
-            {/* IMAGEM — floatAnim preservado, source preservado */}
+            {/* IMAGEM â€” floatAnim preservado, source preservado */}
             <Animated.Image
               source={require('../../assets/img/socios/card_branco.png')}
               style={[
@@ -280,13 +291,11 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
               ]}
             />
 
-            {/* TEXTO — preservado */}
-            <Text style={styles.title}>Seja Sócio</Text>
-            <Text style={styles.desc}>
-              Tenha benefícios exclusivos
-            </Text>
+            {/* TEXTO â€” preservado */}
+            <Text style={styles.title}>{socioCardTitle}</Text>
+            <Text style={styles.desc}>{socioCardDesc}</Text>
 
-            {/* BOTÃO — estrutura preservada, acabamento refinado */}
+            {/* BOTÃƒO â€” estrutura preservada, acabamento refinado */}
             <View style={styles.button}>
               <BlurView
                 intensity={40}
@@ -304,7 +313,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
                 end={{ x: 0.5, y: 1 }}
               />
 
-              {/* Linha especular interna — aresta superior do botão */}
+              {/* Linha especular interna â€” aresta superior do botÃ£o */}
               <View style={styles.buttonSpecular} />
 
               <View style={styles.buttonBorder} />
@@ -313,18 +322,18 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
             </View>
 
           </View>
-          {/* ── fim conteúdo ──────────────────────────────────────────── */}
+          {/* â”€â”€ fim conteÃºdo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 
         </View>
-        {/* ── fim glassBody ─────────────────────────────────────────── */}
+        {/* â”€â”€ fim glassBody â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
 
-        {/* ════════════════════════════════════════════════════════════════
-            CAMADA ESPECULAR — fora do overflow:hidden
+        {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            CAMADA ESPECULAR â€” fora do overflow:hidden
             Elementos especulares posicionados sobre o vidro, sem clipping.
-            Simulam as superfícies físicas reais de um material óptico.
-        ════════════════════════════════════════════════════════════════ */}
+            Simulam as superfÃ­cies fÃ­sicas reais de um material Ã³ptico.
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
 
-        {/* E1: Barra especular superior — a "linha diagnóstica" do vidro real
+        {/* E1: Barra especular superior â€” a "linha diagnÃ³stica" do vidro real
             Reflexo direto da fonte de luz na aresta superior.
             Presente mesmo em flatLeft/flatRight. */}
         <View
@@ -355,8 +364,8 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
           />
         </View>
 
-        {/* E2: Rim light esquerdo — iluminação de estúdio lateral
-            Suprimido quando flatLeft está ativo (borda plana sem aresta). */}
+        {/* E2: Rim light esquerdo â€” iluminaÃ§Ã£o de estÃºdio lateral
+            Suprimido quando flatLeft estÃ¡ ativo (borda plana sem aresta). */}
         {!flatLeft && (
           <View
             pointerEvents="none"
@@ -385,9 +394,9 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
           </View>
         )}
 
-        {/* E3: Franja cromática inferior — refração de ondas curtas
-            Azul-índigo extremamente sutil na aresta inferior.
-            Imperceptível na maioria dos ângulos; textura de vidro óptico. */}
+        {/* E3: Franja cromÃ¡tica inferior â€” refraÃ§Ã£o de ondas curtas
+            Azul-Ã­ndigo extremamente sutil na aresta inferior.
+            ImperceptÃ­vel na maioria dos Ã¢ngulos; textura de vidro Ã³ptico. */}
         <View
           pointerEvents="none"
           style={{
@@ -414,8 +423,8 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
           />
         </View>
 
-        {/* E4: Franja âmbar — borda superior-direita (refração de ondas longas)
-            Suprimida quando flatRight está ativo. */}
+        {/* E4: Franja Ã¢mbar â€” borda superior-direita (refraÃ§Ã£o de ondas longas)
+            Suprimida quando flatRight estÃ¡ ativo. */}
         {!flatRight && (
           <View
             pointerEvents="none"
@@ -464,7 +473,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
         />
 
         {/* E6: Anel interno inset (0.5px, recuado 1.5px)
-            Segunda superfície do vidro — ilusão de espessura do material.
+            Segunda superfÃ­cie do vidro â€” ilusÃ£o de espessura do material.
             Detalhe que separa o premium do comum. */}
         <View
           pointerEvents="none"
@@ -493,12 +502,12 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const styles = StyleSheet.create({
 
-  // Container externo de transformação — sem overflow:hidden.
+  // Container externo de transformaÃ§Ã£o â€” sem overflow:hidden.
   // Sombras aqui renderizam corretamente no iOS (overflow as cancelaria).
-  // Sombra: neutra, soft, premium — sem tonalidades quentes ou avermelhadas.
+  // Sombra: neutra, soft, premium â€” sem tonalidades quentes ou avermelhadas.
   outerContainer: {
     height:       250,
     borderRadius: 22,
@@ -509,7 +518,7 @@ const styles = StyleSheet.create({
     elevation:     12,
   },
 
-  // Corpo do vidro — overflow:hidden para clip do blur e shimmer.
+  // Corpo do vidro â€” overflow:hidden para clip do blur e shimmer.
   glassBody: {
     flex:            1,
     borderRadius:    22,
@@ -517,7 +526,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.02)',
   },
 
-  // ── Conteúdo — preservado ─────────────────────────────────────────────
+  // â”€â”€ ConteÃºdo â€” preservado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   content: {
     padding: 20,
     flex:    1,
@@ -546,7 +555,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
 
-  // Botão glass — estrutura preservada
+  // BotÃ£o glass â€” estrutura preservada
   button: {
     marginTop:      'auto',
     height:         26,
@@ -558,7 +567,7 @@ const styles = StyleSheet.create({
     alignSelf:      'flex-start',
   },
 
-  // Linha especular interna do botão — aresta superior do vidro
+  // Linha especular interna do botÃ£o â€” aresta superior do vidro
   buttonSpecular: {
     position:        'absolute',
     top:             0,
@@ -583,7 +592,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 
-  // Glow style — preservado na definição (não renderizado, igual ao original)
+  // Glow style â€” preservado na definiÃ§Ã£o (nÃ£o renderizado, igual ao original)
   glow: {
     position:        'absolute',
     width:           110,
@@ -594,7 +603,7 @@ const styles = StyleSheet.create({
     top:             20,
   },
 
-  // ── Flat edge styles — preservados ───────────────────────────────────
+  // â”€â”€ Flat edge styles â€” preservados â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   flatLeft: {
     borderTopLeftRadius:    4,
     borderBottomLeftRadius: 4,
@@ -615,3 +624,5 @@ const styles = StyleSheet.create({
   },
 
 });
+
+
