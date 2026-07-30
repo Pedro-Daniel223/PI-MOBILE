@@ -30,6 +30,7 @@ import { fetchPurchaseHistory } from "../services/purchaseService";
 
 import { useSubscription } from "../contexts/SubscriptionContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
 
 const user = defaultUser;
 const DEFAULT_AVATAR = defaultUser.avatar;
@@ -123,53 +124,238 @@ const SEXO_OPTIONS = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
+// DESIGN SYSTEM — Tokens Light/Dark (Liquid Glass)
+// Segue o mesmo padrão adotado em LojaScreens: ThemeContext + makeStyles(DS)
+// via useMemo. Dark Mode mantém EXATAMENTE os valores originais já usados
+// nesta tela; Light Mode é um conjunto de tokens novo e paralelo.
+// ─────────────────────────────────────────────────────────────────────────────
+const DARK_DS = {
+  scheme: "dark",
+  bgGradient: ["#160000", "#0a0a0a", "#050505"],
+  screenBg: "#050505",
+
+  textPrimary: "#ffffff",
+  textSecondary: "rgba(255,255,255,0.7)",
+  textMuted: "rgba(255,255,255,0.45)",
+  textFaint: "rgba(255,255,255,0.35)",
+
+  glassBlurIntensity: 32,
+  glassBlurTint: "dark",
+  glassFillGradient: ["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"],
+  glassBorder: "rgba(255,255,255,0.10)",
+  glassBorderSoft: "rgba(255,255,255,0.09)",
+  glassIconBg: "rgba(255,255,255,0.06)",
+  glassChipBg: "rgba(255,255,255,0.08)",
+
+  specularTop: "rgba(255,255,255,0.35)",
+  specularTopStrong: "rgba(255,255,255,0.55)",
+
+  shadowColor: "#000",
+  shadowOpacityCard: 0.35,
+  shadowOpacityPromo: 0.3,
+  shadowOpacityModal: 0.4,
+
+  accent: "#e8000f",
+  accentSoft: "rgba(232,0,15,0.12)",
+  accentBorder: "rgba(232,0,15,0.42)",
+  accentGradient: ["#e8000f", "#a3000a"],
+
+  dividerColor: "rgba(255,255,255,0.10)",
+  dividerColorSoft: "rgba(255,255,255,0.07)",
+
+  logoutText: "#ff6b6b",
+  logoutBorder: "rgba(255,107,107,0.25)",
+
+  notifDotBorder: "#0a0a0a",
+
+  // Modal (Editar Perfil)
+  modalOverlay: "rgba(4,0,0,0.55)",
+  modalBg: "rgba(18,10,10,0.4)",
+  modalBlurTint: "dark",
+  modalBorder: "rgba(255,255,255,0.16)",
+  modalFillGradient: ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"],
+  modalTitleColor: "#ffffff",
+  modalSubtitleColor: "rgba(255,255,255,0.5)",
+  closeBtnBg: "rgba(255,255,255,0.10)",
+  closeBtnBorder: "rgba(255,255,255,0.16)",
+  closeBtnIcon: "#ffffff",
+
+  fieldLabelColor: "rgba(255,255,255,0.62)",
+  fieldBorder: "rgba(255,255,255,0.14)",
+  fieldIconColor: "rgba(255,255,255,0.55)",
+  fieldTextColor: "#ffffff",
+  fieldPlaceholder: "rgba(255,255,255,0.32)",
+  fieldReadOnlyBorder: "rgba(255,255,255,0.08)",
+  fieldReadOnlyText: "rgba(255,255,255,0.45)",
+  fieldReadOnlyIcon: "rgba(255,255,255,0.32)",
+  fieldLockIcon: "rgba(255,255,255,0.28)",
+  fieldValidBorder: "rgba(78,224,138,0.55)",
+  fieldErrorBorder: "rgba(255,107,107,0.55)",
+
+  sexoOptionBorder: "rgba(255,255,255,0.14)",
+  sexoOptionBg: "rgba(255,255,255,0.05)",
+  sexoOptionSelectedBorder: "rgba(232,0,15,0.65)",
+  sexoOptionText: "rgba(255,255,255,0.6)",
+  sexoOptionTextSelected: "#ffffff",
+
+  footerBorder: "rgba(255,255,255,0.10)",
+  cancelBtnBg: "rgba(255,255,255,0.08)",
+  cancelBtnBorder: "rgba(255,255,255,0.16)",
+  cancelTextColor: "rgba(255,255,255,0.75)",
+  saveBtnBorder: "rgba(255,255,255,0.18)",
+  saveTextColor: "#ffffff",
+  saveTextDisabledColor: "rgba(255,255,255,0.35)",
+  saveDisabledGradient: ["rgba(255,255,255,0.10)", "rgba(255,255,255,0.05)"],
+};
+
+const LIGHT_DS = {
+  scheme: "light",
+  // Fundo levemente rosado/crimson-neutro para preservar a identidade Drakos
+  // sem cair em branco puro (regra do design system: evitar fundos puros).
+  bgGradient: ["#fbeceb", "#f6f1ef", "#f3f2f0"],
+  screenBg: "#f3f2f0",
+
+  textPrimary: "#1a1414",
+  textSecondary: "rgba(26,20,20,0.68)",
+  textMuted: "rgba(26,20,20,0.48)",
+  textFaint: "rgba(26,20,20,0.38)",
+
+  glassBlurIntensity: 40,
+  glassBlurTint: "light",
+  glassFillGradient: ["rgba(255,255,255,0.55)", "rgba(255,255,255,0.22)"],
+  glassBorder: "rgba(20,10,10,0.08)",
+  glassBorderSoft: "rgba(20,10,10,0.07)",
+  glassIconBg: "rgba(20,10,10,0.05)",
+  glassChipBg: "rgba(255,255,255,0.6)",
+
+  specularTop: "rgba(255,255,255,0.85)",
+  specularTopStrong: "rgba(255,255,255,0.95)",
+
+  shadowColor: "#402020",
+  shadowOpacityCard: 0.14,
+  shadowOpacityPromo: 0.10,
+  shadowOpacityModal: 0.16,
+
+  accent: "#c0000a",
+  accentSoft: "rgba(192,0,10,0.08)",
+  accentBorder: "rgba(192,0,10,0.30)",
+  accentGradient: ["#e8000f", "#a3000a"],
+
+  dividerColor: "rgba(20,10,10,0.08)",
+  dividerColorSoft: "rgba(20,10,10,0.06)",
+
+  logoutText: "#c0392b",
+  logoutBorder: "rgba(192,57,43,0.22)",
+
+  notifDotBorder: "#f3f2f0",
+
+  // Modal (Editar Perfil)
+  modalOverlay: "rgba(30,15,15,0.32)",
+  modalBg: "rgba(255,251,250,0.55)",
+  modalBlurTint: "light",
+  modalBorder: "rgba(20,10,10,0.10)",
+  modalFillGradient: ["rgba(255,255,255,0.55)", "rgba(255,255,255,0.20)"],
+  modalTitleColor: "#1a1414",
+  modalSubtitleColor: "rgba(26,20,20,0.55)",
+  closeBtnBg: "rgba(20,10,10,0.06)",
+  closeBtnBorder: "rgba(20,10,10,0.10)",
+  closeBtnIcon: "#1a1414",
+
+  fieldLabelColor: "rgba(26,20,20,0.62)",
+  fieldBorder: "rgba(20,10,10,0.12)",
+  fieldIconColor: "rgba(26,20,20,0.5)",
+  fieldTextColor: "#1a1414",
+  fieldPlaceholder: "rgba(26,20,20,0.32)",
+  fieldReadOnlyBorder: "rgba(20,10,10,0.06)",
+  fieldReadOnlyText: "rgba(26,20,20,0.45)",
+  fieldReadOnlyIcon: "rgba(26,20,20,0.30)",
+  fieldLockIcon: "rgba(26,20,20,0.28)",
+  fieldValidBorder: "rgba(36,158,90,0.55)",
+  fieldErrorBorder: "rgba(214,68,58,0.55)",
+
+  sexoOptionBorder: "rgba(20,10,10,0.12)",
+  sexoOptionBg: "rgba(20,10,10,0.03)",
+  sexoOptionSelectedBorder: "rgba(192,0,10,0.55)",
+  sexoOptionText: "rgba(26,20,20,0.55)",
+  sexoOptionTextSelected: "#ffffff",
+
+  footerBorder: "rgba(20,10,10,0.08)",
+  cancelBtnBg: "rgba(20,10,10,0.05)",
+  cancelBtnBorder: "rgba(20,10,10,0.10)",
+  cancelTextColor: "rgba(26,20,20,0.72)",
+  saveBtnBorder: "rgba(20,10,10,0.10)",
+  saveTextColor: "#ffffff",
+  saveTextDisabledColor: "rgba(26,20,20,0.32)",
+  saveDisabledGradient: ["rgba(20,10,10,0.08)", "rgba(20,10,10,0.04)"],
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // HELPER — Identidade visual do plano de sócio (apenas apresentação)
 // Deriva emoji/label/cores a partir de subscription.tier (API) + title/price
 // já existentes no objeto subscription. Não introduz novos campos de dados,
-// não cria estado, não toca em contexts. Paleta 100% crimson/neutra — sem
-// dourado — para manter consistência com o resto do app.
+// não cria estado, não toca em contexts.
+// Agora recebe DS (tokens de tema) para adaptar cores neutras entre temas,
+// preservando as cores de identidade de cada tier (diamante/ouro/prata).
 // ─────────────────────────────────────────────────────────────────────────────
-const TIER_META = {
+const getTierMeta = (DS) => ({
   diamante: {
     emoji: "👑",
     label: "Sócio Diamante",
-    accent: "#ffffff",
-    cardColors: ["#2c2c2e", "#161616", "#0a0a0a"],
-    borderColor: "rgba(255,255,255,0.30)",
-    glowColor: "rgba(255,255,255,0.12)",
-    textColor: "#ffffff",
+    accent: DS.scheme === "dark" ? "#ffffff" : "#3a3a3c",
+    cardColors:
+      DS.scheme === "dark"
+        ? ["#2c2c2e", "#161616", "#0a0a0a"]
+        : ["#f2f2f4", "#e4e4e7", "#d4d4d8"],
+    borderColor:
+      DS.scheme === "dark" ? "rgba(255,255,255,0.30)" : "rgba(60,60,67,0.22)",
+    glowColor:
+      DS.scheme === "dark" ? "rgba(255,255,255,0.12)" : "rgba(60,60,67,0.08)",
+    textColor: DS.scheme === "dark" ? "#ffffff" : "#1a1414",
   },
   ouro: {
     emoji: "⭐",
     label: "Sócio Ouro",
-    accent: "#ff3b30",
-    cardColors: ["#3a0006", "#1c0002", "#0a0a0a"],
-    borderColor: "rgba(232,0,15,0.42)",
-    glowColor: "rgba(232,0,15,0.20)",
-    textColor: "#ffece9",
+    accent: DS.scheme === "dark" ? "#ff3b30" : "#c0000a",
+    cardColors:
+      DS.scheme === "dark"
+        ? ["#3a0006", "#1c0002", "#0a0a0a"]
+        : ["#fdebe9", "#fbd8d4", "#f5c1bc"],
+    borderColor:
+      DS.scheme === "dark" ? "rgba(232,0,15,0.42)" : "rgba(192,0,10,0.30)",
+    glowColor:
+      DS.scheme === "dark" ? "rgba(232,0,15,0.20)" : "rgba(192,0,10,0.10)",
+    textColor: DS.scheme === "dark" ? "#ffece9" : "#5c0a06",
   },
   prata: {
     emoji: "🥈",
     label: "Sócio Prata",
-    accent: "#c7c9cc",
-    cardColors: ["#2a2a2c", "#18181a", "#0a0a0a"],
-    borderColor: "rgba(199,201,204,0.32)",
-    glowColor: "rgba(199,201,204,0.14)",
-    textColor: "#f0f0f2",
+    accent: DS.scheme === "dark" ? "#c7c9cc" : "#5c5c60",
+    cardColors:
+      DS.scheme === "dark"
+        ? ["#2a2a2c", "#18181a", "#0a0a0a"]
+        : ["#f4f4f5", "#e6e6e8", "#d8d8db"],
+    borderColor:
+      DS.scheme === "dark" ? "rgba(199,201,204,0.32)" : "rgba(92,92,96,0.22)",
+    glowColor:
+      DS.scheme === "dark" ? "rgba(199,201,204,0.14)" : "rgba(92,92,96,0.08)",
+    textColor: DS.scheme === "dark" ? "#f0f0f2" : "#242426",
   },
-};
+});
 
-const DEFAULT_TIER_META = {
+const getDefaultTierMeta = (DS) => ({
   emoji: "⭐",
   label: null,
-  accent: "#e8000f",
-  cardColors: ["#3a0006", "#1c0002", "#0a0a0a"],
-  borderColor: "rgba(232,0,15,0.42)",
-  glowColor: "rgba(232,0,15,0.20)",
-  textColor: "#ffece9",
-};
+  accent: DS.accent,
+  cardColors:
+    DS.scheme === "dark"
+      ? ["#3a0006", "#1c0002", "#0a0a0a"]
+      : ["#fdebe9", "#fbd8d4", "#f5c1bc"],
+  borderColor: DS.accentBorder,
+  glowColor: DS.scheme === "dark" ? "rgba(232,0,15,0.20)" : "rgba(192,0,10,0.10)",
+  textColor: DS.scheme === "dark" ? "#ffece9" : "#5c0a06",
+});
 
-const getPlanIdentity = (subscription) => {
+const getPlanIdentity = (subscription, DS) => {
   if (!subscription) {
     return {
       isSocio: false,
@@ -178,16 +364,20 @@ const getPlanIdentity = (subscription) => {
       sublabel: "Torne-se Sócio Drakos",
       title: null,
       price: null,
-      accent: "rgba(255,255,255,0.55)",
-      cardColors: ["rgba(255,255,255,0.07)", "rgba(255,255,255,0.02)"],
-      borderColor: "rgba(255,255,255,0.14)",
-      glowColor: "rgba(255,255,255,0.05)",
-      textColor: "rgba(255,255,255,0.75)",
+      accent: DS.textMuted,
+      cardColors:
+        DS.scheme === "dark"
+          ? ["rgba(255,255,255,0.07)", "rgba(255,255,255,0.02)"]
+          : ["rgba(20,10,10,0.05)", "rgba(20,10,10,0.015)"],
+      borderColor: DS.glassBorder,
+      glowColor: DS.scheme === "dark" ? "rgba(255,255,255,0.05)" : "rgba(20,10,10,0.03)",
+      textColor: DS.textSecondary,
     };
   }
 
   const tierKey = String(subscription.tier || "").trim().toLowerCase();
-  const meta = TIER_META[tierKey] || DEFAULT_TIER_META;
+  const TIER_META = getTierMeta(DS);
+  const meta = TIER_META[tierKey] || getDefaultTierMeta(DS);
 
   return {
     isSocio: true,
@@ -257,6 +447,8 @@ const GlassField = React.memo(function GlassField({
   onSubmitEditing,
   blurOnSubmit = false,
   inputRef,
+  editStyles,
+  DS,
 }) {
   const invalid = showValidation && isValid === false;
   const valid = showValidation && isValid === true;
@@ -271,15 +463,17 @@ const GlassField = React.memo(function GlassField({
           valid && editStyles.inputShellValid,
         ]}
       >
-        <BlurView intensity={26} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={26} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
         <LinearGradient
-          colors={["rgba(255,255,255,0.07)", "rgba(255,255,255,0.02)"]}
+          colors={DS.scheme === "dark"
+            ? ["rgba(255,255,255,0.07)", "rgba(255,255,255,0.02)"]
+            : ["rgba(255,255,255,0.5)", "rgba(255,255,255,0.15)"]}
           style={StyleSheet.absoluteFill}
         />
         <Ionicons
           name={icon}
           size={16}
-          color="rgba(255,255,255,0.55)"
+          color={DS.fieldIconColor}
           style={editStyles.fieldIcon}
         />
         <TextInput
@@ -288,7 +482,7 @@ const GlassField = React.memo(function GlassField({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="rgba(255,255,255,0.32)"
+          placeholderTextColor={DS.fieldPlaceholder}
           keyboardType={keyboardType}
           maxLength={maxLength}
           autoCapitalize={autoCapitalize}
@@ -321,16 +515,18 @@ const ReadOnlyField = React.memo(function ReadOnlyField({
   label,
   icon,
   value,
+  editStyles,
+  DS,
 }) {
   return (
     <View style={editStyles.fieldWrap}>
       <Text style={editStyles.fieldLabel}>{label}</Text>
       <View style={[editStyles.inputShell, editStyles.inputShellReadOnly]}>
-        <BlurView intensity={14} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={14} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
         <Ionicons
           name={icon}
           size={16}
-          color="rgba(255,255,255,0.32)"
+          color={DS.fieldReadOnlyIcon}
           style={editStyles.fieldIcon}
         />
         <Text style={editStyles.readOnlyText} numberOfLines={1}>
@@ -339,7 +535,7 @@ const ReadOnlyField = React.memo(function ReadOnlyField({
         <Ionicons
           name="lock-closed"
           size={13}
-          color="rgba(255,255,255,0.28)"
+          color={DS.fieldLockIcon}
           style={editStyles.validIcon}
         />
       </View>
@@ -347,7 +543,11 @@ const ReadOnlyField = React.memo(function ReadOnlyField({
   );
 });
 
-const SexoSelector = React.memo(function SexoSelector({ value, onChange }) {
+const SexoSelector = React.memo(function SexoSelector({
+  value,
+  onChange,
+  editStyles,
+}) {
   const selectedValue = normalizeSexo(value);
 
   return (
@@ -375,7 +575,7 @@ const SexoSelector = React.memo(function SexoSelector({ value, onChange }) {
               <Ionicons
                 name={opt.icon}
                 size={16}
-                color={selected ? "#ffffff" : "rgba(255,255,255,0.55)"}
+                color={selected ? "#ffffff" : editStyles.sexoOptionIconColor}
               />
               <Text
                 style={[
@@ -394,6 +594,14 @@ const SexoSelector = React.memo(function SexoSelector({ value, onChange }) {
 });
 
 export default function PerfilScreen({ navigation }) {
+  const { isDark } = useTheme();
+  const DS = useMemo(
+    () => (isDark ? DARK_DS : LIGHT_DS),
+    [isDark],
+  );
+  const ps = useMemo(() => makePs(DS), [DS]);
+  const editStyles = useMemo(() => makeEditStyles(DS), [DS]);
+
   const [editingField, setEditingField] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -415,8 +623,8 @@ export default function PerfilScreen({ navigation }) {
 
   // ── Derivações puras de apresentação (não criam estado nem tocam contexts) ──
   const planIdentity = useMemo(
-    () => getPlanIdentity(subscription),
-    [subscription],
+    () => getPlanIdentity(subscription, DS),
+    [subscription, DS],
   );
 
   const [profileDraft, setProfileDraft] = useState(currentCliente);
@@ -651,7 +859,7 @@ export default function PerfilScreen({ navigation }) {
     <View style={ps.container}>
       {/* BACKGROUND */}
       <LinearGradient
-        colors={["#160000", "#0a0a0a", "#050505"]}
+        colors={DS.bgGradient}
         style={StyleSheet.absoluteFill}
       />
 
@@ -669,7 +877,11 @@ export default function PerfilScreen({ navigation }) {
             resizeMode="contain"
           />
           <LinearGradient
-            colors={["transparent", "rgba(5,5,5,0.55)", "#050505"]}
+            colors={
+              DS.scheme === "dark"
+                ? ["transparent", "rgba(5,5,5,0.55)", "#050505"]
+                : ["transparent", "rgba(243,242,240,0.55)", "#f3f2f0"]
+            }
             style={ps.heroFade}
             pointerEvents="none"
           />
@@ -692,7 +904,7 @@ export default function PerfilScreen({ navigation }) {
               activeOpacity={0.8}
               onPress={pickProfileImage}
             >
-              <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+              <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
               <View style={ps.editAvatarBorder} />
               <Ionicons name="camera" size={13} color="#fff" />
             </TouchableOpacity>
@@ -705,7 +917,7 @@ export default function PerfilScreen({ navigation }) {
 
           {/* Chip de status — identificação premium do plano do sócio */}
           <View style={ps.statusChip}>
-            <BlurView intensity={34} tint="dark" style={StyleSheet.absoluteFill} />
+            <BlurView intensity={34} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
             <LinearGradient
               colors={[planIdentity.glowColor, "transparent"]}
               style={StyleSheet.absoluteFill}
@@ -732,7 +944,7 @@ export default function PerfilScreen({ navigation }) {
               disabled={isSavingPhoto}
             >
               <LinearGradient
-                colors={["#e8000f", "#a3000a"]}
+                colors={DS.accentGradient}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -763,7 +975,7 @@ export default function PerfilScreen({ navigation }) {
             />
             <BlurView
               intensity={16}
-              tint="dark"
+              tint={DS.modalBlurTint}
               style={[StyleSheet.absoluteFill, { opacity: 0.35 }]}
             />
             <View
@@ -781,7 +993,7 @@ export default function PerfilScreen({ navigation }) {
               <Text style={ps.membershipEmoji}>{planIdentity.emoji}</Text>
             </View>
 
-            <Text style={ps.membershipTitle}>
+            <Text style={[ps.membershipTitle, { color: planIdentity.textColor }]}>
               {planIdentity.title || planIdentity.label}
             </Text>
             <Text style={ps.membershipSubtitle}>Sócio-torcedor Drakos FC</Text>
@@ -804,7 +1016,7 @@ export default function PerfilScreen({ navigation }) {
                 </View>
               </View>
               {planIdentity.price ? (
-                <Text style={ps.membershipPrice}>{planIdentity.price}</Text>
+                <Text style={[ps.membershipPrice, { color: planIdentity.textColor }]}>{planIdentity.price}</Text>
               ) : null}
             </View>
 
@@ -813,10 +1025,10 @@ export default function PerfilScreen({ navigation }) {
               activeOpacity={0.85}
               onPress={() => navigation.navigate("Socio")}
             >
-              <BlurView intensity={24} tint="dark" style={StyleSheet.absoluteFill} />
+              <BlurView intensity={24} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
               <View style={ps.membershipManageBorder} />
-              <Text style={ps.membershipManageBtnText}>Gerenciar assinatura</Text>
-              <Ionicons name="chevron-forward" size={14} color="#fff" />
+              <Text style={[ps.membershipManageBtnText, { color: planIdentity.textColor }]}>Gerenciar assinatura</Text>
+              <Ionicons name="chevron-forward" size={14} color={planIdentity.textColor} />
             </TouchableOpacity>
           </View>
         ) : (
@@ -826,7 +1038,11 @@ export default function PerfilScreen({ navigation }) {
             onPress={() => navigation.navigate("Socio")}
           >
             <LinearGradient
-              colors={["#2a0004", "#150002", "#0a0a0a"]}
+              colors={
+                DS.scheme === "dark"
+                  ? ["#2a0004", "#150002", "#0a0a0a"]
+                  : ["#fdebe9", "#fbd8d4", "#f5c1bc"]
+              }
               style={StyleSheet.absoluteFill}
               start={{ x: 0.1, y: 0 }}
               end={{ x: 0.9, y: 1 }}
@@ -835,7 +1051,7 @@ export default function PerfilScreen({ navigation }) {
             <View style={ps.membershipSpecularTop} />
 
             <View style={ps.membershipPromoIconWrap}>
-              <Ionicons name="shield-outline" size={22} color="#e8000f" />
+              <Ionicons name="shield-outline" size={22} color={DS.accent} />
             </View>
             <View style={ps.membershipPromoTextGroup}>
               <Text style={ps.membershipPromoTitle}>Torne-se Sócio Drakos</Text>
@@ -846,7 +1062,7 @@ export default function PerfilScreen({ navigation }) {
             </View>
             <View style={ps.membershipPromoCta}>
               <Text style={ps.membershipPromoCtaText}>Ver planos</Text>
-              <Ionicons name="arrow-forward" size={15} color="#e8000f" />
+              <Ionicons name="arrow-forward" size={15} color={DS.accent} />
             </View>
           </TouchableOpacity>
         )}
@@ -855,15 +1071,15 @@ export default function PerfilScreen({ navigation }) {
             BOAS-VINDAS — mensagem leve com notificação
         ══════════════════════════════════════════════════════════════ */}
         <View style={ps.welcomeCard}>
-          <BlurView intensity={32} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={32} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
           <LinearGradient
-            colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
+            colors={DS.glassFillGradient}
             style={StyleSheet.absoluteFill}
           />
           <View style={ps.welcomeBorder} />
 
           <View style={ps.welcomeIconWrap}>
-            <Ionicons name="sparkles-outline" size={16} color="#e8000f" />
+            <Ionicons name="sparkles-outline" size={16} color={DS.accent} />
           </View>
           <Text style={ps.welcomeBody}>
             Olá, {currentUser.name.split(" ")[0]}. Explore as novidades,
@@ -871,7 +1087,7 @@ export default function PerfilScreen({ navigation }) {
             gente.
           </Text>
           <TouchableOpacity style={ps.notifBadge} activeOpacity={0.8}>
-            <Ionicons name="notifications-outline" size={18} color="#fff" />
+            <Ionicons name="notifications-outline" size={18} color={DS.textPrimary} />
             <View style={ps.notifDot} />
           </TouchableOpacity>
         </View>
@@ -882,10 +1098,10 @@ export default function PerfilScreen({ navigation }) {
         <Text style={ps.groupLabel}>Acesso rápido</Text>
         <View style={ps.actionsRow}>
           <TouchableOpacity style={ps.actionCard} activeOpacity={0.85}>
-            <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+            <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
             <View style={ps.actionBorder} />
             <View style={ps.actionIconWrap}>
-              <Ionicons name="card-outline" size={19} color="#fff" />
+              <Ionicons name="card-outline" size={19} color={DS.textPrimary} />
             </View>
             <Text style={ps.actionLabel}>Meu Cartão</Text>
           </TouchableOpacity>
@@ -895,10 +1111,10 @@ export default function PerfilScreen({ navigation }) {
             activeOpacity={0.85}
             onPress={() => setShowHistory((prev) => !prev)}
           >
-            <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+            <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
             <View style={ps.actionBorder} />
             <View style={ps.actionIconWrap}>
-              <Ionicons name="receipt-outline" size={19} color="#fff" />
+              <Ionicons name="receipt-outline" size={19} color={DS.textPrimary} />
             </View>
             <Text style={ps.actionLabel}>Compras</Text>
           </TouchableOpacity>
@@ -908,10 +1124,10 @@ export default function PerfilScreen({ navigation }) {
             activeOpacity={0.85}
             onPress={() => navigation.navigate("Socio")}
           >
-            <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+            <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
             <View style={ps.actionBorder} />
             <View style={ps.actionIconWrap}>
-              <Ionicons name="people-outline" size={19} color="#fff" />
+              <Ionicons name="people-outline" size={19} color={DS.textPrimary} />
             </View>
             <Text style={ps.actionLabel}>Sócio</Text>
           </TouchableOpacity>
@@ -922,9 +1138,9 @@ export default function PerfilScreen({ navigation }) {
         ══════════════════════════════════════════════════════════════ */}
         {showHistory && (
           <View style={ps.historySection}>
-            <BlurView intensity={32} tint="dark" style={StyleSheet.absoluteFill} />
+            <BlurView intensity={32} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
             <LinearGradient
-              colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
+              colors={DS.glassFillGradient}
               style={StyleSheet.absoluteFill}
             />
             <View style={ps.historyBorder} />
@@ -936,7 +1152,7 @@ export default function PerfilScreen({ navigation }) {
                 activeOpacity={0.7}
                 style={ps.historyCloseBtn}
               >
-                <Ionicons name="close" size={15} color="#fff" />
+                <Ionicons name="close" size={15} color={DS.textPrimary} />
               </TouchableOpacity>
             </View>
 
@@ -963,7 +1179,7 @@ export default function PerfilScreen({ navigation }) {
                         <Ionicons
                           name="shield-checkmark-outline"
                           size={15}
-                          color="#e8000f"
+                          color={DS.accent}
                         />
                       </View>
                     ) : item.itemImages && item.itemImages[0] ? (
@@ -973,7 +1189,7 @@ export default function PerfilScreen({ navigation }) {
                       />
                     ) : (
                       <View style={ps.historyIconWrap}>
-                        <Ionicons name="bag-outline" size={15} color="#e8000f" />
+                        <Ionicons name="bag-outline" size={15} color={DS.accent} />
                       </View>
                     )}
                     <View style={ps.historyInfo}>
@@ -1000,7 +1216,7 @@ export default function PerfilScreen({ navigation }) {
                 <Ionicons
                   name="document-text-outline"
                   size={30}
-                  color="rgba(255,255,255,0.22)"
+                  color={DS.scheme === "dark" ? "rgba(255,255,255,0.22)" : "rgba(26,20,20,0.20)"}
                 />
                 <Text style={ps.historyEmptyText}>
                   Nenhuma compra ou assinatura ainda
@@ -1020,14 +1236,14 @@ export default function PerfilScreen({ navigation }) {
             onPress={() => setEditModalVisible(true)}
             activeOpacity={0.7}
           >
-            <Ionicons name="pencil-outline" size={15} color="#fff" />
+            <Ionicons name="pencil-outline" size={15} color={DS.textPrimary} />
           </TouchableOpacity>
         </View>
 
         <View style={ps.infoCard}>
-          <BlurView intensity={32} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={32} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
           <LinearGradient
-            colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.015)"]}
+            colors={DS.glassFillGradient}
             style={StyleSheet.absoluteFill}
           />
           <View style={ps.infoBorder} />
@@ -1035,7 +1251,7 @@ export default function PerfilScreen({ navigation }) {
           <View style={ps.infoRow}>
             <View style={ps.infoLeft}>
               <View style={ps.infoIconWrap}>
-                <Ionicons name="person-outline" size={15} color="#fff" />
+                <Ionicons name="person-outline" size={15} color={DS.textPrimary} />
               </View>
               <View style={ps.infoTextGroup}>
                 <Text style={ps.infoLabel}>Nome completo</Text>
@@ -1049,7 +1265,7 @@ export default function PerfilScreen({ navigation }) {
           <View style={ps.infoRow}>
             <View style={ps.infoLeft}>
               <View style={ps.infoIconWrap}>
-                <Ionicons name="mail-outline" size={15} color="#fff" />
+                <Ionicons name="mail-outline" size={15} color={DS.textPrimary} />
               </View>
               <View style={ps.infoTextGroup}>
                 <Text style={ps.infoLabel}>Email</Text>
@@ -1063,7 +1279,7 @@ export default function PerfilScreen({ navigation }) {
           <View style={ps.infoRow}>
             <View style={ps.infoLeft}>
               <View style={ps.infoIconWrap}>
-                <Ionicons name="call-outline" size={15} color="#fff" />
+                <Ionicons name="call-outline" size={15} color={DS.textPrimary} />
               </View>
               <View style={ps.infoTextGroup}>
                 <Text style={ps.infoLabel}>Telefone</Text>
@@ -1081,9 +1297,9 @@ export default function PerfilScreen({ navigation }) {
           activeOpacity={0.8}
           onPress={handleLogout}
         >
-          <BlurView intensity={22} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={22} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
           <View style={ps.logoutBorder} />
-          <Ionicons name="log-out-outline" size={17} color="#ff6b6b" />
+          <Ionicons name="log-out-outline" size={17} color={DS.logoutText} />
           <Text style={ps.logoutText}>Sair da conta</Text>
         </TouchableOpacity>
 
@@ -1145,11 +1361,11 @@ export default function PerfilScreen({ navigation }) {
             >
               <BlurView
                 intensity={55}
-                tint="dark"
+                tint={DS.modalBlurTint}
                 style={StyleSheet.absoluteFill}
               />
               <LinearGradient
-                colors={["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]}
+                colors={DS.modalFillGradient}
                 style={StyleSheet.absoluteFill}
               />
               <View style={editStyles.specularTop} />
@@ -1168,7 +1384,7 @@ export default function PerfilScreen({ navigation }) {
                   onPress={closeEditModal}
                   activeOpacity={0.75}
                 >
-                  <Ionicons name="close" size={18} color="#fff" />
+                  <Ionicons name="close" size={18} color={DS.closeBtnIcon} />
                 </TouchableOpacity>
               </View>
 
@@ -1190,6 +1406,8 @@ export default function PerfilScreen({ navigation }) {
                   autoCapitalize="none"
                   returnKeyType="next"
                   onSubmitEditing={() => nomeRef.current?.focus()}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
 
                 <Text style={editStyles.sectionLabel}>Informações básicas</Text>
@@ -1206,6 +1424,8 @@ export default function PerfilScreen({ navigation }) {
                   returnKeyType="next"
                   inputRef={nomeRef}
                   onSubmitEditing={() => sobrenomeRef.current?.focus()}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
 
                 <GlassField
@@ -1218,6 +1438,8 @@ export default function PerfilScreen({ navigation }) {
                   returnKeyType="next"
                   inputRef={sobrenomeRef}
                   onSubmitEditing={() => emailRef.current?.focus()}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
 
                 <GlassField
@@ -1233,6 +1455,8 @@ export default function PerfilScreen({ navigation }) {
                   returnKeyType="next"
                   inputRef={emailRef}
                   onSubmitEditing={() => telefoneRef.current?.focus()}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
 
                 <GlassField
@@ -1248,11 +1472,14 @@ export default function PerfilScreen({ navigation }) {
                   returnKeyType="next"
                   inputRef={telefoneRef}
                   onSubmitEditing={() => ruaRef.current?.focus()}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
 
                 <SexoSelector
                   value={profileDraft.sexo}
                   onChange={handleSexoChange}
+                  editStyles={editStyles}
                 />
 
                 <Text style={editStyles.sectionLabel}>Endereço</Text>
@@ -1267,6 +1494,8 @@ export default function PerfilScreen({ navigation }) {
                   returnKeyType="next"
                   inputRef={ruaRef}
                   onSubmitEditing={() => numeroRef.current?.focus()}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
 
                 <View style={editStyles.rowTwo}>
@@ -1282,6 +1511,8 @@ export default function PerfilScreen({ navigation }) {
                       returnKeyType="next"
                       inputRef={numeroRef}
                       onSubmitEditing={() => cepRef.current?.focus()}
+                      editStyles={editStyles}
+                      DS={DS}
                     />
                   </View>
                   <View style={{ width: 12 }} />
@@ -1299,6 +1530,8 @@ export default function PerfilScreen({ navigation }) {
                       returnKeyType="next"
                       inputRef={cepRef}
                       onSubmitEditing={() => bairroRef.current?.focus()}
+                      editStyles={editStyles}
+                      DS={DS}
                     />
                   </View>
                 </View>
@@ -1313,6 +1546,8 @@ export default function PerfilScreen({ navigation }) {
                   returnKeyType="next"
                   inputRef={bairroRef}
                   onSubmitEditing={() => complementoRef.current?.focus()}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
 
                 <GlassField
@@ -1326,6 +1561,8 @@ export default function PerfilScreen({ navigation }) {
                   blurOnSubmit
                   inputRef={complementoRef}
                   onSubmitEditing={() => complementoRef.current?.blur()}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
 
                 <Text style={editStyles.sectionLabel}>Dados verificados</Text>
@@ -1334,16 +1571,22 @@ export default function PerfilScreen({ navigation }) {
                   label="CPF"
                   icon="card-outline"
                   value={currentUser.cpf}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
                 <ReadOnlyField
                   label="ID do cliente"
                   icon="finger-print-outline"
                   value={currentUser.id}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
                 <ReadOnlyField
                   label="Categoria"
                   icon="ribbon-outline"
                   value={currentUser.category || currentUser.status}
+                  editStyles={editStyles}
+                  DS={DS}
                 />
               </ScrollView>
 
@@ -1366,8 +1609,8 @@ export default function PerfilScreen({ navigation }) {
                   <LinearGradient
                     colors={
                       isProfileFormValid
-                        ? ["#e8000f", "#a3000a"]
-                        : ["rgba(255,255,255,0.10)", "rgba(255,255,255,0.05)"]
+                        ? DS.accentGradient
+                        : DS.saveDisabledGradient
                     }
                     style={StyleSheet.absoluteFill}
                     start={{ x: 0, y: 0 }}
@@ -1377,7 +1620,7 @@ export default function PerfilScreen({ navigation }) {
                     name="checkmark"
                     size={17}
                     color={
-                      isProfileFormValid ? "#fff" : "rgba(255,255,255,0.35)"
+                      isProfileFormValid ? "#fff" : DS.saveTextDisabledColor
                     }
                   />
                   <Text
@@ -1402,811 +1645,829 @@ export default function PerfilScreen({ navigation }) {
 // Hero cinematográfico + Membership Card + cartões renovados.
 // Regra de sombra iOS: containers com shadow* NÃO usam overflow:'hidden';
 // um wrapper interno separado faz o clip de blur/gradiente.
+//
+// Convertido para factory makePs(DS) para suportar Light/Dark Mode mantendo
+// a mesma estrutura/valores de layout já existentes — apenas cores/tokens
+// passam a vir de DS. Nenhuma prop, nome de chave ou valor de layout
+// (paddings, tamanhos, radius, gaps) foi alterado.
 // ─────────────────────────────────────────────────────────────────────────────
-const ps = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 56,
-    paddingBottom: 40,
-    gap: 18,
-  },
+const makePs = (DS) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    content: {
+      paddingHorizontal: 20,
+      paddingTop: 56,
+      paddingBottom: 40,
+      gap: 18,
+    },
 
-  // ── HERO ──────────────────────────────────────────────────────────────
-  hero: {
-    alignItems: "center",
-    paddingBottom: 6,
-    position: "relative",
-  },
-  heroWatermark: {
-    position: "absolute",
-    width: 260,
-    height: 260,
-    top: -70,
-    alignSelf: "center",
-    opacity: 0.05,
-  },
-  heroFade: {
-    position: "absolute",
-    top: -40,
-    left: -20,
-    right: -20,
-    height: 180,
-  },
-  avatarStage: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  avatarGlow: {
-    position: "absolute",
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-  },
-  avatarRing: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
-    borderWidth: 1.5,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 4,
-  },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-  },
-  editAvatarBtn: {
-    position: "absolute",
-    bottom: 0,
-    right: 4,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(232,0,15,0.9)",
-  },
-  editAvatarBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.35)",
-  },
-  username: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "800",
-    letterSpacing: -0.3,
-    textAlign: "center",
-  },
-  categoryText: {
-    color: "rgba(255,255,255,0.45)",
-    fontSize: 12.5,
-    fontWeight: "500",
-    marginTop: 3,
-    textAlign: "center",
-  },
+    // ── HERO ──────────────────────────────────────────────────────────────
+    hero: {
+      alignItems: "center",
+      paddingBottom: 6,
+      position: "relative",
+    },
+    heroWatermark: {
+      position: "absolute",
+      width: 260,
+      height: 260,
+      top: -70,
+      alignSelf: "center",
+      opacity: DS.scheme === "dark" ? 0.05 : 0.045,
+    },
+    heroFade: {
+      position: "absolute",
+      top: -40,
+      left: -20,
+      right: -20,
+      height: 180,
+    },
+    avatarStage: {
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 16,
+    },
+    avatarGlow: {
+      position: "absolute",
+      width: 140,
+      height: 140,
+      borderRadius: 70,
+    },
+    avatarRing: {
+      width: 108,
+      height: 108,
+      borderRadius: 54,
+      borderWidth: 1.5,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 4,
+    },
+    avatar: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+    },
+    editAvatarBtn: {
+      position: "absolute",
+      bottom: 0,
+      right: 4,
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      overflow: "hidden",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: DS.scheme === "dark" ? "rgba(232,0,15,0.9)" : "rgba(192,0,10,0.92)",
+    },
+    editAvatarBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 15,
+      borderWidth: 1,
+      borderColor: DS.scheme === "dark" ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.55)",
+    },
+    username: {
+      color: DS.textPrimary,
+      fontSize: 24,
+      fontWeight: "800",
+      letterSpacing: -0.3,
+      textAlign: "center",
+    },
+    categoryText: {
+      color: DS.textMuted,
+      fontSize: 12.5,
+      fontWeight: "500",
+      marginTop: 3,
+      textAlign: "center",
+    },
 
-  statusChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "center",
-    borderRadius: 30,
-    overflow: "hidden",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    gap: 7,
-    marginTop: 14,
-  },
-  statusChipBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 30,
-    borderWidth: 1,
-  },
-  statusChipEmoji: {
-    fontSize: 13,
-  },
-  statusChipText: {
-    fontSize: 12.5,
-    fontWeight: "700",
-    letterSpacing: 0.3,
-  },
+    statusChip: {
+      flexDirection: "row",
+      alignItems: "center",
+      alignSelf: "center",
+      borderRadius: 30,
+      overflow: "hidden",
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      gap: 7,
+      marginTop: 14,
+    },
+    statusChipBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 30,
+      borderWidth: 1,
+    },
+    statusChipEmoji: {
+      fontSize: 13,
+    },
+    statusChipText: {
+      fontSize: 12.5,
+      fontWeight: "700",
+      letterSpacing: 0.3,
+    },
 
-  savePhotoBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    height: 40,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    overflow: "hidden",
-    gap: 7,
-    marginTop: 14,
-  },
-  savePhotoBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)",
-  },
-  savePhotoText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "700",
-  },
+    savePhotoBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      alignSelf: "center",
+      height: 40,
+      paddingHorizontal: 20,
+      borderRadius: 20,
+      overflow: "hidden",
+      gap: 7,
+      marginTop: 14,
+    },
+    savePhotoBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.25)",
+    },
+    savePhotoText: {
+      color: "#fff",
+      fontSize: 13,
+      fontWeight: "700",
+    },
 
-  // ── MEMBERSHIP CARD ───────────────────────────────────────────────────
-  membershipCard: {
-    borderRadius: 22,
-    overflow: "hidden",
-    padding: 18,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-  membershipBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: "rgba(232,0,15,0.42)",
-  },
-  membershipSpecularTop: {
-    position: "absolute",
-    top: 0,
-    left: "14%",
-    right: "14%",
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.35)",
-  },
-  membershipTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  membershipBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  membershipBadgeText: {
-    fontSize: 10,
-    fontWeight: "800",
-    letterSpacing: 1,
-  },
-  membershipEmoji: {
-    fontSize: 22,
-  },
-  membershipTitle: {
-    color: "#fff",
-    fontSize: 21,
-    fontWeight: "900",
-    letterSpacing: -0.4,
-    marginTop: 14,
-  },
-  membershipSubtitle: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 12,
-    fontWeight: "500",
-    marginTop: 3,
-  },
-  membershipDivider: {
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.10)",
-    marginVertical: 16,
-  },
-  membershipFooterRow: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-  },
-  membershipBenefits: {
-    gap: 7,
-    flex: 1,
-  },
-  membershipBenefitItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  membershipBenefitDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "rgba(255,255,255,0.5)",
-  },
-  membershipBenefitText: {
-    color: "rgba(255,255,255,0.65)",
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  membershipPrice: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  membershipManageBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 42,
-    borderRadius: 13,
-    overflow: "hidden",
-    gap: 6,
-    marginTop: 16,
-  },
-  membershipManageBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 13,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.16)",
-  },
-  membershipManageBtnText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "700",
-  },
+    // ── MEMBERSHIP CARD ───────────────────────────────────────────────────
+    membershipCard: {
+      borderRadius: 22,
+      overflow: "hidden",
+      padding: 18,
+      shadowColor: DS.shadowColor,
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: DS.shadowOpacityCard,
+      shadowRadius: 20,
+      elevation: 12,
+    },
+    membershipBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 22,
+      borderWidth: 1,
+      borderColor: DS.accentBorder,
+    },
+    membershipSpecularTop: {
+      position: "absolute",
+      top: 0,
+      left: "14%",
+      right: "14%",
+      height: 1,
+      backgroundColor: DS.specularTop,
+    },
+    membershipTopRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    membershipBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+    },
+    membershipBadgeText: {
+      fontSize: 10,
+      fontWeight: "800",
+      letterSpacing: 1,
+    },
+    membershipEmoji: {
+      fontSize: 22,
+    },
+    membershipTitle: {
+      color: DS.textPrimary,
+      fontSize: 21,
+      fontWeight: "900",
+      letterSpacing: -0.4,
+      marginTop: 14,
+    },
+    membershipSubtitle: {
+      color: DS.textMuted,
+      fontSize: 12,
+      fontWeight: "500",
+      marginTop: 3,
+    },
+    membershipDivider: {
+      height: 1,
+      backgroundColor: DS.dividerColor,
+      marginVertical: 16,
+    },
+    membershipFooterRow: {
+      flexDirection: "row",
+      alignItems: "flex-end",
+      justifyContent: "space-between",
+    },
+    membershipBenefits: {
+      gap: 7,
+      flex: 1,
+    },
+    membershipBenefitItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    membershipBenefitDot: {
+      width: 4,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: DS.textMuted,
+    },
+    membershipBenefitText: {
+      color: DS.textSecondary,
+      fontSize: 12,
+      fontWeight: "500",
+    },
+    membershipPrice: {
+      color: DS.textPrimary,
+      fontSize: 16,
+      fontWeight: "800",
+    },
+    membershipManageBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      height: 42,
+      borderRadius: 13,
+      overflow: "hidden",
+      gap: 6,
+      marginTop: 16,
+    },
+    membershipManageBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 13,
+      borderWidth: 1,
+      borderColor: DS.scheme === "dark" ? "rgba(255,255,255,0.16)" : "rgba(20,10,10,0.10)",
+    },
+    membershipManageBtnText: {
+      color: DS.textPrimary,
+      fontSize: 13,
+      fontWeight: "700",
+    },
 
-  membershipPromo: {
-    borderRadius: 22,
-    overflow: "hidden",
-    padding: 18,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  membershipPromoIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(232,0,15,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
-  },
-  membershipPromoTextGroup: {
-    marginBottom: 16,
-  },
-  membershipPromoTitle: {
-    color: "#fff",
-    fontSize: 17,
-    fontWeight: "800",
-    marginBottom: 6,
-  },
-  membershipPromoBody: {
-    color: "rgba(255,255,255,0.55)",
-    fontSize: 12.5,
-    lineHeight: 18,
-    fontWeight: "400",
-  },
-  membershipPromoCta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  membershipPromoCtaText: {
-    color: "#e8000f",
-    fontSize: 13.5,
-    fontWeight: "800",
-  },
+    membershipPromo: {
+      borderRadius: 22,
+      overflow: "hidden",
+      padding: 18,
+      shadowColor: DS.shadowColor,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: DS.shadowOpacityPromo,
+      shadowRadius: 16,
+      elevation: 8,
+    },
+    membershipPromoIconWrap: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: DS.accentSoft,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 12,
+    },
+    membershipPromoTextGroup: {
+      marginBottom: 16,
+    },
+    membershipPromoTitle: {
+      color: DS.textPrimary,
+      fontSize: 17,
+      fontWeight: "800",
+      marginBottom: 6,
+    },
+    membershipPromoBody: {
+      color: DS.textSecondary,
+      fontSize: 12.5,
+      lineHeight: 18,
+      fontWeight: "400",
+    },
+    membershipPromoCta: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+    membershipPromoCtaText: {
+      color: DS.accent,
+      fontSize: 13.5,
+      fontWeight: "800",
+    },
 
-  // ── BOAS-VINDAS ───────────────────────────────────────────────────────
-  welcomeCard: {
-    borderRadius: 18,
-    overflow: "hidden",
-    padding: 16,
-    paddingRight: 52,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  welcomeBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
-  },
-  welcomeIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "rgba(232,0,15,0.14)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  welcomeBody: {
-    flex: 1,
-    color: "rgba(255,255,255,0.7)",
-    fontSize: 12.5,
-    lineHeight: 18,
-    fontWeight: "400",
-  },
-  notifBadge: {
-    position: "absolute",
-    top: 14,
-    right: 14,
-    padding: 4,
-  },
-  notifDot: {
-    position: "absolute",
-    top: 2,
-    right: 2,
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: "#ff2b2b",
-    borderWidth: 1.5,
-    borderColor: "#0a0a0a",
-  },
+    // ── BOAS-VINDAS ───────────────────────────────────────────────────────
+    welcomeCard: {
+      borderRadius: 18,
+      overflow: "hidden",
+      padding: 16,
+      paddingRight: 52,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    welcomeBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: DS.glassBorder,
+    },
+    welcomeIconWrap: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: DS.accentSoft,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    welcomeBody: {
+      flex: 1,
+      color: DS.textSecondary,
+      fontSize: 12.5,
+      lineHeight: 18,
+      fontWeight: "400",
+    },
+    notifBadge: {
+      position: "absolute",
+      top: 14,
+      right: 14,
+      padding: 4,
+    },
+    notifDot: {
+      position: "absolute",
+      top: 2,
+      right: 2,
+      width: 7,
+      height: 7,
+      borderRadius: 3.5,
+      backgroundColor: "#ff2b2b",
+      borderWidth: 1.5,
+      borderColor: DS.notifDotBorder,
+    },
 
-  // ── AÇÕES RÁPIDAS ─────────────────────────────────────────────────────
-  groupLabel: {
-    color: "rgba(255,255,255,0.4)",
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: -6,
-  },
-  actionsRow: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  actionCard: {
-    flex: 1,
-    borderRadius: 16,
-    overflow: "hidden",
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  actionBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.09)",
-  },
-  actionIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "rgba(255,255,255,0.06)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  actionLabel: {
-    color: "#fff",
-    fontSize: 11.5,
-    fontWeight: "600",
-    textAlign: "center",
-  },
+    // ── AÇÕES RÁPIDAS ─────────────────────────────────────────────────────
+    groupLabel: {
+      color: DS.textFaint,
+      fontSize: 11,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: -6,
+    },
+    actionsRow: {
+      flexDirection: "row",
+      gap: 10,
+    },
+    actionCard: {
+      flex: 1,
+      borderRadius: 16,
+      overflow: "hidden",
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+    },
+    actionBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: DS.glassBorderSoft,
+    },
+    actionIconWrap: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: DS.glassIconBg,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    actionLabel: {
+      color: DS.textPrimary,
+      fontSize: 11.5,
+      fontWeight: "600",
+      textAlign: "center",
+    },
 
-  // ── HISTÓRICO ─────────────────────────────────────────────────────────
-  historySection: {
-    borderRadius: 18,
-    overflow: "hidden",
-    padding: 16,
-  },
-  historyBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
-  },
-  historyHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  historyTitle: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  historyCloseBtn: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  historySubBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(232,0,15,0.10)",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "rgba(232,0,15,0.20)",
-    marginBottom: 14,
-    gap: 8,
-  },
-  historySubEmoji: {
-    fontSize: 13,
-  },
-  historySubText: {
-    color: "#fff",
-    fontSize: 12.5,
-    fontWeight: "600",
-    flex: 1,
-  },
-  historySubPrice: {
-    color: "#fff",
-    fontSize: 12.5,
-    fontWeight: "700",
-  },
-  historyListTitle: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 11.5,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.6,
-    marginBottom: 8,
-  },
-  historyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  historyIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: "rgba(232,0,15,0.10)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  historyInfo: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  historyPlan: {
-    color: "#fff",
-    fontSize: 13.5,
-    fontWeight: "600",
-  },
-  historyDate: {
-    color: "rgba(255,255,255,0.45)",
-    fontSize: 11,
-    marginTop: 1,
-  },
-  historyPrice: {
-    color: "#fff",
-    fontSize: 13.5,
-    fontWeight: "700",
-  },
-  historyDivider: {
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.07)",
-  },
-  historyProductImage: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-  },
-  historyEmpty: {
-    alignItems: "center",
-    paddingVertical: 22,
-    gap: 8,
-  },
-  historyEmptyText: {
-    color: "rgba(255,255,255,0.35)",
-    fontSize: 12.5,
-    textAlign: "center",
-  },
+    // ── HISTÓRICO ─────────────────────────────────────────────────────────
+    historySection: {
+      borderRadius: 18,
+      overflow: "hidden",
+      padding: 16,
+    },
+    historyBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: DS.glassBorder,
+    },
+    historyHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 12,
+    },
+    historyTitle: {
+      color: DS.textPrimary,
+      fontSize: 15,
+      fontWeight: "700",
+    },
+    historyCloseBtn: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      backgroundColor: DS.glassIconBg,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    historySubBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: DS.accentSoft,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: DS.scheme === "dark" ? "rgba(232,0,15,0.20)" : "rgba(192,0,10,0.16)",
+      marginBottom: 14,
+      gap: 8,
+    },
+    historySubEmoji: {
+      fontSize: 13,
+    },
+    historySubText: {
+      color: DS.textPrimary,
+      fontSize: 12.5,
+      fontWeight: "600",
+      flex: 1,
+    },
+    historySubPrice: {
+      color: DS.textPrimary,
+      fontSize: 12.5,
+      fontWeight: "700",
+    },
+    historyListTitle: {
+      color: DS.textMuted,
+      fontSize: 11.5,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 0.6,
+      marginBottom: 8,
+    },
+    historyRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 10,
+    },
+    historyIconWrap: {
+      width: 32,
+      height: 32,
+      borderRadius: 10,
+      backgroundColor: DS.accentSoft,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    historyInfo: {
+      flex: 1,
+      marginLeft: 10,
+    },
+    historyPlan: {
+      color: DS.textPrimary,
+      fontSize: 13.5,
+      fontWeight: "600",
+    },
+    historyDate: {
+      color: DS.textMuted,
+      fontSize: 11,
+      marginTop: 1,
+    },
+    historyPrice: {
+      color: DS.textPrimary,
+      fontSize: 13.5,
+      fontWeight: "700",
+    },
+    historyDivider: {
+      height: 1,
+      backgroundColor: DS.dividerColorSoft,
+    },
+    historyProductImage: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+    },
+    historyEmpty: {
+      alignItems: "center",
+      paddingVertical: 22,
+      gap: 8,
+    },
+    historyEmptyText: {
+      color: DS.textFaint,
+      fontSize: 12.5,
+      textAlign: "center",
+    },
 
-  // ── DADOS PESSOAIS ────────────────────────────────────────────────────
-  sectionHeaderCustom: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  sectionTitle: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "800",
-    letterSpacing: 0.2,
-  },
-  sectionEditBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  infoCard: {
-    borderRadius: 18,
-    overflow: "hidden",
-  },
-  infoBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
-  },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  infoLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    gap: 12,
-  },
-  infoIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.06)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  infoTextGroup: {
-    flex: 1,
-  },
-  infoLabel: {
-    color: "rgba(255,255,255,0.42)",
-    fontSize: 10.5,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 3,
-  },
-  infoValue: {
-    color: "#fff",
-    fontSize: 14.5,
-    fontWeight: "600",
-  },
-  infoDivider: {
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    marginHorizontal: 16,
-  },
+    // ── DADOS PESSOAIS ────────────────────────────────────────────────────
+    sectionHeaderCustom: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    sectionTitle: {
+      color: DS.textPrimary,
+      fontSize: 16,
+      fontWeight: "800",
+      letterSpacing: 0.2,
+    },
+    sectionEditBtn: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: DS.glassIconBg,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    infoCard: {
+      borderRadius: 18,
+      overflow: "hidden",
+    },
+    infoBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: DS.glassBorder,
+    },
+    infoRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+    },
+    infoLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      flex: 1,
+      gap: 12,
+    },
+    infoIconWrap: {
+      width: 32,
+      height: 32,
+      borderRadius: 10,
+      backgroundColor: DS.glassIconBg,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    infoTextGroup: {
+      flex: 1,
+    },
+    infoLabel: {
+      color: DS.textFaint,
+      fontSize: 10.5,
+      fontWeight: "600",
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+      marginBottom: 3,
+    },
+    infoValue: {
+      color: DS.textPrimary,
+      fontSize: 14.5,
+      fontWeight: "600",
+    },
+    infoDivider: {
+      height: 1,
+      backgroundColor: DS.dividerColorSoft,
+      marginHorizontal: 16,
+    },
 
-  // ── SAIR ──────────────────────────────────────────────────────────────
-  logoutBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 16,
-    paddingVertical: 15,
-    gap: 10,
-    overflow: "hidden",
-  },
-  logoutBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "rgba(255,107,107,0.25)",
-  },
-  logoutText: {
-    color: "#ff6b6b",
-    fontSize: 14.5,
-    fontWeight: "600",
-    letterSpacing: 0.3,
-  },
-});
+    // ── SAIR ──────────────────────────────────────────────────────────────
+    logoutBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 16,
+      paddingVertical: 15,
+      gap: 10,
+      overflow: "hidden",
+    },
+    logoutBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: DS.logoutBorder,
+    },
+    logoutText: {
+      color: DS.logoutText,
+      fontSize: 14.5,
+      fontWeight: "600",
+      letterSpacing: 0.3,
+    },
+  });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ESTILOS — Popup "Editar Perfil" (Liquid Glass, escopo local ao componente)
+// Convertido para factory makeEditStyles(DS). O popup mantém a MESMA estrutura,
+// mesmo layout e mesmo comportamento — apenas os tokens de cor mudam com o tema.
 // ─────────────────────────────────────────────────────────────────────────────
-const editStyles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(4,0,0,0.55)",
-    justifyContent: "flex-end",
-  },
-  kav: {
-    width: "100%",
-  },
-  modalCard: {
-    maxHeight: "88%",
-    marginHorizontal: 12,
-    marginBottom: 12,
-    borderRadius: 28,
-    overflow: "hidden",
-    backgroundColor: "rgba(18,10,10,0.4)",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.4,
-    shadowRadius: 30,
-    elevation: 20,
-  },
-  specularTop: {
-    position: "absolute",
-    top: 0,
-    left: "12%",
-    right: "12%",
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.55)",
-  },
-  modalBorder: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 28,
-    borderWidth: 0.75,
-    borderColor: "rgba(255,255,255,0.16)",
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: 22,
-    paddingHorizontal: 22,
-    paddingBottom: 14,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#fff",
-    letterSpacing: 0.2,
-  },
-  modalSubtitle: {
-    fontSize: 12.5,
-    color: "rgba(255,255,255,0.5)",
-    marginTop: 2,
-  },
-  closeIconBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.10)",
-    borderWidth: 0.75,
-    borderColor: "rgba(255,255,255,0.16)",
-  },
-  scrollContent: {
-    paddingHorizontal: 22,
-    paddingBottom: 18,
-  },
-  sectionLabel: {
-    fontSize: 11.5,
-    fontWeight: "700",
-    color: "rgba(255,255,255,0.42)",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginTop: 18,
-    marginBottom: 10,
-  },
-  fieldWrap: {
-    marginBottom: 12,
-  },
-  fieldLabel: {
-    fontSize: 12.5,
-    color: "rgba(255,255,255,0.62)",
-    marginBottom: 6,
-    fontWeight: "500",
-  },
-  inputShell: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 48,
-    borderRadius: 14,
-    overflow: "hidden",
-    paddingHorizontal: 14,
-    borderWidth: 0.75,
-    borderColor: "rgba(255,255,255,0.14)",
-  },
-  inputShellValid: {
-    borderColor: "rgba(78,224,138,0.55)",
-  },
-  inputShellError: {
-    borderColor: "rgba(255,107,107,0.55)",
-  },
-  inputShellReadOnly: {
-    borderColor: "rgba(255,255,255,0.08)",
-  },
-  fieldIcon: {
-    marginRight: 10,
-  },
-  fieldInput: {
-    flex: 1,
-    fontSize: 15,
-    color: "#fff",
-    padding: 0,
-  },
-  readOnlyText: {
-    flex: 1,
-    fontSize: 15,
-    color: "rgba(255,255,255,0.45)",
-  },
-  validIcon: {
-    marginLeft: 8,
-  },
-  sexoRow: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  sexoOption: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 46,
-    borderRadius: 14,
-    overflow: "hidden",
-    borderWidth: 0.75,
-    borderColor: "rgba(255,255,255,0.14)",
-    backgroundColor: "rgba(255,255,255,0.05)",
-  },
-  sexoOptionSelected: {
-    borderColor: "rgba(232,0,15,0.65)",
-  },
-  sexoOptionText: {
-    marginLeft: 8,
-    fontSize: 14,
-    fontWeight: "600",
-    color: "rgba(255,255,255,0.6)",
-  },
-  sexoOptionTextSelected: {
-    color: "#fff",
-  },
-  rowTwo: {
-    flexDirection: "row",
-  },
-  footerRow: {
-    flexDirection: "row",
-    paddingHorizontal: 22,
-    paddingTop: 14,
-    paddingBottom: 20,
-    gap: 12,
-    borderTopWidth: 0.75,
-    borderTopColor: "rgba(255,255,255,0.10)",
-  },
-  cancelBtn: {
-    flex: 1,
-    height: 48,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.08)",
-    borderWidth: 0.75,
-    borderColor: "rgba(255,255,255,0.16)",
-  },
-  cancelText: {
-    color: "rgba(255,255,255,0.75)",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  saveBtn: {
-    flex: 1.4,
-    height: 48,
-    borderRadius: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    gap: 6,
-    borderWidth: 0.75,
-    borderColor: "rgba(255,255,255,0.18)",
-  },
-  saveText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  saveTextDisabled: {
-    color: "rgba(255,255,255,0.35)",
-  },
-});
+const makeEditStyles = (DS) => {
+  const styles = StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: DS.modalOverlay,
+      justifyContent: "flex-end",
+    },
+    kav: {
+      width: "100%",
+    },
+    modalCard: {
+      maxHeight: "88%",
+      marginHorizontal: 12,
+      marginBottom: 12,
+      borderRadius: 28,
+      overflow: "hidden",
+      backgroundColor: DS.modalBg,
+      shadowColor: DS.shadowColor,
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: DS.shadowOpacityModal,
+      shadowRadius: 30,
+      elevation: 20,
+    },
+    specularTop: {
+      position: "absolute",
+      top: 0,
+      left: "12%",
+      right: "12%",
+      height: 1,
+      backgroundColor: DS.specularTopStrong,
+    },
+    modalBorder: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: 28,
+      borderWidth: 0.75,
+      borderColor: DS.modalBorder,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingTop: 22,
+      paddingHorizontal: 22,
+      paddingBottom: 14,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: DS.modalTitleColor,
+      letterSpacing: 0.2,
+    },
+    modalSubtitle: {
+      fontSize: 12.5,
+      color: DS.modalSubtitleColor,
+      marginTop: 2,
+    },
+    closeIconBtn: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: DS.closeBtnBg,
+      borderWidth: 0.75,
+      borderColor: DS.closeBtnBorder,
+    },
+    scrollContent: {
+      paddingHorizontal: 22,
+      paddingBottom: 18,
+    },
+    sectionLabel: {
+      fontSize: 11.5,
+      fontWeight: "700",
+      color: DS.textFaint,
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+      marginTop: 18,
+      marginBottom: 10,
+    },
+    fieldWrap: {
+      marginBottom: 12,
+    },
+    fieldLabel: {
+      fontSize: 12.5,
+      color: DS.fieldLabelColor,
+      marginBottom: 6,
+      fontWeight: "500",
+    },
+    inputShell: {
+      flexDirection: "row",
+      alignItems: "center",
+      height: 48,
+      borderRadius: 14,
+      overflow: "hidden",
+      paddingHorizontal: 14,
+      borderWidth: 0.75,
+      borderColor: DS.fieldBorder,
+    },
+    inputShellValid: {
+      borderColor: DS.fieldValidBorder,
+    },
+    inputShellError: {
+      borderColor: DS.fieldErrorBorder,
+    },
+    inputShellReadOnly: {
+      borderColor: DS.fieldReadOnlyBorder,
+    },
+    fieldIcon: {
+      marginRight: 10,
+    },
+    fieldInput: {
+      flex: 1,
+      fontSize: 15,
+      color: DS.fieldTextColor,
+      padding: 0,
+    },
+    readOnlyText: {
+      flex: 1,
+      fontSize: 15,
+      color: DS.fieldReadOnlyText,
+    },
+    validIcon: {
+      marginLeft: 8,
+    },
+    sexoRow: {
+      flexDirection: "row",
+      gap: 10,
+    },
+    sexoOption: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      height: 46,
+      borderRadius: 14,
+      overflow: "hidden",
+      borderWidth: 0.75,
+      borderColor: DS.sexoOptionBorder,
+      backgroundColor: DS.sexoOptionBg,
+    },
+    sexoOptionSelected: {
+      borderColor: DS.sexoOptionSelectedBorder,
+    },
+    sexoOptionText: {
+      marginLeft: 8,
+      fontSize: 14,
+      fontWeight: "600",
+      color: DS.sexoOptionText,
+    },
+    sexoOptionTextSelected: {
+      color: DS.sexoOptionTextSelected,
+    },
+    rowTwo: {
+      flexDirection: "row",
+    },
+    footerRow: {
+      flexDirection: "row",
+      paddingHorizontal: 22,
+      paddingTop: 14,
+      paddingBottom: 20,
+      gap: 12,
+      borderTopWidth: 0.75,
+      borderTopColor: DS.footerBorder,
+    },
+    cancelBtn: {
+      flex: 1,
+      height: 48,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: DS.cancelBtnBg,
+      borderWidth: 0.75,
+      borderColor: DS.cancelBtnBorder,
+    },
+    cancelText: {
+      color: DS.cancelTextColor,
+      fontSize: 15,
+      fontWeight: "600",
+    },
+    saveBtn: {
+      flex: 1.4,
+      height: 48,
+      borderRadius: 14,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+      gap: 6,
+      borderWidth: 0.75,
+      borderColor: DS.saveBtnBorder,
+    },
+    saveText: {
+      color: DS.saveTextColor,
+      fontSize: 15,
+      fontWeight: "700",
+    },
+    saveTextDisabled: {
+      color: DS.saveTextDisabledColor,
+    },
+  });
+
+  // Valor auxiliar não-estilo (cor do ícone do seletor Sexo quando não
+  // selecionado), consumido pelo SexoSelector. Mantido fora do objeto de
+  // estilos do StyleSheet.create para não quebrar validação de estilos RN,
+  // mas anexado ao mesmo objeto retornado por conveniência de uso local.
+  styles.sexoOptionIconColor = DS.sexoOptionText;
+
+  return styles;
+};

@@ -50,19 +50,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const { Value, timing, loop, sequence, delay } = Animated;
 
 
-export default function CardProfileWelcome({
-    isDarkMode,
-    setIsDarkMode,
-  }) {
-  // const [isDarkMode, setIsDarkMode] = useState(true);
+export default function CardProfileWelcome() {
   const navigation = useNavigation();
   const { cliente } = useAuth();
   const { subscription, loadingSubscription } = useSubscription();
+  const { isDark, toggleTheme } = useTheme();
   const avatarUri = cliente?.url_foto_clientes?.trim() || 'https://i.pravatar.cc/150?img=12';
 
   // â”€â”€ LÃ³gica original â€” intacta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -208,13 +206,13 @@ export default function CardProfileWelcome({
           </BlurView>
         </TouchableOpacity>
 
-                <TouchableOpacity
+        <TouchableOpacity
           style={styles.themeButton}
-          onPress={() => setIsDarkMode(!isDarkMode)}
+          onPress={toggleTheme}
         >
           <BlurView intensity={5} tint="dark" style={styles.editBlur}>
             <Ionicons
-              name={isDarkMode ? 'sunny-outline' : 'moon-outline'}
+              name={isDark ? 'sunny-outline' : 'moon-outline'}
               size={16}
               color="#fff"
             />

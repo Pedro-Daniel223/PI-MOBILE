@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,25 +19,23 @@ import PremiumGlassCard from '../components/Cards_home/PremiumGlassCard';
 import VideoHighlightCard from '../components/Cards_home/Videohighlightcard';
 import { stylesHome } from '../styles/styleHome/styleHome';
 import { useProducts } from '../contexts/ProductContext';
+import { useTheme } from '../contexts/ThemeContext';
 import HomeBackground from '../styles/styleHome/HomeBackground';
 
 export default function Home({ navigation }) {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const { isDark } = useTheme();
   const { products } = useProducts();
   const featuredProducts = useMemo(() => products.slice(0, 3), [products]);
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-      <HomeBackground isDarkMode={isDarkMode} />
+      <HomeBackground isDarkMode={isDark} />
 
       <ScrollView
         style={{ flex: 1, backgroundColor: 'transparent' }}
         contentContainerStyle={stylesHome.content}
       >
-        <CardProfileWelcome
-          isDarkMode={isDarkMode}
-          setIsDarkMode={setIsDarkMode}
-        />
+        <CardProfileWelcome />
 
         <View style={stylesHome.row}>
           <CardActionGlass

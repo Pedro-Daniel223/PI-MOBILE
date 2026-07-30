@@ -18,6 +18,8 @@ import CheckoutModal from "./CheckoutModal";
 import { theme } from "../data/dataCarrinhos";
 import styles from "../styles/styleCarrinhos/styleCarrinhos";
 import { checkout } from "../services/checkoutService";
+import { useMemo } from "react";
+import { useColorScheme } from "../contexts/ColorSchemeContext";
 
 // theme moved to src/data/dataCarrinhos.js
 
@@ -33,7 +35,13 @@ const resolveImageSource = (value) => {
   return value;
 };
 
-const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
+const CartItem = ({
+  item,
+  onUpdateQuantity,
+  onRemove,
+  styles,
+  DS,
+}) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const itemOpacity = useRef(new Animated.Value(1)).current;
 
@@ -193,7 +201,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                 style={styles.deleteButton}
                 onPress={handleRemoveAnimation}
               >
-                <Ionicons name="trash-outline" size={18} color={theme.accent} />
+                <Ionicons
+                  name="trash-outline"
+                  size={18}
+                  color={DS.colors.accent}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -203,7 +215,53 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   );
 };
 
+
 export default function CarrinhosScreen({ navigation }) {
+  const { isDarkMode } = useColorScheme();
+
+  const DS = useMemo(
+    () => ({
+      isDark: isDarkMode,
+      colors: {
+        background: isDarkMode ? "#090909" : "#F7F4F2",
+        surface: isDarkMode ? "#171717" : "#FFFFFF",
+
+        text: isDarkMode ? "#FFFFFF" : "#111111",
+        textSecondary: isDarkMode
+          ? "rgba(255,255,255,0.65)"
+          : "#6B7280",
+
+        accent: "#E8000F",
+
+        accentLight: isDarkMode
+          ? "rgba(232,0,15,0.18)"
+          : "#FFE8E8",
+
+        black: isDarkMode ? "#FFFFFF" : "#111111",
+
+        card: isDarkMode ? "#141414" : "#FFFFFF",
+
+        border: isDarkMode
+          ? "rgba(255,255,255,.08)"
+          : "rgba(0,0,0,.06)",
+
+        quantityBackground: isDarkMode
+          ? "#232323"
+          : "#F2F2F7",
+
+        quantityButton: isDarkMode
+          ? "#2C2C2E"
+          : "#FFFFFF",
+
+        bottomBar: isDarkMode
+          ? "rgba(18,18,18,.97)"
+          : "rgba(255,255,255,.95)",
+      },
+    }),
+    [isDarkMode]
+  );
+
+  const styles = useMemo(() => makeStyles(DS), [DS]);
   const { cartItems, updateQuantity, removeItem, clearCart, subtotal } =
     useCart();
   const { token } = useAuth();
@@ -304,21 +362,23 @@ export default function CarrinhosScreen({ navigation }) {
       >
         {hasItems ? (
           cartItems.map((item) => (
-            <CartItem
+          <CartItem
               key={`${item.id}-${item.tamanho}`}
               item={item}
               onUpdateQuantity={updateQuantity}
               onRemove={removeItem}
-            />
+              styles={styles}
+              DS={DS}
+          />
           ))
         ) : (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconCircle}>
-              <Ionicons
-                name="bag-handle-outline"
-                size={60}
-                color={theme.accent}
-              />
+                <Ionicons
+                    name="chevron-back"
+                    size={24}
+                    color={DS.colors.black}
+                />
             </View>
             <Text style={styles.emptyTitle}>Sacola vazia</Text>
             <Text style={styles.emptySubtitle}>
@@ -358,7 +418,7 @@ export default function CarrinhosScreen({ navigation }) {
             >
               <Text style={styles.checkoutText}>Comprar</Text>
               <View style={styles.checkoutIcon}>
-                <Ionicons name="arrow-forward" size={18} color={theme.black} />
+                <Ionicons name="arrow-forward" size={18}color={DS.colors.black}/>
               </View>
             </TouchableOpacity>
           </View>
@@ -377,4 +437,4 @@ export default function CarrinhosScreen({ navigation }) {
   );
 }
 
-// styles moved to src/styles/styleCarrinhos/styleCarrinhos.js
+

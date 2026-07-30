@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import {
   View, Text, Image, TouchableOpacity, ScrollView,
   StatusBar, Dimensions, Alert
@@ -7,8 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../contexts/CartContext';
 import { useProducts } from '../contexts/ProductContext';
+import { useTheme } from '../contexts/ThemeContext';
 import CartBadge from '../components/CartBadge';
-import styles from '../styles/styleDetalhesProdutos/styleDetalhesProdutos';
+import { makeStyles, DARK_DS, LIGHT_DS } from '../styles/styleDetalhesProdutos/styleDetalhesProdutos';
 
 const { width } = Dimensions.get('window');
 
@@ -100,6 +101,13 @@ const EMPTY_PRODUCT = {
 };
 
 export default function DetalhesProdutosScreens({ route, navigation }) {
+  const { isDark } = useTheme();
+  const DS = useMemo(
+    () => (isDark ? DARK_DS : LIGHT_DS),
+    [isDark],
+  );
+  const styles = useMemo(() => makeStyles(DS), [DS]);
+
   const { addItem, totalItems } = useCart();
   const { getProductById } = useProducts();
 
@@ -212,11 +220,11 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle={DS.statusBarStyle} />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconButton}>
-          <Ionicons name="chevron-back" size={20} color="#333" />
+          <Ionicons name="chevron-back" size={20} color={DS.headerIconColor} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes</Text>
         <TouchableOpacity
@@ -224,7 +232,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
           style={styles.iconButton}
           activeOpacity={0.8}
         >
-          <Ionicons name="bag-outline" size={20} color="#333" />
+          <Ionicons name="bag-outline" size={20} color={DS.headerIconColor} />
           <CartBadge count={totalItems} />
         </TouchableOpacity>
       </View>
@@ -299,7 +307,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
                       />
                     ) : (
                       <View style={styles.thumbnailPlaceholder}>
-                        <Ionicons name="image-outline" size={14} color="#999" />
+                        <Ionicons name="image-outline" size={14} color={DS.thumbnailPlaceholderIcon} />
                       </View>
                     )}
                   </TouchableOpacity>
@@ -371,7 +379,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             }}
           >
             <View style={styles.cartButtonContent}>
-              <Ionicons name="bag-outline" size={22} color="#FFF" />
+              <Ionicons name="bag-outline" size={22} color={DS.cartButtonIcon} />
               <Text style={styles.cartButtonText}>Adicionar ao Carrinho</Text>
             </View>
           </TouchableOpacity>

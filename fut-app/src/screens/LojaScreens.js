@@ -6,8 +6,9 @@
  * crimson usado como assinatura, não como decoração. Um único momento de
  * vidro líquido, reservado para o instante de maior intenção (a campanha).
  *
- * Suporte a Dark Mode: segue o tema do sistema (useColorScheme) por padrão,
- * com um toggle manual na TopBar para o usuário sobrepor a preferência.
+ * Suporte a Dark Mode: segue o ThemeContext global por padrão.
+ * A troca de tema é controlada apenas pelo botão da Home, e esta tela apenas
+ * reage ao tema atual sem manter estado local.
  * No dark, a paleta "papel" vira "carvão/breu" — mesma hierarquia editorial,
  * mesmo crimson como assinatura, sem perder a identidade em nenhum dos dois.
  *
@@ -29,7 +30,6 @@ import {
   Easing,
   Dimensions,
   Platform,
-  useColorScheme,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -37,6 +37,7 @@ import { BlurView } from 'expo-blur';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useProducts } from '../contexts/ProductContext';
 import { useCart } from '../contexts/CartContext';
+import { useTheme } from '../contexts/ThemeContext';
 import CartBadge from '../components/CartBadge';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -96,18 +97,15 @@ const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios', 'Ingressos'];
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: TopBar
 // Wordmark editorial, sem ruído. Um traço fino separa do conteúdo.
-// Inclui o toggle de tema — um pequeno botão sol/lua ao lado do carrinho.
+// Mantém apenas o acesso ao carrinho; o tema é controlado globalmente.
 // ═══════════════════════════════════════════════════════════════════════════════
-const TopBar = memo(({ onCartPress, isDark, onToggleTheme, DS, s, cartCount }) => (
+const TopBar = memo(({ onCartPress, DS, s, cartCount }) => (
   <View style={s.topBar}>
     <View>
       <Text style={s.topEyebrow}>DRAKOS FUTEBOL CLUBE</Text>
       <Text style={s.topWordmark}>Loja Oficial</Text>
     </View>
     <View style={s.topActions}>
-      <TouchableOpacity onPress={onToggleTheme} style={s.themeBtn} activeOpacity={0.6}>
-        <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={17} color={DS.ink} />
-      </TouchableOpacity>
       <TouchableOpacity onPress={onCartPress} style={s.cartBtn} activeOpacity={0.6}>
         <Ionicons name="bag-outline" size={19} color={DS.ink} />
         <CartBadge count={cartCount} />
@@ -502,12 +500,10 @@ const ProductGrid = memo(({ products, onPressItem, DS, s }) => (
 // COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════════
 function LojaContent({ navigation }) {
-  const systemScheme = useColorScheme(); // 'light' | 'dark' | null
-  const [themeOverride, setThemeOverride] = useState(null); // null = segue o sistema
+  const { isDark } = useTheme();
   const { products, loadProducts } = useProducts();
   const { totalItems } = useCart();
 
-  const isDark = (themeOverride ?? systemScheme) === 'dark';
   const DS = isDark ? DARK : LIGHT;
   const s = useMemo(() => makeStyles(DS), [DS]);
 
@@ -551,13 +547,6 @@ function LojaContent({ navigation }) {
     if (navigation?.navigate) navigation.navigate('Carrinho');
   }, [navigation]);
 
-  const toggleTheme = useCallback(() => {
-    setThemeOverride((prev) => {
-      const current = prev ?? systemScheme ?? 'light';
-      return current === 'dark' ? 'light' : 'dark';
-    });
-  }, [systemScheme]);
-
   return (
     <View style={[s.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle={DS.statusBarStyle} backgroundColor="transparent" translucent />
@@ -566,14 +555,12 @@ function LojaContent({ navigation }) {
         <Hero DS={DS} s={s} />
 
         <View style={s.body}>
-          <TopBar
-            onCartPress={goToCart}
-            isDark={isDark}
-            onToggleTheme={toggleTheme}
-            DS={DS}
-            s={s}
-            cartCount={totalItems}
-          />
+        <TopBar
+          onCartPress={goToCart}
+          DS={DS}
+          s={s}
+          cartCount={totalItems}
+        />
 
           <CategoryRail selected={category} onSelect={setCategory} s={s} />
 
@@ -753,16 +740,6 @@ function makeStyles(DS) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 10,
-    },
-    themeBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: DS.paper,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: DS.hairlineStrong,
     },
     cartBtn: {
       width: 40,
