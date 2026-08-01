@@ -77,15 +77,15 @@ const GlassItemWrapper = ({ children, shimmerX }) => (
 
       {/* G1: BlurView primário — translúcido neutro, fundo visível */}
       <BlurView
-        intensity={28}
-        tint="light"
+        intensity={0}
+        tint="dark"
         style={StyleSheet.absoluteFill}
       />
 
       {/* G2: BlurView secundário — profundidade sutil */}
       <BlurView
-        intensity={8}
-        tint="light"
+        intensity={0}
+        tint="dark"
         style={[StyleSheet.absoluteFill, { opacity: 0.20 }]}
       />
 
@@ -94,9 +94,7 @@ const GlassItemWrapper = ({ children, shimmerX }) => (
           uma camada colorida independente. */}
       <LinearGradient
       colors={[
-        'rgba(255,255,255,0.05)',
-        'rgba(255,255,255,0.02)',
-        'rgba(255,255,255,0.04)',
+        'transparent',
       ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
@@ -107,8 +105,6 @@ const GlassItemWrapper = ({ children, shimmerX }) => (
           Fonte de luz de estúdio — efeito visionOS clássico */}
       <LinearGradient
         colors={[
-          'rgba(255, 255, 255, 0.08)',
-          'rgba(255, 255, 255, 0.06)',
           'transparent',
         ]}
         style={StyleSheet.absoluteFill}
@@ -137,8 +133,7 @@ const GlassItemWrapper = ({ children, shimmerX }) => (
         colors={[
           'transparent',
           'transparent',
-          'rgba(0, 8, 24, 0.016)',
-          'rgba(0, 8, 24, 0.040)',
+
         ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0.5, y: 0.44 }}
@@ -164,11 +159,7 @@ const GlassItemWrapper = ({ children, shimmerX }) => (
         <LinearGradient
           colors={[
             'transparent',
-            'rgba(255, 255, 255, 0.04)',
-            'rgba(255, 255, 255, 0.14)',
-            'rgba(255, 255, 255, 0.22)',
-            'rgba(255, 255, 255, 0.14)',
-            'rgba(255, 255, 255, 0.04)',
+
             'transparent',
           ]}
           style={StyleSheet.absoluteFill}

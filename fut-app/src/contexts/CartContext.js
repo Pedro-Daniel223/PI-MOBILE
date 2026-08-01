@@ -29,15 +29,45 @@ const getItemKey = (itemId, tamanho) => {
 const normalizeCartItem = (product = {}) => {
   const tamanho = normalizeSize(product.tamanho);
   const quantity = normalizeQuantity(product.quantity ?? product.quantidade);
-  const preco = normalizePrice(product.preco ?? product.price);
+  const precoFinal = normalizePrice(
+    product.preco_final ??
+    product.precoFinal ??
+    product.preco ??
+    product.price
+  );
+  const precoOriginal = normalizePrice(
+    product.preco_original ??
+    product.precoOriginal ??
+    product.precoAntigo ??
+    product.oldPrice ??
+    product.preco ??
+    product.price
+  );
+  const economia = normalizePrice(
+    product.economia_total ??
+    product.economia ??
+    product.economiaDisplay ??
+    0
+  );
+  const descontoPercent = normalizePrice(product.desconto_percent ?? product.descontoPercent ?? 0);
 
   return {
     id: String(product.id ?? ''),
     nome: product.nome ?? product.title ?? product.name ?? 'Produto',
     imagem: product.imagem ?? product.image ?? null,
     image: product.image ?? product.imagem ?? null,
-    preco,
-    price: preco,
+    preco: precoFinal,
+    price: precoFinal,
+    precoOriginal,
+    preco_original: precoOriginal,
+    precoFinal,
+    preco_final: precoFinal,
+    economia,
+    economia_total: economia,
+    descontoPercent,
+    desconto_percent: descontoPercent,
+    beneficios_plano: product.beneficios_plano ?? product.beneficiosPlano ?? [],
+    plano_atual: product.plano_atual ?? product.planoAtual ?? null,
     quantity,
     ...(tamanho ? { tamanho } : {}),
     imagens: product.imagens ?? product.images ?? [],

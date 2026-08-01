@@ -444,6 +444,8 @@ const CheckoutModal = ({
   cartItems = [],
   items,
   total = 0,
+  pricingSummary = null,
+  planBenefits = [],
   onConfirmPurchase,
   onConfirm,
   onGoToShop,
@@ -467,8 +469,13 @@ const CheckoutModal = ({
   const [cardCvv, setCardCvv] = useState('');
   const [cvvFocused, setCvvFocused] = useState(false);
   const [checkoutResult, setCheckoutResult] = useState(null);
+  const previewItems = Array.isArray(pricingSummary?.itens) ? pricingSummary.itens : [];
+  const hasPricingPreview = previewItems.length > 0;
+  const payableTotal = pricingSummary?.total_final ?? total;
+  const subtotalOriginal = pricingSummary?.subtotal_original ?? payableTotal;
+  const economiaTotal = pricingSummary?.economia_total ?? 0;
 
-  const pixCode = useMemo(() => generatePixCode(total), [total, visible]);
+  const pixCode = useMemo(() => generatePixCode(payableTotal), [payableTotal, visible]);
   const [pixCopied, setPixCopied] = useState(false);
   const [pixWaiting, setPixWaiting] = useState(false);
 
@@ -622,10 +629,10 @@ const CheckoutModal = ({
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={{ paddingBottom: 6 }}
                 >
-                  {safeResolvedItems.map((item) => {
+                  {(hasPricingPreview ? previewItems : safeResolvedItems).map((item) => {
                     const img = Array.isArray(item.imagens) && item.imagens.length > 0
                       ? item.imagens[0]
-                      : item.imagem || item.image || item.capa || item.foto || item.imagem_plano || null;
+                      : item.imagem_produtos || item.imagem || item.image || item.capa || item.foto || item.imagem_plano || null;
                     const imgSource = typeof img === 'string' ? { uri: img } : img;
                     return (
                       <View key={`${item.id || item.plano_id || item.nome}-${item.tamanho || item.size || item.quantidade || item.quantity || 0}`} style={s.summaryRow}>
@@ -640,14 +647,14 @@ const CheckoutModal = ({
                         </View>
                         <View style={{ flex: 1 }}>
                           <Text style={s.summaryName} numberOfLines={1}>
-                            {item.nome || item.nome_plano || item.title || checkoutCopy.summaryPlaceholderName}
+                            {item.nome_produtos || item.nome || item.nome_plano || item.title || checkoutCopy.summaryPlaceholderName}
                           </Text>
                           <Text style={s.summaryMeta}>
                             {(item.tamanho || item.size) ? `${checkoutCopy.summarySizePrefix} ${item.tamanho || item.size} · ` : ""}{checkoutCopy.summaryQuantityPrefix} {item.quantity || item.quantidade || 1}
                           </Text>
                         </View>
                         <Text style={s.summaryPrice}>
-                          {formatBRL((item.preco ?? item.valor ?? item.total ?? 0) * (item.quantity || item.quantidade || 1))}
+                          {formatBRL(item.preco_final_total ?? item.total ?? item.preco ?? item.valor ?? 0)}
                         </Text>
                       </View>
                     );
@@ -659,17 +666,47 @@ const CheckoutModal = ({
                 <View style={s.totalsBlock}>
                   <View style={s.totalsLine}>
                     <Text style={s.totalsLabel}>{checkoutCopy.summaryItemsLabel} ({itemsCount})</Text>
-                    <Text style={s.totalsValue}>{formatBRL(total)}</Text>
+                    <Text style={s.totalsValue}>{formatBRL(payableTotal)}</Text>
                   </View>
                   <View style={s.totalsLine}>
                     <Text style={s.totalsLabel}>{checkoutCopy.summaryShippingLabel}</Text>
                     <Text style={[s.totalsValue, { color: DS.success }]}>{checkoutCopy.summaryShippingValue}</Text>
                   </View>
-                  <View style={[s.totalsLine, { marginTop: 6 }]}>
+                  {pricingSummary?.subtotal_original != null ? (
+                    <View style={s.totalsLine}>
+                      <Text style={s.totalsLabel}>Subtotal original</Text>
+                      <Text style={s.totalsValueMuted}>{formatBRL(subtotalOriginal)}</Text>
+                    </View>
+                  ) : null}
+                  {pricingSummary?.desconto_total != null ? (
+                    <View style={s.totalsLine}>
+                      <Text style={s.totalsLabel}>Desconto aplicado</Text>
+                      <Text style={s.totalsValueSavings}>{formatBRL(pricingSummary.desconto_total)}</Text>
+                    </View>
+                  ) : null}
+                  {pricingSummary?.economia_total != null ? (
+                    <View style={s.totalsLine}>
+                      <Text style={s.totalsLabel}>Economia total</Text>
+                      <Text style={s.totalsValueSavings}>{formatBRL(economiaTotal)}</Text>
+                    </View>
+                  ) : null}
+                <View style={[s.totalsLine, { marginTop: 6 }]}>
                     <Text style={s.grandLabel}>{checkoutCopy.summaryTotalLabel}</Text>
-                    <Text style={s.grandValue}>{formatBRL(total)}</Text>
+                    <Text style={s.grandValue}>{formatBRL(payableTotal)}</Text>
                   </View>
                 </View>
+
+                {Array.isArray(planBenefits) && planBenefits.length > 0 ? (
+                  <View style={s.planBenefitsCard}>
+                    <Text style={s.planBenefitsTitle}>Benefícios do plano</Text>
+                    {planBenefits.map((benefit, index) => (
+                      <View key={`${String(benefit)}-${index}`} style={s.planBenefitLine}>
+                        <Ionicons name="checkmark-circle" size={14} color={DS.success} />
+                        <Text style={s.planBenefitText}>{String(benefit)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
 
                 <TouchableOpacity
                   style={s.primaryBtn}
@@ -863,7 +900,7 @@ const CheckoutModal = ({
                   ) : (
                     <>
                       <Text style={s.primaryBtnText}>{resolveCopyValue(checkoutCopy.confirmBtnText, { purchaseType })}</Text>
-                      <Text style={s.primaryBtnTotal}>{formatBRL(total)}</Text>
+                      <Text style={s.primaryBtnTotal}>{formatBRL(payableTotal)}</Text>
                     </>
                   )}
                 </TouchableOpacity>
@@ -920,7 +957,7 @@ const CheckoutModal = ({
                 <View style={s.successTotalPill}>
                   <Text style={s.successTotalLabel}>{resolveCopyValue(checkoutCopy.successTotalLabel, { purchaseType })}</Text>
                   <Text style={s.successTotalValue}>
-                    {formatBRL(checkoutResult?.total ?? total)}
+                    {formatBRL(checkoutResult?.total ?? payableTotal)}
                   </Text>
                 </View>
 
@@ -1113,6 +1150,16 @@ const s = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
+  totalsValueMuted: {
+    color: DS.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  totalsValueSavings: {
+    color: DS.success,
+    fontSize: 13,
+    fontWeight: '700',
+  },
   grandLabel: {
     color: DS.textPrimary,
     fontSize: 15,
@@ -1122,6 +1169,32 @@ const s = StyleSheet.create({
     color: DS.crimsonVivid,
     fontSize: 19,
     fontWeight: '800',
+  },
+  planBenefitsCard: {
+    marginTop: 14,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 0.75,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  planBenefitsTitle: {
+    color: DS.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  planBenefitLine: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginBottom: 8,
+  },
+  planBenefitText: {
+    flex: 1,
+    color: DS.textSecondary,
+    fontSize: 12.5,
+    lineHeight: 17,
   },
 
   primaryBtn: {

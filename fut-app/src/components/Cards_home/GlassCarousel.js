@@ -158,7 +158,7 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
 
         {/* G1. BlurView primário — base fosca principal */}
         <BlurView
-          intensity={55}
+          intensity={10}
           tint="dark"
           style={StyleSheet.absoluteFill}
         />

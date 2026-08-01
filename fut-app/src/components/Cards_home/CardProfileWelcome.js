@@ -219,9 +219,10 @@ export default function CardProfileWelcome() {
           </BlurView>
         </TouchableOpacity>
 
+{/* ------------------------importante---------------------- */}
         {/* G1: BlurView primÃ¡rio â€” base fosca principal */}
         <BlurView
-          intensity={90}
+          intensity={10}
           tint="dark"
           style={StyleSheet.absoluteFill}
         />

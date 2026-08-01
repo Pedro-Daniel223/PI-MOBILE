@@ -17,6 +17,11 @@
  *   - FlatList → ScrollView + map: para permitir que os itens vivam dentro de
  *     UMA única superfície de vidro contínua (o pedido explícito era "não
  *     criar vários cartões"). Nenhum handler mudou, apenas o contêiner de lista.
+ *   - ThemeContext global + DARK_DS/LIGHT_DS + makeStyles(DS), seguindo o mesmo
+ *     padrão de PerfilScreen/SociosScreen. Light Mode tem identidade visual
+ *     própria (vidro com tinta ardósia, sombra pesada para elevação, bordô
+ *     saturado como âncora cromática) em vez de ser uma inversão mecânica
+ *     de opacidades brancas.
  *
  * ARQUITETURA DE VIDRO (idêntica à do PremiumGlassCard/CardActionGlass):
  *   BlurView primário → BlurView secundário → tom base translúcido →
@@ -31,7 +36,7 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -48,12 +53,14 @@ import {
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTheme } from '../contexts/ThemeContext';
+
 import { dadosJogos } from '../data/dataIngresso';
 import { decrease, increase, calculateTotal } from '../services/ingressosService/allIngressoService';
+import { DARK_DS, LIGHT_DS, makeStyles } from '../styles/styleIngresso/styleIngresso';
 
 // Se você já tiver o componente real, descomente:
 // import StadiumSeatExperience from '../components/StadiumSeatExperience';
@@ -62,36 +69,22 @@ const { width: SCREEN_W } = Dimensions.get('window');
 const { Value, timing, spring, loop, sequence, delay: animDelay } = Animated;
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DESIGN TOKENS
-// ═══════════════════════════════════════════════════════════════════════════
-const DS = {
-  bg: '#050607',
-  overlay: 'rgba(4, 6, 10, 0.62)',
-  crimson: '#c0000a',
-  crimsonSoft: 'rgba(192, 0, 10, 0.35)',
-  glassBorder: 'rgba(255, 255, 255, 0.30)',
-  glassBorderInner: 'rgba(255, 255, 255, 0.16)',
-  textPrimary: 'rgba(255, 255, 255, 0.96)',
-  textSecondary: 'rgba(255, 255, 255, 0.62)',
-  textTertiary: 'rgba(255, 255, 255, 0.40)',
-};
-
-// ═══════════════════════════════════════════════════════════════════════════
 // PRIMITIVO: GlassSurface
 // Mesma arquitetura de camadas do PremiumGlassCard, porém de altura fluida
 // (não fixa), para poder hospedar qualquer conteúdo — hero, painel de
-// informações, lista de ingressos etc.
+// informações, lista de ingressos etc. Recebe DS do chamador para refletir
+// o tema ativo.
 // ═══════════════════════════════════════════════════════════════════════════
 function GlassSurface({
   children,
   style,
   borderRadius = 28,
   blurIntensity = 46,
-  tint = 'dark',
   padding = 20,
   shimmerAnim,
   enableShimmer = true,
   shimmerWidth = 140,
+  DS,
 }) {
   const shimmerX = shimmerAnim
     ? shimmerAnim.interpolate({
@@ -110,30 +103,26 @@ function GlassSurface({
           position: 'absolute',
           top: 0, left: 0, right: 0, bottom: 0,
           borderRadius,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 14 },
-          shadowOpacity: 0.38,
-          shadowRadius: 26,
+          shadowColor: DS.surfaceShadowColor,
+          shadowOffset: DS.surfaceShadowOffset,
+          shadowOpacity: DS.surfaceShadowOpacity,
+          shadowRadius: DS.surfaceShadowRadius,
           elevation: 18,
         }}
       />
 
       {/* Corpo de vidro — overflow hidden aqui, clipando blur/shimmer */}
       <View style={{ borderRadius, overflow: 'hidden' }}>
-        <BlurView intensity={blurIntensity} tint={tint} style={StyleSheet.absoluteFill} />
+        <BlurView intensity={blurIntensity} tint={DS.blurTintPrimary} style={StyleSheet.absoluteFill} />
         <BlurView
           intensity={14}
-          tint="light"
+          tint={DS.blurTintSecondary}
           style={[StyleSheet.absoluteFill, { opacity: 0.35 }]}
         />
 
-        {/* Tom base translúcido — branco frio, neutro, sem calor */}
+        {/* Tom base translúcido */}
         <LinearGradient
-          colors={[
-            'rgba(255,255,255,0.10)',
-            'rgba(255,255,255,0.04)',
-            'rgba(255,255,255,0.06)',
-          ]}
+          colors={DS.surfaceBaseTone}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -141,7 +130,7 @@ function GlassSurface({
 
         {/* Reflexo ambiental superior-esquerdo */}
         <LinearGradient
-          colors={['rgba(255,255,255,0.14)', 'rgba(255,255,255,0.03)', 'transparent']}
+          colors={DS.surfaceReflection}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 0.7, y: 0.6 }}
@@ -149,7 +138,7 @@ function GlassSurface({
 
         {/* Volume central */}
         <LinearGradient
-          colors={['transparent', 'rgba(255,255,255,0.05)', 'transparent']}
+          colors={DS.surfaceVolume}
           style={StyleSheet.absoluteFill}
           start={{ x: 0.1, y: 0.5 }}
           end={{ x: 0.9, y: 0.5 }}
@@ -157,7 +146,7 @@ function GlassSurface({
 
         {/* Vignette inferior */}
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.16)']}
+          colors={DS.surfaceVignette}
           style={StyleSheet.absoluteFill}
           start={{ x: 0.5, y: 0.5 }}
           end={{ x: 0.5, y: 1 }}
@@ -175,13 +164,7 @@ function GlassSurface({
             }}
           >
             <LinearGradient
-              colors={[
-                'transparent',
-                'rgba(255,255,255,0.05)',
-                'rgba(255,255,255,0.12)',
-                'rgba(255,255,255,0.05)',
-                'transparent',
-              ]}
+              colors={DS.surfaceShimmer}
               style={StyleSheet.absoluteFill}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
@@ -202,13 +185,7 @@ function GlassSurface({
         }}
       >
         <LinearGradient
-          colors={[
-            'transparent',
-            'rgba(255,255,255,0.55)',
-            'rgba(255,255,255,0.85)',
-            'rgba(255,255,255,0.55)',
-            'transparent',
-          ]}
+          colors={DS.surfaceSpecularTop}
           style={{ flex: 1 }}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
@@ -224,7 +201,7 @@ function GlassSurface({
         }}
       >
         <LinearGradient
-          colors={['transparent', 'rgba(255,255,255,0.42)', 'transparent']}
+          colors={DS.surfaceRimLeft}
           style={{ flex: 1 }}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
@@ -255,7 +232,7 @@ function GlassSurface({
 // ═══════════════════════════════════════════════════════════════════════════
 // PRIMITIVO: GlassBackButton — circular, blur, borda fina, reflexo superior
 // ═══════════════════════════════════════════════════════════════════════════
-function GlassBackButton({ onPress }) {
+function GlassBackButton({ onPress, DS }) {
   const pressAnim = useRef(new Value(0)).current;
   const scale = pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.9] });
 
@@ -300,7 +277,7 @@ function GlassBackButton({ onPress }) {
 // ═══════════════════════════════════════════════════════════════════════════
 // PRIMITIVO: GlassChip — categorias (Premium, Arquibancada, VIP...)
 // ═══════════════════════════════════════════════════════════════════════════
-function GlassChip({ label, active, onPress }) {
+function GlassChip({ label, active, onPress, DS }) {
   const pressAnim = useRef(new Value(0)).current;
   const scale = pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.95] });
 
@@ -312,17 +289,17 @@ function GlassChip({ label, active, onPress }) {
     >
       <Animated.View style={{ transform: [{ scale }], marginRight: 10 }}>
         <View style={{ borderRadius: 100, overflow: 'hidden' }}>
-          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={40} tint={DS.blurTintPrimary} style={StyleSheet.absoluteFill} />
           {active && (
             <LinearGradient
-              colors={[DS.crimsonSoft, 'rgba(192,0,10,0.08)']}
+              colors={DS.chipActiveGradient}
               style={StyleSheet.absoluteFill}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             />
           )}
           <LinearGradient
-            colors={['rgba(255,255,255,0.14)', 'rgba(255,255,255,0.02)']}
+            colors={DS.chipBaseGradient}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -333,7 +310,7 @@ function GlassChip({ label, active, onPress }) {
                 fontSize: 13,
                 fontWeight: '600',
                 letterSpacing: 0.3,
-                color: active ? '#fff' : DS.textSecondary,
+                color: active ? DS.chipTextActive : DS.textSecondary,
               }}
             >
               {label}
@@ -346,7 +323,7 @@ function GlassChip({ label, active, onPress }) {
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
             borderRadius: 100,
             borderWidth: 0.75,
-            borderColor: active ? 'rgba(255,120,120,0.55)' : DS.glassBorder,
+            borderColor: active ? DS.chipBorderActive : DS.glassBorder,
           }}
         />
       </Animated.View>
@@ -357,7 +334,7 @@ function GlassChip({ label, active, onPress }) {
 // ═══════════════════════════════════════════════════════════════════════════
 // PRIMITIVO: GlassCapsuleSelector — seletor de jogo (substitui o dropdown)
 // ═══════════════════════════════════════════════════════════════════════════
-function GlassCapsuleSelector({ label, onPress }) {
+function GlassCapsuleSelector({ label, onPress, DS }) {
   const pressAnim = useRef(new Value(0)).current;
   const scale = pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.98] });
 
@@ -369,9 +346,9 @@ function GlassCapsuleSelector({ label, onPress }) {
     >
       <Animated.View style={{ transform: [{ scale }] }}>
         <View style={{ borderRadius: 100, overflow: 'hidden' }}>
-          <BlurView intensity={46} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={46} tint={DS.blurTintPrimary} style={StyleSheet.absoluteFill} />
           <LinearGradient
-            colors={['rgba(255,255,255,0.14)', 'rgba(255,255,255,0.03)']}
+            colors={DS.capsuleGradient}
             style={StyleSheet.absoluteFill}
             start={{ x: 0.1, y: 0 }}
             end={{ x: 0.9, y: 1 }}
@@ -395,7 +372,7 @@ function GlassCapsuleSelector({ label, onPress }) {
           pointerEvents="none"
           style={{
             position: 'absolute', top: 0, left: '12%', right: '12%',
-            height: 1, backgroundColor: 'rgba(255,255,255,0.6)', opacity: 0.55,
+            height: 1, backgroundColor: DS.capsuleSpecular, opacity: 0.55,
           }}
         />
         <View
@@ -413,7 +390,7 @@ function GlassCapsuleSelector({ label, onPress }) {
 // ═══════════════════════════════════════════════════════════════════════════
 // PRIMITIVO: GlassBuyButton — cápsula, glow vermelho sutil, respiração, shimmer
 // ═══════════════════════════════════════════════════════════════════════════
-function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim }) {
+function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim, DS }) {
   const pressAnim = useRef(new Value(0)).current;
   const scale = pressAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.965] });
   const glowOpacity = breatheAnim
@@ -443,16 +420,16 @@ function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim }) {
 
         <View style={{ borderRadius: 100, overflow: 'hidden' }}>
           <LinearGradient
-            colors={['#9c0009', '#9c0009']}
+            colors={DS.buyButtonGradient}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           />
-          <BlurView intensity={12} tint="light" style={[StyleSheet.absoluteFill, { opacity: 0.18 }]} />
+          <BlurView intensity={12} tint={DS.blurTintSecondary} style={[StyleSheet.absoluteFill, { opacity: 0.18 }]} />
 
           {/* Highlight superior */}
           <LinearGradient
-            colors={['rgba(255,255,255,0.30)', 'transparent']}
+            colors={DS.buyButtonHighlight}
             style={[StyleSheet.absoluteFill, { height: '55%' }]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
@@ -468,7 +445,7 @@ function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim }) {
               }}
             >
               <LinearGradient
-                colors={['transparent', 'rgba(255,255,255,0.30)', 'transparent']}
+                colors={DS.buyButtonShimmer}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
@@ -477,7 +454,7 @@ function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim }) {
           )}
 
           <View style={{ paddingVertical: 18, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '700', letterSpacing: 0.4 }}>
+            <Text style={{ color: DS.buyButtonText, fontSize: 15, fontWeight: '700', letterSpacing: 0.4 }}>
               {label}
             </Text>
           </View>
@@ -487,14 +464,14 @@ function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim }) {
           pointerEvents="none"
           style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            borderRadius: 100, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)',
+            borderRadius: 100, borderWidth: 1, borderColor: DS.buyButtonBorder,
           }}
         />
         <View
           pointerEvents="none"
           style={{
             position: 'absolute', top: 1.5, left: 1.5, right: 1.5, bottom: 1.5,
-            borderRadius: 98, borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.18)',
+            borderRadius: 98, borderWidth: 0.5, borderColor: DS.buyButtonBorderInner,
           }}
         />
       </Animated.View>
@@ -505,13 +482,13 @@ function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim }) {
 // ═══════════════════════════════════════════════════════════════════════════
 // PRIMITIVO: Stepper glass (linha de ingresso dentro da superfície única)
 // ═══════════════════════════════════════════════════════════════════════════
-function GlassStepperButton({ icon, onPress }) {
+function GlassStepperButton({ icon, onPress, DS }) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.75}>
       <View style={{ width: 30, height: 30, borderRadius: 15, overflow: 'hidden' }}>
-        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={40} tint={DS.blurTintPrimary} style={StyleSheet.absoluteFill} />
         <LinearGradient
-          colors={['rgba(255,255,255,0.18)', 'rgba(255,255,255,0.04)']}
+          colors={DS.stepperGradient}
           style={StyleSheet.absoluteFill}
         />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -533,7 +510,12 @@ function GlassStepperButton({ icon, onPress }) {
 // TELA
 // ═══════════════════════════════════════════════════════════════════════════
 export default function IngressosScreen({ navigation }) {
-  const navigationRef = useNavigation();
+  const { isDark } = useTheme();
+  const DS = useMemo(
+    () => (isDark ? DARK_DS : LIGHT_DS),
+    [isDark],
+  );
+  const styles = useMemo(() => makeStyles(DS), [DS]);
 
   // ── Offsets para posicionar o botão flutuante acima da Tab Bar ──────────
   const tabBarHeight = useBottomTabBarHeight();
@@ -605,7 +587,7 @@ export default function IngressosScreen({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: DS.bg }}>
       {/* ══════════════════════════════════════════════════════════════════
-          FUNDO — foto do estádio + overlay escuro extremamente leve
+          FUNDO — foto do estádio + overlay leve
           Troque a source pela sua imagem real do estádio.
       ══════════════════════════════════════════════════════════════════ */}
       <ImageBackground
@@ -634,7 +616,7 @@ export default function IngressosScreen({ navigation }) {
               paddingBottom: 28,
             }}
           >
-            <GlassBackButton onPress={() => navigationRef.goBack()} />
+            <View style={{ width: 44, height: 44 }} />
             <View style={{ marginLeft: 16 }}>
               <Text style={{ color: DS.textPrimary, fontSize: 24, fontWeight: '700', letterSpacing: -0.3 }}>
                 Ingressos
@@ -653,6 +635,7 @@ export default function IngressosScreen({ navigation }) {
             borderRadius={30}
             padding={24}
             shimmerAnim={shimmerAnim}
+            DS={DS}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ alignItems: 'center', width: 96 }}>
@@ -686,7 +669,7 @@ export default function IngressosScreen({ navigation }) {
               </View>
             </View>
 
-            <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.10)', marginVertical: 22 }} />
+            <View style={{ height: 1, backgroundColor: DS.dividerColor, marginVertical: 22 }} />
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 14 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -718,6 +701,7 @@ export default function IngressosScreen({ navigation }) {
             <GlassCapsuleSelector
               label={selectedGame ? `${selectedGame.homeName}  ×  ${selectedGame.awayName}` : 'Escolha o jogo'}
               onPress={() => setModalVisible(true)}
+              DS={DS}
             />
           </View>
 
@@ -738,6 +722,7 @@ export default function IngressosScreen({ navigation }) {
                     label={cat}
                     active={activeCategory === cat}
                     onPress={() => setActiveCategory((prev) => (prev === cat ? null : cat))}
+                    DS={DS}
                   />
                 ))}
               </ScrollView>
@@ -749,7 +734,7 @@ export default function IngressosScreen({ navigation }) {
           ════════════════════════════════════════════════════════════ */}
           <View style={{ marginHorizontal: 16, marginBottom: 18 }}>
             <Text style={styles.sectionLabel}>ESCOLHA O SEU INGRESSO</Text>
-            <GlassSurface borderRadius={26} padding={6} shimmerAnim={shimmerAnim}>
+            <GlassSurface borderRadius={26} padding={6} shimmerAnim={shimmerAnim} DS={DS}>
               {ingressosVisiveis.map((item, index) => {
                 const qtd = quantities[item.id] || 0;
                 const isLast = index === ingressosVisiveis.length - 1;
@@ -763,7 +748,7 @@ export default function IngressosScreen({ navigation }) {
                       paddingVertical: 16,
                       paddingHorizontal: 14,
                       borderBottomWidth: isLast ? 0 : 0.5,
-                      borderBottomColor: 'rgba(255,255,255,0.08)',
+                      borderBottomColor: DS.dividerColorSoft,
                     }}
                   >
                     <View style={{ flex: 1, marginRight: 12 }}>
@@ -773,17 +758,17 @@ export default function IngressosScreen({ navigation }) {
                       <Text style={{ color: DS.textTertiary, fontSize: 12, marginTop: 2 }}>
                         {item.lugar}
                       </Text>
-                      <Text style={{ color: 'rgba(255,150,150,0.9)', fontSize: 13, fontWeight: '600', marginTop: 4 }}>
+                      <Text style={{ color: DS.crimsonText, fontSize: 13, fontWeight: '600', marginTop: 4 }}>
                         {item.valor}
                       </Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                      <GlassStepperButton icon="remove" onPress={() => decrease(quantities, setQuantities, item.id)} />
+                      <GlassStepperButton icon="remove" onPress={() => decrease(quantities, setQuantities, item.id)} DS={DS} />
                       <Text style={{ color: DS.textPrimary, fontSize: 15, fontWeight: '700', minWidth: 18, textAlign: 'center' }}>
                         {qtd}
                       </Text>
-                      <GlassStepperButton icon="add" onPress={() => increase(quantities, setQuantities, item.id)} />
+                      <GlassStepperButton icon="add" onPress={() => increase(quantities, setQuantities, item.id)} DS={DS} />
                     </View>
                   </View>
                 );
@@ -798,7 +783,7 @@ export default function IngressosScreen({ navigation }) {
           ════════════════════════════════════════════════════════════ */}
           <View style={{ marginHorizontal: 16, marginBottom: 18 }}>
             <Text style={styles.sectionLabel}>MAPA DO ESTÁDIO</Text>
-            <GlassSurface borderRadius={26} padding={0} shimmerAnim={shimmerAnim}>
+            <GlassSurface borderRadius={26} padding={0} shimmerAnim={shimmerAnim} DS={DS}>
               {/*
                 <StadiumSeatExperience
                   game={selectedGame}
@@ -819,12 +804,12 @@ export default function IngressosScreen({ navigation }) {
               INFORMAÇÕES — uma única superfície glass
           ════════════════════════════════════════════════════════════ */}
           <View style={{ marginHorizontal: 16, marginBottom: 12 }}>
-            <GlassSurface borderRadius={26} padding={20} shimmerAnim={shimmerAnim}>
-              <InfoRow icon="🎫" title="Entrada Digital" subtitle="QR Code liberado após confirmação." />
-              <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 14 }} />
-              <InfoRow icon="💳" title="Pagamento Seguro" subtitle="Compra protegida." />
-              <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 14 }} />
-              <InfoRow icon="⚡" title="Acesso Rápido" subtitle="Entrada imediata." isLast />
+            <GlassSurface borderRadius={26} padding={20} shimmerAnim={shimmerAnim} DS={DS}>
+              <InfoRow icon="🎫" title="Entrada Digital" subtitle="QR Code liberado após confirmação." DS={DS} />
+              <View style={{ height: 1, backgroundColor: DS.dividerColorSoft, marginVertical: 14 }} />
+              <InfoRow icon="💳" title="Pagamento Seguro" subtitle="Compra protegida." DS={DS} />
+              <View style={{ height: 1, backgroundColor: DS.dividerColorSoft, marginVertical: 14 }} />
+              <InfoRow icon="⚡" title="Acesso Rápido" subtitle="Entrada imediata." isLast DS={DS} />
             </GlassSurface>
           </View>
         </Animated.View>
@@ -845,6 +830,7 @@ export default function IngressosScreen({ navigation }) {
           onPress={handlePurchase}
           breatheAnim={breatheAnim}
           shimmerAnim={shimmerAnim}
+          DS={DS}
         />
       </View>
 
@@ -858,20 +844,20 @@ export default function IngressosScreen({ navigation }) {
         onRequestClose={() => setModalVisible(false)}
       >
         <TouchableOpacity
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' }}
+          style={{ flex: 1, backgroundColor: DS.modalBackdrop, justifyContent: 'flex-end' }}
           activeOpacity={1}
           onPress={() => setModalVisible(false)}
         >
           <TouchableWithoutFeedback>
             <View style={{ paddingHorizontal: 16, paddingBottom: 40 }}>
-              <GlassSurface borderRadius={28} padding={20} enableShimmer={false}>
+              <GlassSurface borderRadius={28} padding={20} enableShimmer={false} DS={DS}>
                 <Text style={{ color: DS.textPrimary, fontSize: 16, fontWeight: '700', marginBottom: 14 }}>
                   Selecionar Jogo
                 </Text>
                 {dadosJogos.map((jogo) => (
                   <TouchableOpacity
                     key={jogo.id}
-                    style={{ paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: 'rgba(255,255,255,0.08)' }}
+                    style={{ paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: DS.dividerColorSoft }}
                     onPress={() => {
                       setSelectedGame(jogo);
                       setModalVisible(false);
@@ -883,7 +869,7 @@ export default function IngressosScreen({ navigation }) {
                   </TouchableOpacity>
                 ))}
                 <TouchableOpacity style={{ paddingTop: 16, alignItems: 'center' }} onPress={() => setModalVisible(false)}>
-                  <Text style={{ color: 'rgba(255,120,120,0.9)', fontSize: 14, fontWeight: '600' }}>Cancelar</Text>
+                  <Text style={{ color: DS.cancelTextColor, fontSize: 14, fontWeight: '600' }}>Cancelar</Text>
                 </TouchableOpacity>
               </GlassSurface>
             </View>
@@ -901,15 +887,15 @@ export default function IngressosScreen({ navigation }) {
         onRequestClose={() => setSuccessModalVisible(false)}
       >
         <TouchableOpacity
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}
+          style={{ flex: 1, backgroundColor: DS.successBackdrop, alignItems: 'center', justifyContent: 'center' }}
           activeOpacity={1}
           onPress={() => setSuccessModalVisible(false)}
         >
           <TouchableWithoutFeedback>
             <View style={{ width: '80%' }}>
-              <GlassSurface borderRadius={26} padding={26} enableShimmer={false}>
+              <GlassSurface borderRadius={26} padding={26} enableShimmer={false} DS={DS}>
                 <View style={{ alignItems: 'center' }}>
-                  <Ionicons name="checkmark-circle" size={40} color="rgba(120,255,170,0.9)" />
+                  <Ionicons name="checkmark-circle" size={40} color={DS.successIconColor} />
                   <Text style={{ color: DS.textPrimary, fontSize: 17, fontWeight: '700', marginTop: 12 }}>
                     Sucesso!
                   </Text>
@@ -923,7 +909,7 @@ export default function IngressosScreen({ navigation }) {
                     <View
                       style={{
                         borderRadius: 100, paddingVertical: 12, alignItems: 'center',
-                        backgroundColor: 'rgba(255,255,255,0.12)',
+                        backgroundColor: DS.okButtonBg,
                         borderWidth: 0.75, borderColor: DS.glassBorder,
                       }}
                     >
@@ -940,7 +926,7 @@ export default function IngressosScreen({ navigation }) {
   );
 }
 
-function InfoRow({ icon, title, subtitle }) {
+function InfoRow({ icon, title, subtitle, DS }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <Text style={{ fontSize: 20, marginRight: 14 }}>{icon}</Text>
@@ -951,14 +937,3 @@ function InfoRow({ icon, title, subtitle }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionLabel: {
-    color: DS.textTertiary,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    marginBottom: 10,
-    marginLeft: 4,
-  },
-});

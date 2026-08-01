@@ -626,6 +626,9 @@ export default function PerfilScreen({ navigation }) {
     () => getPlanIdentity(subscription, DS),
     [subscription, DS],
   );
+  const beneficiosAtivos = Array.isArray(subscription?.beneficios)
+    ? subscription.beneficios
+    : [];
 
   const [profileDraft, setProfileDraft] = useState(currentCliente);
   const originalProfileRef = useRef(currentCliente);
@@ -1002,18 +1005,16 @@ export default function PerfilScreen({ navigation }) {
 
             <View style={ps.membershipFooterRow}>
               <View style={ps.membershipBenefits}>
-                <View style={ps.membershipBenefitItem}>
-                  <View style={ps.membershipBenefitDot} />
-                  <Text style={ps.membershipBenefitText}>
-                    Benefícios ativos do plano
-                  </Text>
-                </View>
-                <View style={ps.membershipBenefitItem}>
-                  <View style={ps.membershipBenefitDot} />
-                  <Text style={ps.membershipBenefitText}>
-                    Prioridade em compras e ingressos
-                  </Text>
-                </View>
+                <Text style={ps.membershipBenefitsTitle}>Benefícios do plano</Text>
+                <Text style={ps.membershipBenefitsSubtitle}>
+                  Vantagens ativas da assinatura atual
+                </Text>
+                {beneficiosAtivos.map((beneficio, index) => (
+                  <View key={`${String(beneficio)}-${index}`} style={ps.membershipBenefitItem}>
+                    <Ionicons name="checkmark-circle" size={13} color={planIdentity.accent} />
+                    <Text style={ps.membershipBenefitText}>{beneficio}</Text>
+                  </View>
+                ))}
               </View>
               {planIdentity.price ? (
                 <Text style={[ps.membershipPrice, { color: planIdentity.textColor }]}>{planIdentity.price}</Text>
@@ -1858,19 +1859,26 @@ const makePs = (DS) =>
       justifyContent: "space-between",
     },
     membershipBenefits: {
-      gap: 7,
+      gap: 8,
       flex: 1,
+      paddingRight: 14,
+    },
+    membershipBenefitsTitle: {
+      color: DS.textPrimary,
+      fontSize: 13,
+      fontWeight: "800",
+      letterSpacing: 0.2,
+    },
+    membershipBenefitsSubtitle: {
+      color: DS.textMuted,
+      fontSize: 11,
+      fontWeight: "500",
+      marginBottom: 2,
     },
     membershipBenefitItem: {
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
-    },
-    membershipBenefitDot: {
-      width: 4,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: DS.textMuted,
     },
     membershipBenefitText: {
       color: DS.textSecondary,

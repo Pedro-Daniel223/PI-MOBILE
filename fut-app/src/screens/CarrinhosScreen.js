@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+﻿import React, { useRef, useState, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,14 +14,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useSubscription } from "../contexts/SubscriptionContext";
+import { useTheme } from "../contexts/ThemeContext";
 import CheckoutModal from "./CheckoutModal";
-import { theme } from "../data/dataCarrinhos";
-import styles from "../styles/styleCarrinhos/styleCarrinhos";
-import { checkout } from "../services/checkoutService";
-import { useMemo } from "react";
-import { useColorScheme } from "../contexts/ColorSchemeContext";
-
-// theme moved to src/data/dataCarrinhos.js
+import { makeStyles, DARK_DS, LIGHT_DS } from "../styles/styleCarrinhos/styleCarrinhos";
+import { checkout, previewCheckout } from "../services/checkoutService";
 
 const resolveImageSource = (value) => {
   if (!value) {
@@ -35,8 +32,17 @@ const resolveImageSource = (value) => {
   return value;
 };
 
+const formatBRL = (value) =>
+  Number(value || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+
+const itemKey = (item) => `${item.id}::${item.tamanho || "__no-size__"}`;
+
 const CartItem = ({
   item,
+  pricing,
   onUpdateQuantity,
   onRemove,
   styles,
@@ -133,13 +139,13 @@ const CartItem = ({
               />
             ) : (
               <View style={styles.imagePlaceholder}>
-                <Ionicons name="shirt-outline" size={28} color="#D1D1D6" />
+                <Ionicons name="shirt-outline" size={28} color={DS.colors.imagePlaceholderIcon} />
               </View>
             )}
           </View>
 
           <View style={styles.infoContainer}>
-            <Text style={styles.sectionLabel}>Descrição do pedido</Text>
+            <Text style={styles.sectionLabel}>DescriÃ§Ã£o do pedido</Text>
             <Text style={styles.productName} numberOfLines={2}>
               {item.nome || "Produto sem nome"}
             </Text>
@@ -157,14 +163,19 @@ const CartItem = ({
               </Text>
             </View>
 
-            <View style={styles.priceRow}>
-              <Text style={styles.priceLabel}>Preço unitário</Text>
-              <Text style={styles.priceValue}>
-                {item.preco.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </Text>
+            <View style={styles.pricingBlock}>
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabel}>Preço original</Text>
+                <Text style={styles.pricingValueMuted}>{formatBRL(pricing?.preco_original_unitario ?? item.precoOriginal ?? item.preco ?? item.price)}</Text>
+              </View>
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabel}>Preço final</Text>
+                <Text style={styles.pricingValue}>{formatBRL(pricing?.preco_final_unitario ?? item.precoFinal ?? item.preco ?? item.price)}</Text>
+              </View>
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabel}>Economia</Text>
+                <Text style={styles.economyText}>{formatBRL(pricing?.economia_total ?? item.economia_total ?? item.economia ?? 0)}</Text>
+              </View>
             </View>
 
             <View style={styles.actionsRow}>
@@ -180,11 +191,10 @@ const CartItem = ({
                   <Text
                     style={[
                       styles.qtySymbol,
-                      item.quantity <= 1 && { color: "#D1D1D6" },
+                      item.quantity <= 1 && { color: DS.colors.qtySymbolDisabled },
                     ]}
                   >
-                    −
-                  </Text>
+                    -</Text>
                 </TouchableOpacity>
                 <Text style={styles.qtyNumber}>
                   {item.quantity.toString().padStart(2, "0")}
@@ -217,54 +227,18 @@ const CartItem = ({
 
 
 export default function CarrinhosScreen({ navigation }) {
-  const { isDarkMode } = useColorScheme();
+  const { isDark } = useTheme();
 
   const DS = useMemo(
-    () => ({
-      isDark: isDarkMode,
-      colors: {
-        background: isDarkMode ? "#090909" : "#F7F4F2",
-        surface: isDarkMode ? "#171717" : "#FFFFFF",
-
-        text: isDarkMode ? "#FFFFFF" : "#111111",
-        textSecondary: isDarkMode
-          ? "rgba(255,255,255,0.65)"
-          : "#6B7280",
-
-        accent: "#E8000F",
-
-        accentLight: isDarkMode
-          ? "rgba(232,0,15,0.18)"
-          : "#FFE8E8",
-
-        black: isDarkMode ? "#FFFFFF" : "#111111",
-
-        card: isDarkMode ? "#141414" : "#FFFFFF",
-
-        border: isDarkMode
-          ? "rgba(255,255,255,.08)"
-          : "rgba(0,0,0,.06)",
-
-        quantityBackground: isDarkMode
-          ? "#232323"
-          : "#F2F2F7",
-
-        quantityButton: isDarkMode
-          ? "#2C2C2E"
-          : "#FFFFFF",
-
-        bottomBar: isDarkMode
-          ? "rgba(18,18,18,.97)"
-          : "rgba(255,255,255,.95)",
-      },
-    }),
-    [isDarkMode]
+    () => (isDark ? DARK_DS : LIGHT_DS),
+    [isDark],
   );
 
   const styles = useMemo(() => makeStyles(DS), [DS]);
   const { cartItems, updateQuantity, removeItem, clearCart, subtotal } =
     useCart();
   const { token } = useAuth();
+  const { subscription } = useSubscription();
   const total = subtotal;
   const hasItems = cartItems.length > 0;
   const [checkoutVisible, setCheckoutVisible] = useState(false);
@@ -272,9 +246,57 @@ export default function CarrinhosScreen({ navigation }) {
     cartItems: [],
     total: 0,
   });
+  const [pricingSummary, setPricingSummary] = useState(null);
 
-  // ==================== FRONT (CABEÇALHO) ====================
-  // Cabeçalho superior com título MEU CARRINHO e botão Limpar
+  const pricingMap = useMemo(() => {
+    const map = new Map();
+    const items = Array.isArray(pricingSummary?.itens) ? pricingSummary.itens : [];
+
+    items.forEach((item) => {
+      map.set(`${String(item.produto_id)}::${String(item.tamanho || "__no-size__")}`, item);
+    });
+
+    return map;
+  }, [pricingSummary]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPricing = async () => {
+      if (!token || !hasItems) {
+        setPricingSummary(null);
+        return;
+      }
+
+      try {
+        const payload = {
+          itens: cartItems.map((item) => ({
+            produto_id: item.id,
+            quantidade: item.quantity,
+            ...(item.tamanho ? { tamanho: item.tamanho } : {}),
+          })),
+        };
+
+        const response = await previewCheckout(payload, token);
+        if (!cancelled) {
+          setPricingSummary(response);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setPricingSummary(null);
+        }
+      }
+    };
+
+    loadPricing();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cartItems, hasItems, token]);
+
+  // ==================== FRONT (CABEÃ‡ALHO) ====================
+  // CabeÃ§alho superior com tÃ­tulo MEU CARRINHO e botÃ£o Limpar
   // =============================================================
 
   const handleCheckout = () => {
@@ -284,7 +306,7 @@ export default function CarrinhosScreen({ navigation }) {
 
     setCheckoutSnapshot({
       cartItems: [...cartItems],
-      total,
+      total: pricingSummary?.total_final ?? total,
     });
     setCheckoutVisible(true);
   };
@@ -327,10 +349,10 @@ export default function CarrinhosScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle={DS.statusBarStyle} />
 
-      {/* ==================== FRONT (CABEÇALHO) ==================== */}
-      {/* Cabeçalho superior com botão voltar, título MEU CARRINHO e botão Limpar */}
+      {/* ==================== FRONT (CABEÃ‡ALHO) ==================== */}
+      {/* CabeÃ§alho superior com botÃ£o voltar, tÃ­tulo MEU CARRINHO e botÃ£o Limpar */}
       {/* ============================================================= */}
 
       <View style={styles.header}>
@@ -338,7 +360,7 @@ export default function CarrinhosScreen({ navigation }) {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Ionicons name="chevron-back" size={24} color={theme.black} />
+          <Ionicons name="chevron-back" size={24} color={DS.colors.black} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>MEU CARRINHO</Text>
         <TouchableOpacity onPress={() => hasItems && clearCart()}>
@@ -351,7 +373,7 @@ export default function CarrinhosScreen({ navigation }) {
       </View>
 
       {/* ==================== SCROLLVIEW (ITENS DO CARRINHO) ==================== */}
-      {/* Lista rolável com os itens do carrinho ou estado vazio */}
+      {/* Lista rolÃ¡vel com os itens do carrinho ou estado vazio */}
       {/* ==================================================================== */}
 
       <ScrollView
@@ -365,6 +387,7 @@ export default function CarrinhosScreen({ navigation }) {
           <CartItem
               key={`${item.id}-${item.tamanho}`}
               item={item}
+              pricing={pricingMap.get(itemKey(item))}
               onUpdateQuantity={updateQuantity}
               onRemove={removeItem}
               styles={styles}
@@ -395,7 +418,7 @@ export default function CarrinhosScreen({ navigation }) {
       </ScrollView>
 
       {/* ==================== BOTTOM BAR (TOTAL + CHECKOUT) ==================== */}
-      {/* Barra inferior fixa com total e botão de compra (apenas se houver itens) */}
+      {/* Barra inferior fixa com total e botÃ£o de compra (apenas se houver itens) */}
       {/* ====================================================================== */}
 
       {hasItems && (
@@ -403,12 +426,15 @@ export default function CarrinhosScreen({ navigation }) {
           <View style={styles.bottomBar}>
             <View>
               <Text style={styles.totalLabel}>Total geral</Text>
+              {pricingSummary?.subtotal_original != null ? (
+                <Text style={styles.totalOldAmount}>{formatBRL(pricingSummary.subtotal_original)}</Text>
+              ) : null}
               <Text style={styles.totalAmount}>
-                {total.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
+                {formatBRL(pricingSummary?.total_final ?? total)}
               </Text>
+              {pricingSummary?.economia_total != null ? (
+                <Text style={styles.totalSavings}>Economia {formatBRL(pricingSummary.economia_total)}</Text>
+              ) : null}
             </View>
 
             <TouchableOpacity
@@ -418,7 +444,7 @@ export default function CarrinhosScreen({ navigation }) {
             >
               <Text style={styles.checkoutText}>Comprar</Text>
               <View style={styles.checkoutIcon}>
-                <Ionicons name="arrow-forward" size={18}color={DS.colors.black}/>
+                <Ionicons name="arrow-forward" size={18} color={DS.colors.checkoutIconColor} />
               </View>
             </TouchableOpacity>
           </View>
@@ -429,6 +455,8 @@ export default function CarrinhosScreen({ navigation }) {
         visible={checkoutVisible}
         cartItems={checkoutSnapshot.cartItems}
         total={checkoutSnapshot.total}
+        pricingSummary={pricingSummary}
+        planBenefits={subscription?.beneficios ?? []}
         onClose={handleCloseCheckout}
         onConfirmPurchase={handleConfirmPurchase}
         onGoToShop={handleGoToShop}

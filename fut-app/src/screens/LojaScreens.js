@@ -233,6 +233,9 @@ const normalizeCategory = (value) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
 
+const formatBRL = (value) =>
+  Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
 const matchesCategory = (productCategory, selectedCategory) => {
   if (selectedCategory === 'Tudo') {
     return true;
@@ -470,15 +473,16 @@ const ProductCard = memo(({ item, onPress, DS, s }) => {
           <Text style={s.cardCat}>{item.cat.toUpperCase()}</Text>
           <Text style={s.cardName} numberOfLines={2}>{item.name}</Text>
           <View style={s.cardPriceRow}>
-            <Text style={s.cardPrice}>
-              {item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            </Text>
-            {item.oldPrice && (
-              <Text style={s.cardOldPrice}>
-                {item.oldPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-              </Text>
-            )}
+            <Text style={s.cardPrice}>{formatBRL(item.preco_final)}</Text>
+            {Number(item.desconto_percent || 0) > 0 && item.preco_original != null ? (
+              <Text style={s.cardOldPrice}>{formatBRL(item.preco_original)}</Text>
+            ) : null}
           </View>
+          {Number(item.desconto_percent || 0) > 0 ? (
+            <Text style={s.cardSavings}>
+              {item.desconto_percent}% OFF · Economia {formatBRL(item.economia ?? 0)}
+            </Text>
+          ) : null}
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -953,6 +957,12 @@ function makeStyles(DS) {
       fontSize: 11.5,
       color: DS.inkFaint,
       textDecorationLine: 'line-through',
+    },
+    cardSavings: {
+      marginTop: 4,
+      fontSize: 10.5,
+      fontWeight: '600',
+      color: DS.crimson,
     },
 
     // ── Closing ─────────────────────────────────────────────────────────────

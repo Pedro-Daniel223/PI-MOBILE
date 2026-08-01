@@ -31,6 +31,9 @@ const parseCurrencyValue = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const formatBRL = (value) =>
+  Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
 const extractImagePath = (image) => {
   if (!image) {
     return null;
@@ -92,8 +95,11 @@ const EMPTY_PRODUCT = {
   id: '',
   nome: 'Produto',
   preco: 0,
-  precoAntigo: 0,
+  precoAntigo: null,
   desconto: '',
+  economia: null,
+  desconto_percent: 0,
+  beneficios_plano: [],
   imagens: [],
   imagem: null,
   descricao: '',
@@ -117,11 +123,16 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
     ...EMPTY_PRODUCT,
     ...produtoEntrada,
     nome: produtoEntrada.nome ?? produtoEntrada.title ?? EMPTY_PRODUCT.nome,
-    preco: typeof produtoEntrada.preco === 'number' ? produtoEntrada.preco : parseCurrencyValue(produtoEntrada.price),
-    precoAntigo: typeof produtoEntrada.precoAntigo === 'number' ? produtoEntrada.precoAntigo : parseCurrencyValue(produtoEntrada.precoAntigo ?? produtoEntrada.oldPrice),
+    preco: produtoEntrada.preco_final ?? EMPTY_PRODUCT.preco,
+    preco_final: produtoEntrada.preco_final ?? EMPTY_PRODUCT.preco,
+    precoAntigo: produtoEntrada.preco_original ?? null,
+    preco_original: produtoEntrada.preco_original ?? null,
     imagens: normalizeImages(produtoEntrada),
     imagem: produtoEntrada.imagem ?? produtoEntrada.image ?? normalizeImages(produtoEntrada)[0] ?? null,
     descricao: produtoEntrada.descricao ?? produtoEntrada.description ?? EMPTY_PRODUCT.descricao,
+    economia: produtoEntrada.economia ?? null,
+    desconto_percent: produtoEntrada.desconto_percent ?? 0,
+    beneficios_plano: Array.isArray(produtoEntrada.beneficios_plano) ? produtoEntrada.beneficios_plano : [],
   } : EMPTY_PRODUCT);
 
   useEffect(() => {
@@ -134,15 +145,16 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
             ...prev,
             ...produtoEntrada,
             nome: produtoEntrada.nome ?? produtoEntrada.title ?? prev.nome,
-            preco: typeof produtoEntrada.preco === 'number'
-              ? produtoEntrada.preco
-              : parseCurrencyValue(produtoEntrada.price),
-            precoAntigo: typeof produtoEntrada.precoAntigo === 'number'
-              ? produtoEntrada.precoAntigo
-              : parseCurrencyValue(produtoEntrada.precoAntigo ?? produtoEntrada.oldPrice),
+            preco: produtoEntrada.preco_final ?? prev.preco,
+            preco_final: produtoEntrada.preco_final ?? prev.preco_final ?? prev.preco,
+            precoAntigo: produtoEntrada.preco_original ?? prev.precoAntigo ?? null,
+            preco_original: produtoEntrada.preco_original ?? prev.preco_original ?? null,
             imagens: normalizeImages(produtoEntrada),
             imagem: produtoEntrada.imagem ?? produtoEntrada.image ?? normalizeImages(produtoEntrada)[0] ?? null,
             descricao: produtoEntrada.descricao ?? produtoEntrada.description ?? prev.descricao,
+            economia: produtoEntrada.economia ?? prev.economia,
+            desconto_percent: produtoEntrada.desconto_percent ?? prev.desconto_percent,
+            beneficios_plano: Array.isArray(produtoEntrada.beneficios_plano) ? produtoEntrada.beneficios_plano : prev.beneficios_plano,
           }));
         }
         return;
@@ -161,11 +173,16 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
         ...EMPTY_PRODUCT,
         ...resolved,
         nome: resolved.nome ?? resolved.title ?? EMPTY_PRODUCT.nome,
-        preco: typeof resolved.preco === 'number' ? resolved.preco : parseCurrencyValue(resolved.price),
-        precoAntigo: typeof resolved.precoAntigo === 'number' ? resolved.precoAntigo : parseCurrencyValue(resolved.precoAntigo ?? resolved.oldPrice),
+        preco: resolved.preco_final ?? EMPTY_PRODUCT.preco,
+        preco_final: resolved.preco_final ?? EMPTY_PRODUCT.preco,
+        precoAntigo: resolved.preco_original ?? null,
+        preco_original: resolved.preco_original ?? null,
         imagens: normalizeImages(resolved),
         imagem: resolved.imagem ?? resolved.image ?? normalizeImages(resolved)[0] ?? null,
         descricao: resolved.descricao ?? resolved.description ?? EMPTY_PRODUCT.descricao,
+        economia: resolved.economia ?? null,
+        desconto_percent: resolved.desconto_percent ?? 0,
+        beneficios_plano: Array.isArray(resolved.beneficios_plano) ? resolved.beneficios_plano : [],
       });
     };
 
@@ -318,15 +335,33 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
         )}
 
         <View style={styles.infoSection}>
-          <View style={styles.priceRow}>
-            <Text style={styles.currentPrice}>{produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
-            {produto.precoAntigo ? <Text style={styles.oldPrice}>{produto.precoAntigo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text> : null}
-            {produto.desconto ? (
-              <View style={styles.discountBadge}>
-                <Text style={styles.discountText}>{produto.desconto}</Text>
+          {Number(produto.desconto_percent || 0) > 0 && produto.preco_original != null ? (
+            <View style={styles.pricingBlock}>
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabel}>Pre?o original</Text>
+                <Text style={styles.pricingValueMuted}>{formatBRL(produto.preco_original)}</Text>
               </View>
-            ) : null}
-          </View>
+              <View style={styles.pricingRow}>
+                <Text style={styles.pricingLabel}>Pre?o final</Text>
+                <Text style={styles.pricingValue}>{formatBRL(produto.preco_final)}</Text>
+              </View>
+              {produto.economia != null ? (
+                <View style={styles.pricingRow}>
+                  <Text style={styles.pricingLabel}>Economia</Text>
+                  <Text style={styles.economyText}>{formatBRL(produto.economia)}</Text>
+                </View>
+              ) : null}
+              {Number(produto.desconto_percent || 0) > 0 ? (
+                <View style={styles.discountRow}>
+                  <Text style={styles.discountText}>{produto.desconto_percent}% OFF</Text>
+                </View>
+              ) : null}
+            </View>
+          ) : (
+            <View style={styles.singlePriceRow}>
+              <Text style={styles.currentPrice}>{formatBRL(produto.preco_final)}</Text>
+            </View>
+          )}
 
           <Text style={styles.productName}>{produto.nome}</Text>
 
@@ -370,7 +405,12 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
                 id: produto.id ?? produto.nome,
                 nome: produto.nome,
                 imagem: produto.imagem ?? produto.image ?? null,
-                preco: produto.preco,
+                preco: produto.preco_final,
+                preco_original: produto.preco_original,
+                preco_final: produto.preco_final,
+                economia: produto.economia,
+                desconto_percent: produto.desconto_percent,
+                beneficios_plano: produto.beneficios_plano,
                 quantity: 1,
                 ...(mostrarTamanhos ? { tamanho: tamanhoSelecionado } : {}),
               };

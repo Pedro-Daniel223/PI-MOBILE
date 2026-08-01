@@ -30,10 +30,18 @@
  *   – Backdrop com BlurView escuro (não preto sólido)
  *   – Painel translúcido com mesma arquitetura especular do card
  *   – Botões "Fechar" (glass neutro) e "Assinar" (glass com glow de acento)
+ *
+ * LIGHT/DARK MODE:
+ *   – useColorScheme() + DARK_DS/LIGHT_DS + makeCardStyles/makeSheetStyles/
+ *     makeMainStyles(DS), seguindo o mesmo padrão de PerfilScreen.
+ *   – DARK_DS reproduz EXATAMENTE os valores que já existiam no DS estático
+ *     original desta tela. LIGHT_DS é um conjunto de tokens novo e paralelo.
+ *   – Nenhum valor de layout (paddings, tamanhos, radius, gaps, shadowOffset,
+ *     shadowRadius, elevation) foi alterado — apenas cores/tokens.
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useMemo, memo, useCallback } from 'react';
 import {
   Alert,
   View,
@@ -46,6 +54,7 @@ import {
   TouchableWithoutFeedback,
   Animated,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -55,26 +64,22 @@ import { useFocusEffect } from '@react-navigation/native';
 import CheckoutModal from './CheckoutModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
+import { useTheme } from '../contexts/ThemeContext';
+import apiClient from '../services/api';
 import { dadosPlano } from '../data/dataSocios/dataSocios';
 import NavbarGlass from '../components/NavbarGlass';
-import { assinarPlano } from '../services/subscriptionService';
+import { assinarPlano, getPlanos } from '../services/subscriptionService';
+import {
+  DARK_DS,
+  LIGHT_DS,
+  makeCardStyles,
+  makeSheetStyles,
+  makeMainStyles,
+} from '../styles/styleSocios/stylesSocios';
 
 const escudoDrakos = require('../assets/img/Escudo_Drakos.png');
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-// ─── Design System ────────────────────────────────────────────────────────────
-const DS = {
-  bg:           '#0a0a0a',
-  bgElevated:   '#121212',
-  accent:       '#c0000a',
-  accentBright: '#e8000f',
-  text:         '#f4f4f4',
-  textDim:      'rgba(244,244,244,0.58)',
-  textFaint:    'rgba(244,244,244,0.30)',
-  glassBorder:  'rgba(255,255,255,0.18)',
-  radius:       22,
-  spacing:      { sm: 12, md: 16, lg: 20, xl: 24 },
-};
+const { BASE_URL } = apiClient;
 
 const parsePlanoValor = (valor) => {
   if (typeof valor === 'number') {
@@ -105,6 +110,53 @@ const buildSubscriptionCheckoutItem = (plan) => ({
   image: plan?.cardImage,
 });
 
+const FALLBACK_PLANOS = dadosPlano;
+
+const resolveRemoteImageUri = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  if (/^https?:\/\//i.test(value)) {
+    return value;
+  }
+
+  const normalizedBase = String(BASE_URL || '').replace(/\/+$/, '');
+  const normalizedPath = value.startsWith('/') ? value : `/${value}`;
+  return normalizedBase ? `${normalizedBase}${normalizedPath}` : value;
+};
+
+const normalizePlano = (plan, fallback = {}) => {
+  const id = Number(plan?.plano_id ?? plan?.id ?? plan?.id_categoria_cliente ?? fallback.id ?? fallback.plano_id);
+  const title = plan?.title || plan?.nome_plano || plan?.nome || fallback.title || fallback.nome || '';
+  const price = plan?.price ?? plan?.valor ?? plan?.preco ?? fallback.price ?? fallback.preco ?? 0;
+  const description = plan?.description || plan?.descricao || fallback.description || fallback.descricao || '';
+  const benefits = Array.isArray(plan?.beneficios) && plan.beneficios.length > 0
+    ? plan.beneficios
+    : (Array.isArray(fallback.beneficios) ? fallback.beneficios : []);
+  const imageUri = resolveRemoteImageUri(
+    plan?.card_image || plan?.imagem_url || plan?.imagem || fallback.cardImage || fallback.imagem || null,
+  );
+
+  return {
+    id: Number.isFinite(id) ? String(id) : String(plan?.id ?? fallback.id ?? title),
+    title,
+    description,
+    price,
+    vagas: plan?.vagas || fallback.vagas || '',
+    textColor: plan?.textColor || fallback.textColor || '#fff',
+    cardColor: plan?.cardColor || fallback.cardColor || '#000000',
+    cardImage: imageUri ? (typeof imageUri === 'string' ? { uri: imageUri } : imageUri) : fallback.cardImage || null,
+    beneficios: benefits,
+    tier: plan?.tier || fallback.tier || 'nao-socio',
+    raw: plan,
+  };
+};
+
 const normalizeAssinaturaResponse = (payload, fallbackPlan = null) => {
   if (!payload) {
     return null;
@@ -132,8 +184,9 @@ const normalizeAssinaturaResponse = (payload, fallbackPlan = null) => {
 // adaptada ao layout horizontal (texto à esquerda, imagem à direita).
 // Recebe shimmerAnim e floatAnim COMPARTILHADOS do pai — evita N loops de
 // animação simultâneos quando há múltiplos planos (otimização de performance).
+// Recebe também DS e cardStyles do pai para refletir o tema ativo.
 // ═══════════════════════════════════════════════════════════════════════════════
-const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
+const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim, DS, cardStyles }) => {
   const pressAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -153,10 +206,10 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
       {/* ── Corpo de vidro (overflow:hidden) ────────────────────────────── */}
       <View style={cardStyles.glassBody}>
         {/* G1: BlurView primário */}
-        <BlurView intensity={52} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={52} tint={DS.blurTint} style={StyleSheet.absoluteFill} />
 
         {/* G2: BlurView secundário — profundidade adicional */}
-        <BlurView intensity={16} tint="dark" style={[StyleSheet.absoluteFill, { opacity: 0.5 }]} />
+        <BlurView intensity={16} tint={DS.blurTint} style={[StyleSheet.absoluteFill, { opacity: 0.5 }]} />
 
         {/* G3: Tom base do vidro + tinta de identidade do plano (sutil) */}
         <LinearGradient
@@ -172,7 +225,7 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
 
         {/* G4: Reflexo ambiental superior-esquerdo */}
         <LinearGradient
-          colors={['rgba(255,255,255,0.16)', 'rgba(255,255,255,0.05)', 'transparent']}
+          colors={DS.cardReflectionColors}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 0.6, y: 0.55 }}
@@ -180,7 +233,7 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
 
         {/* G5: Vignette inferior — espessura do vidro */}
         <LinearGradient
-          colors={['transparent', 'transparent', 'rgba(0,5,18,0.06)', 'rgba(0,5,18,0.16)']}
+          colors={DS.cardVignetteColors}
           style={StyleSheet.absoluteFill}
           start={{ x: 0.5, y: 0.4 }}
           end={{ x: 0.5, y: 1 }}
@@ -198,15 +251,7 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
           }}
         >
           <LinearGradient
-            colors={[
-              'transparent',
-              'rgba(255,255,255,0.04)',
-              'rgba(255,255,255,0.12)',
-              'rgba(255,255,255,0.18)',
-              'rgba(255,255,255,0.12)',
-              'rgba(255,255,255,0.04)',
-              'transparent',
-            ]}
+            colors={DS.cardShimmerColors}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
@@ -235,7 +280,7 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
               onPressOut={handlePressOut}
               activeOpacity={0.85}
             >
-              <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
+              <BlurView intensity={20} tint={DS.blurTint} style={StyleSheet.absoluteFill} />
               <View style={cardStyles.buttonSpecular} />
               <View style={cardStyles.buttonBorder} />
               <Text style={cardStyles.verMaisText}>VER MAIS</Text>
@@ -263,10 +308,7 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
       {/* E1: Barra especular superior */}
       <View pointerEvents="none" style={cardStyles.specularTopWrap}>
         <LinearGradient
-          colors={[
-            'transparent', 'rgba(255,255,255,0.55)', 'rgba(255,255,255,0.92)',
-            'rgba(255,255,255,0.95)', 'rgba(255,255,255,0.92)', 'rgba(255,255,255,0.55)', 'transparent',
-          ]}
+          colors={DS.specularTopColors}
           style={{ flex: 1 }}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
@@ -276,7 +318,7 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
       {/* E2: Rim light esquerdo */}
       <View pointerEvents="none" style={cardStyles.rimLeftWrap}>
         <LinearGradient
-          colors={['transparent', 'rgba(255,255,255,0.48)', 'rgba(255,255,255,0.30)', 'rgba(255,255,255,0.10)', 'transparent']}
+          colors={DS.rimLeftColors}
           style={{ flex: 1 }}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
@@ -286,7 +328,7 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
       {/* E3: Franja cromática inferior */}
       <View pointerEvents="none" style={cardStyles.chromaBottomWrap}>
         <LinearGradient
-          colors={['transparent', 'rgba(160,185,255,0.28)', 'rgba(180,200,255,0.40)', 'rgba(160,185,255,0.28)', 'transparent']}
+          colors={DS.chromaBottomColors}
           style={{ flex: 1 }}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
@@ -302,175 +344,17 @@ const PlanGlassCard = memo(({ plan, onVerMais, shimmerAnim, floatAnim }) => {
   );
 });
 
-const cardStyles = StyleSheet.create({
-  outerContainer: {
-    borderRadius: DS.radius,
-    marginHorizontal: DS.spacing.lg,
-    marginBottom: 18,
-    shadowColor: '#000000',
-    shadowOpacity: 0.30,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 10,
-  },
-  glassBody: {
-    borderRadius: DS.radius,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.025)',
-    minHeight: 190,
-  },
-  content: {
-    flex: 1,
-    flexDirection: 'row',
-    padding: DS.spacing.lg,
-  },
-  cardLeft: {
-    flex: 1.3,
-    justifyContent: 'space-between',
-    paddingRight: 8,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 0.75,
-    borderColor: DS.glassBorder,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    gap: 6,
-  },
-  badgeDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: DS.accentBright,
-  },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: DS.text,
-    letterSpacing: 0.6,
-  },
-  planTitle: {
-    fontSize: 21,
-    fontWeight: '900',
-    color: DS.text,
-    letterSpacing: -0.5,
-    marginTop: 12,
-    lineHeight: 24,
-  },
-  planDescription: {
-    fontSize: 11.5,
-    color: DS.textDim,
-    fontWeight: '400',
-    lineHeight: 16,
-    marginTop: 6,
-  },
-  verMaisButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'flex-start',
-    height: 34,
-    paddingHorizontal: 16,
-    borderRadius: 18,
-    overflow: 'hidden',
-    marginTop: 14,
-  },
-  buttonSpecular: {
-    position: 'absolute',
-    top: 0,
-    left: '12%',
-    right: '12%',
-    height: 0.5,
-    backgroundColor: 'rgba(255,255,255,0.6)',
-    borderRadius: 0.5,
-  },
-  buttonBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 18,
-    borderWidth: 0.75,
-    borderColor: 'rgba(255,255,255,0.30)',
-  },
-  verMaisText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: DS.text,
-    letterSpacing: 1,
-  },
-  cardRight: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  imageGlow: {
-    position: 'absolute',
-    width: 110,
-    height: 110,
-    borderRadius: 60,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-  },
-  cardPlanImage: {
-    width: '100%',
-    height: 130,
-  },
-  specularTopWrap: {
-    position: 'absolute',
-    top: 0,
-    left: '10%',
-    right: '10%',
-    height: 1,
-    borderRadius: 1,
-    overflow: 'hidden',
-  },
-  rimLeftWrap: {
-    position: 'absolute',
-    left: 0,
-    top: '12%',
-    width: 1,
-    height: '60%',
-    borderRadius: 1,
-    overflow: 'hidden',
-  },
-  chromaBottomWrap: {
-    position: 'absolute',
-    bottom: 0,
-    left: '16%',
-    right: '16%',
-    height: 0.75,
-    borderRadius: 0.75,
-    overflow: 'hidden',
-  },
-  borderOuter: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: DS.radius,
-    borderWidth: 0.75,
-    borderColor: 'rgba(255,255,255,0.45)',
-  },
-  borderInner: {
-    position: 'absolute',
-    top: 1.5,
-    left: 1.5,
-    right: 1.5,
-    bottom: 1.5,
-    borderRadius: DS.radius - 1.5,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.18)',
-  },
-});
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: GlassBottomSheet
 // Modal de detalhes do plano transformado em bottom-sheet de vidro líquido.
+// Recebe DS e sheetStyles do pai para refletir o tema ativo.
 // ═══════════════════════════════════════════════════════════════════════════════
-const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar }) => (
+const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar, DS, sheetStyles }) => (
   <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
     {/* ── Backdrop com blur escuro (não sólido) ─────────────────────────── */}
     <TouchableWithoutFeedback onPress={onClose}>
       <View style={sheetStyles.backdrop}>
-        <BlurView intensity={35} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={35} tint={DS.blurTint} style={StyleSheet.absoluteFill} />
         <View style={sheetStyles.backdropTint} />
       </View>
     </TouchableWithoutFeedback>
@@ -478,11 +362,11 @@ const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar }) => (
     {/* ── Painel translúcido (bottom sheet) ─────────────────────────────── */}
     <View style={sheetStyles.sheetWrap}>
       <View style={sheetStyles.sheetBody}>
-        <BlurView intensity={55} tint="dark" style={StyleSheet.absoluteFill} />
-        <BlurView intensity={18} tint="dark" style={[StyleSheet.absoluteFill, { opacity: 0.5 }]} />
+        <BlurView intensity={55} tint={DS.blurTint} style={StyleSheet.absoluteFill} />
+        <BlurView intensity={18} tint={DS.blurTint} style={[StyleSheet.absoluteFill, { opacity: 0.5 }]} />
 
         <LinearGradient
-          colors={['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)', 'rgba(0,0,0,0.12)']}
+          colors={DS.sheetGradientColors}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
@@ -525,7 +409,7 @@ const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar }) => (
             <View style={sheetStyles.modalButtons}>
               {/* Fechar — glass neutro */}
               <TouchableOpacity style={sheetStyles.fecharButton} onPress={onClose} activeOpacity={0.8}>
-                <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
+                <BlurView intensity={20} tint={DS.blurTint} style={StyleSheet.absoluteFill} />
                 <View style={sheetStyles.fecharBorder} />
                 <Text style={sheetStyles.fecharButtonText}>Fechar</Text>
               </TouchableOpacity>
@@ -553,10 +437,7 @@ const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar }) => (
         {/* Especular superior do painel */}
         <View pointerEvents="none" style={sheetStyles.sheetSpecularTop}>
           <LinearGradient
-            colors={[
-              'transparent', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.85)',
-              'rgba(255,255,255,0.5)', 'transparent',
-            ]}
+            colors={DS.sheetSpecularColors}
             style={{ flex: 1 }}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
@@ -567,194 +448,25 @@ const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar }) => (
   </Modal>
 ));
 
-const sheetStyles = StyleSheet.create({
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  backdropTint: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.30)',
-  },
-  sheetWrap: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    maxHeight: SCREEN_HEIGHT * 0.82,
-  },
-  sheetBody: {
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    overflow: 'hidden',
-    paddingHorizontal: DS.spacing.xl,
-    paddingTop: 14,
-    paddingBottom: 0,
-    minHeight: SCREEN_HEIGHT * 0.6,
-    borderWidth: 0.75,
-    borderBottomWidth: 0,
-    borderColor: 'rgba(255,255,255,0.16)',
-  },
-  handle: {
-    alignSelf: 'center',
-    width: 38,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    marginBottom: 18,
-  },
-  modalPlanTitle: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: DS.text,
-    letterSpacing: -0.6,
-  },
-  modalPlanDescription: {
-    fontSize: 13,
-    color: DS.textDim,
-    lineHeight: 19,
-    marginTop: 8,
-    fontWeight: '400',
-  },
-  imageWrap: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 22,
-    height: 140,
-  },
-  imageGlowModal: {
-    position: 'absolute',
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-  },
-  modalCardImage: {
-    width: '70%',
-    height: '100%',
-  },
-  beneficiosTitle: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: DS.accentBright,
-    letterSpacing: 2,
-    marginBottom: 12,
-  },
-  beneficiosList: {
-    gap: 11,
-  },
-  beneficioItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-  },
-  bulletDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: DS.accentBright,
-    marginTop: 5,
-  },
-  beneficioText: {
-    flex: 1,
-    fontSize: 13,
-    color: DS.text,
-    lineHeight: 19,
-    fontWeight: '400',
-  },
-  modalFooter: {
-    paddingTop: 14,
-    paddingBottom: 28,
-    backgroundColor: 'rgba(10,10,10,0.55)',
-  },
-  footerTopLine: {
-    height: 0.5,
-    backgroundColor: 'rgba(255,255,255,0.10)',
-    marginBottom: 14,
-    marginHorizontal: -DS.spacing.xl,
-  },
-  footerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  modalPrice: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: DS.text,
-    letterSpacing: -0.5,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  fecharButton: {
-    height: 42,
-    paddingHorizontal: 18,
-    borderRadius: 21,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fecharBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 21,
-    borderWidth: 0.75,
-    borderColor: 'rgba(255,255,255,0.25)',
-  },
-  fecharButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: DS.textDim,
-  },
-  assinarButton: {
-    height: 42,
-    paddingHorizontal: 22,
-    borderRadius: 21,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  assinarSpecular: {
-    position: 'absolute',
-    top: 0,
-    left: '14%',
-    right: '14%',
-    height: 0.75,
-    backgroundColor: 'rgba(255,255,255,0.45)',
-    borderRadius: 0.75,
-  },
-  assinarBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 21,
-    borderWidth: 0.75,
-    borderColor: 'rgba(255,255,255,0.25)',
-  },
-  assinarButtonText: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: DS.text,
-    letterSpacing: 0.3,
-  },
-  sheetSpecularTop: {
-    position: 'absolute',
-    top: 0,
-    left: '20%',
-    right: '20%',
-    height: 1,
-    borderRadius: 1,
-    overflow: 'hidden',
-  },
-});
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // COMPONENTE PRINCIPAL: SociosScreen
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function SociosScreen({ navigation }) {
+  const { isDark } = useTheme();
+  const DS = useMemo(
+    () => (isDark ? DARK_DS : LIGHT_DS),
+    [isDark],
+  );
+  const cardStyles = useMemo(() => makeCardStyles(DS), [DS]);
+  const sheetStyles = useMemo(() => makeSheetStyles(DS), [DS]);
+  const mainStyles = useMemo(() => makeMainStyles(DS), [DS]);
+
   // ── Lógica original — 100% preservada ────────────────────────────────────
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [checkoutVisible, setCheckoutVisible] = useState(false);
   const [checkoutPlan, setCheckoutPlan] = useState(null);
+  const [planos, setPlanos] = useState(FALLBACK_PLANOS);
 
   const { token } = useAuth();
   const { syncSubscription } = useSubscription();
@@ -802,6 +514,36 @@ export default function SociosScreen({ navigation }) {
       return null;
     }
   }, [syncSubscription, token]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPlanos = async () => {
+      try {
+        const response = await getPlanos();
+        const list = Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response)
+            ? response
+            : [];
+
+        if (!cancelled && list.length > 0) {
+          const normalized = list.map((plan) => normalizePlano(plan));
+          setPlanos(normalized);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setPlanos(FALLBACK_PLANOS);
+        }
+      }
+    };
+
+    loadPlanos();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleConfirmSubscription = useCallback(async () => {
     if (!checkoutPlan) {
@@ -892,13 +634,6 @@ export default function SociosScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={mainStyles.content}
       >
-        {/* Botão voltar — glass */}
-        <TouchableOpacity style={mainStyles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.8}>
-          <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
-          <View style={mainStyles.backButtonBorder} />
-          <Ionicons name="arrow-back" size={18} color={DS.text} />
-        </TouchableOpacity>
-
         {/* Título "PLANOS sócio-Torcedor" */}
         <View style={mainStyles.titleContainer}>
           <Text style={mainStyles.titleLine1}>PLANOS</Text>
@@ -909,13 +644,15 @@ export default function SociosScreen({ navigation }) {
         </View>
 
         {/* ─────────── Lista de cards de planos (Liquid Glass) ─────────── */}
-        {(Array.isArray(dadosPlano) ? dadosPlano : []).map((plan) => (
+        {(Array.isArray(planos) && planos.length > 0 ? planos : FALLBACK_PLANOS).map((plan) => (
           <PlanGlassCard
             key={plan.id}
             plan={plan}
             onVerMais={() => openModal(plan)}
             shimmerAnim={shimmerAnim}
             floatAnim={floatAnim}
+            DS={DS}
+            cardStyles={cardStyles}
           />
         ))}
 
@@ -936,6 +673,8 @@ export default function SociosScreen({ navigation }) {
         plan={selectedPlan}
         onClose={closeModal}
         onAssinar={startSubscriptionCheckout}
+        DS={DS}
+        sheetStyles={sheetStyles}
       />
 
       <CheckoutModal
@@ -950,98 +689,3 @@ export default function SociosScreen({ navigation }) {
     </View>
   );
 }
-
-const mainStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DS.bg,
-  },
-  background: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  bgGlow: {
-    position: 'absolute',
-    top: SCREEN_HEIGHT * 0.05,
-    right: -100,
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: DS.accent,
-    opacity: 0.05,
-    shadowColor: DS.accent,
-    shadowOpacity: 1,
-    shadowRadius: 120,
-  },
-  drakosBackground: {
-    position: 'absolute',
-    width: SCREEN_WIDTH * 1.4,
-    height: SCREEN_WIDTH * 1.4,
-    top: SCREEN_HEIGHT * 0.18,
-    left: -SCREEN_WIDTH * 0.3,
-    opacity: 0.035,
-  },
-  content: {
-    paddingTop: 60,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginLeft: DS.spacing.lg,
-    marginBottom: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  backButtonBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 20,
-    borderWidth: 0.75,
-    borderColor: 'rgba(255,255,255,0.20)',
-  },
-  titleContainer: {
-    paddingHorizontal: DS.spacing.lg,
-    marginBottom: 28,
-  },
-  titleLine1: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: DS.textFaint,
-    letterSpacing: 4,
-  },
-  titleLine2: {
-    flexDirection: 'row',
-    marginTop: 2,
-  },
-  titleSocio: {
-    fontSize: 38,
-    fontWeight: '900',
-    color: DS.text,
-    letterSpacing: -1,
-  },
-  titleTorcedor: {
-    fontSize: 38,
-    fontWeight: '900',
-    color: DS.accentBright,
-    letterSpacing: -1,
-  },
-  footerNote: {
-    paddingHorizontal: DS.spacing.xl,
-    marginTop: 16,
-    alignItems: 'center',
-  },
-  footerLine: {
-    width: 28,
-    height: 2,
-    backgroundColor: DS.accent,
-    borderRadius: 1,
-    marginBottom: 14,
-  },
-  footerText: {
-    fontSize: 12,
-    color: DS.textFaint,
-    textAlign: 'center',
-    lineHeight: 18,
-    fontWeight: '400',
-  },
-});

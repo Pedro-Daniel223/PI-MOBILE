@@ -1,215 +1,597 @@
-import { StyleSheet } from 'react-native';
-import { scaleFont } from "../../utils/fontScale";
+import { StyleSheet, Dimensions } from 'react-native';
 
-export const stylesSocio = StyleSheet.create({
-  // ─────── Layout principal ───────
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    paddingBottom: 100, // Espaço para o NavbarGlass
-  },
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-  background: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#f5f5f5',
-  },
+// ─────────────────────────────────────────────────────────────────────────────
+// DESIGN SYSTEM — Tokens Light/Dark (Liquid Glass) — SociosScreen
+// Segue o mesmo padrão adotado em PerfilScreen: useColorScheme() + makeStyles(DS)
+// via useMemo. DARK_DS mantém EXATAMENTE os valores originais já usados nesta
+// tela (o objeto DS previamente hardcoded no componente). LIGHT_DS é um
+// conjunto de tokens novo e paralelo, inspirado na paleta que já existia em
+// stylesSocio.js (fundo #f5f5f5, título serifado #8b0000/#000 etc.), adaptado
+// ao mesmo shape de tokens do DARK_DS para que os três StyleSheet.create
+// (cardStyles, sheetStyles, mainStyles) funcionem identicamente em ambos os
+// temas.
+// ─────────────────────────────────────────────────────────────────────────────
+export const DARK_DS = {
+  scheme: 'dark',
+  blurTint: 'dark',
+  statusBarStyle: 'light-content',
 
-  drakosBackground: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    opacity: 0.15,
-    right: -80,
-    top: -30,
-    transform: [{ rotate: '-15deg' }],
-    zIndex: 0,
-  },
+  bg: '#0a0a0a',
+  bgElevated: '#121212',
+  accent: '#c0000a',
+  accentBright: '#e8000f',
+  text: '#f4f4f4',
+  textDim: 'rgba(244,244,244,0.58)',
+  textFaint: 'rgba(244,244,244,0.30)',
+  glassBorder: 'rgba(255,255,255,0.18)',
+  radius: 22,
+  spacing: { sm: 12, md: 16, lg: 20, xl: 24 },
 
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
+  // Card (PlanGlassCard)
+  cardGlassBg: 'rgba(255,255,255,0.025)',
+  cardReflectionColors: ['rgba(255,255,255,0.16)', 'rgba(255,255,255,0.05)', 'transparent'],
+  cardVignetteColors: ['transparent', 'transparent', 'rgba(0,5,18,0.06)', 'rgba(0,5,18,0.16)'],
+  cardShimmerColors: [
+    'transparent',
+    'rgba(255,255,255,0.04)',
+    'rgba(255,255,255,0.12)',
+    'rgba(255,255,255,0.18)',
+    'rgba(255,255,255,0.12)',
+    'rgba(255,255,255,0.04)',
+    'transparent',
+  ],
+  badgeBg: 'rgba(255,255,255,0.08)',
+  buttonSpecularColor: 'rgba(255,255,255,0.6)',
+  buttonBorderColor: 'rgba(255,255,255,0.30)',
+  imageGlowColor: 'rgba(255,255,255,0.04)',
+  specularTopColors: [
+    'transparent', 'rgba(255,255,255,0.55)', 'rgba(255,255,255,0.92)',
+    'rgba(255,255,255,0.95)', 'rgba(255,255,255,0.92)', 'rgba(255,255,255,0.55)', 'transparent',
+  ],
+  rimLeftColors: ['transparent', 'rgba(255,255,255,0.48)', 'rgba(255,255,255,0.30)', 'rgba(255,255,255,0.10)', 'transparent'],
+  chromaBottomColors: ['transparent', 'rgba(160,185,255,0.28)', 'rgba(180,200,255,0.40)', 'rgba(160,185,255,0.28)', 'transparent'],
+  borderOuterColor: 'rgba(255,255,255,0.45)',
+  borderInnerColor: 'rgba(255,255,255,0.18)',
+  cardShadowColor: '#000000',
+  cardShadowOpacity: 0.30,
 
-  },
+  // Bottom sheet (GlassBottomSheet)
+  backdropTintColor: 'rgba(0,0,0,0.30)',
+  sheetBorderColor: 'rgba(255,255,255,0.16)',
+  sheetGradientColors: ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)', 'rgba(0,0,0,0.12)'],
+  handleColor: 'rgba(255,255,255,0.25)',
+  beneficioDotColor: '#e8000f',
+  footerBg: 'rgba(10,10,10,0.55)',
+  footerTopLineColor: 'rgba(255,255,255,0.10)',
+  fecharBorderColor: 'rgba(255,255,255,0.25)',
+  assinarSpecularColor: 'rgba(255,255,255,0.45)',
+  assinarBorderColor: 'rgba(255,255,255,0.25)',
+  sheetSpecularColors: [
+    'transparent', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.85)',
+    'rgba(255,255,255,0.5)', 'transparent',
+  ],
 
-  // ─────── Botão voltar ───────
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  // Tela principal (mainStyles)
+  bgGlowColor: '#c0000a',
+  backButtonBorderColor: 'rgba(255,255,255,0.20)',
+  footerLineColor: '#c0000a',
+};
 
-  // ─────── Título "PLANOS sócio-Torcedor" ───────
-  titleContainer: {
-    marginBottom: 30,
-  },
+export const LIGHT_DS = {
+  scheme: 'light',
+  blurTint: 'light',
+  statusBarStyle: 'dark-content',
 
-  titleLine1: {
-    fontFamily: 'serif',
-    fontSize: scaleFont(42),
-    fontWeight: 'bold',
-    color: '#000',
-    letterSpacing: 1,
-  },
+  bg: '#11111',
+  bgElevated: '#ffff',
+  accent: '#8b0000',
+  accentBright: '#a3000a',
+  text: '#1a1414',
+  textDim: 'rgba(26,20,20,0.62)',
+  textFaint: 'rgba(26,20,20,0.38)',
+  glassBorder: 'rgba(20,10,10,0.12)',
+  radius: 22,
+  spacing: { sm: 12, md: 16, lg: 20, xl: 24 },
 
-  titleLine2: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: -8,
-  },
+  // Card (PlanGlassCard)
+  cardGlassBg: 'transparent',
+  cardReflectionColors: ['rgba(255,255,255,0.65)', 'rgba(255,255,255,0.25)', 'transparent'],
+  cardVignetteColors: ['transparent', 'transparent', 'rgba(20,10,10,0.03)', 'rgba(20,10,10,0.07)'],
+  cardShimmerColors: [
+    'transparent',
+    'rgba(255,255,255,0.10)',
+    'rgba(255,255,255,0.35)',
+    'rgba(255,255,255,0.55)',
+    'rgba(255,255,255,0.35)',
+    'rgba(255,255,255,0.10)',
+    'transparent',
+  ],
+  badgeBg: 'rgba(20,10,10,0.05)',
+  buttonSpecularColor: 'rgba(255,255,255,0.9)',
+  buttonBorderColor: 'rgba(20,10,10,0.14)',
+  imageGlowColor: 'rgba(139,0,0,0.05)',
+  specularTopColors: [
+    'transparent', 'rgba(255,255,255,0.75)', 'rgba(255,255,255,0.95)',
+    'rgba(255,255,255,0.98)', 'rgba(255,255,255,0.95)', 'rgba(255,255,255,0.75)', 'transparent',
+  ],
+  rimLeftColors: ['transparent', 'rgba(255,255,255,0.75)', 'rgba(255,255,255,0.45)', 'rgba(255,255,255,0.15)', 'transparent'],
+  chromaBottomColors: ['transparent', 'rgba(139,0,0,0.16)', 'rgba(160,20,20,0.24)', 'rgba(139,0,0,0.16)', 'transparent'],
+  borderOuterColor: 'rgba(20,10,10,0.14)',
+  borderInnerColor: 'rgba(255,255,255,0.55)',
+  cardShadowColor: '#402020',
+  cardShadowOpacity: 0.12,
 
-  titleSocio: {
-    fontFamily: 'serif',
-    fontSize: scaleFont(28),
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  // Bottom sheet (GlassBottomSheet)
+  backdropTintColor: 'rgba(30,15,15,0.28)',
+  sheetBorderColor: 'rgba(20,10,10,0.10)',
+  sheetGradientColors: ['rgba(255,255,255,0.65)', 'rgba(255,255,255,0.35)', 'rgba(20,10,10,0.04)'],
+  handleColor: 'rgba(20,10,10,0.18)',
+  beneficioDotColor: '#a3000a',
+  footerBg: 'rgba(255,251,250,0.75)',
+  footerTopLineColor: 'rgba(20,10,10,0.08)',
+  fecharBorderColor: 'rgba(20,10,10,0.14)',
+  assinarSpecularColor: 'rgba(255,255,255,0.55)',
+  assinarBorderColor: 'rgba(20,10,10,0.10)',
+  sheetSpecularColors: [
+    'transparent', 'rgba(255,255,255,0.7)', 'rgba(255,255,255,0.95)',
+    'rgba(255,255,255,0.7)', 'transparent',
+  ],
 
-  titleTorcedor: {
-    fontFamily: 'serif',
-    fontSize: scaleFont(36),
-    fontWeight: 'bold',
-    color: '#8b0000',
-  },
+  // Tela principal (mainStyles)
+  bgGlowColor: '#9b0000',
+  backButtonBorderColor: 'rgba(223, 0, 0, 0.12)',
+  footerLineColor: '#8b0000',
+};
 
-  // ─────── Barra de categorias (Ingressos / Produtos / Descontos) ───────
-  categoryBar: {
-    flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    justifyContent: 'space-between',
-    marginBottom: 30,
-  },
+// ─────────────────────────────────────────────────────────────────────────────
+// cardStyles — PlanGlassCard. Mesma estrutura/valores de layout do
+// StyleSheet.create original — apenas cores/tokens passam a vir de DS.
+// ─────────────────────────────────────────────────────────────────────────────
+export const makeCardStyles = (DS) =>
+  StyleSheet.create({
+    outerContainer: {
+      borderRadius: DS.radius,
+      marginHorizontal: DS.spacing.lg,
+      marginBottom: 18,
+      shadowColor: DS.cardShadowColor,
+      shadowOpacity: DS.cardShadowOpacity,
+      shadowRadius: 24,
+      shadowOffset: { width: 0, height: 12 },
+      elevation: 10,
+    },
+    glassBody: {
+      borderRadius: DS.radius,
+      overflow: 'hidden',
+      backgroundColor: DS.cardGlassBg,
+      minHeight: 190,
+    },
+    content: {
+      flex: 1,
+      flexDirection: 'row',
+      padding: DS.spacing.lg,
+    },
+    cardLeft: {
+      flex: 1.3,
+      justifyContent: 'space-between',
+      paddingRight: 8,
+    },
+    badge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'flex-start',
+      backgroundColor: DS.badgeBg,
+      borderWidth: 0.75,
+      borderColor: DS.glassBorder,
+      borderRadius: 20,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      gap: 6,
+    },
+    badgeDot: {
+      width: 5,
+      height: 5,
+      borderRadius: 3,
+      backgroundColor: DS.accentBright,
+    },
+    badgeText: {
+      fontSize: 9,
+      fontWeight: '700',
+      color: DS.text,
+      letterSpacing: 0.6,
+    },
+    planTitle: {
+      fontSize: 21,
+      fontWeight: '900',
+      color: DS.text,
+      letterSpacing: -0.5,
+      marginTop: 12,
+      lineHeight: 24,
+    },
+    planDescription: {
+      fontSize: 11.5,
+      color: DS.textDim,
+      fontWeight: '400',
+      lineHeight: 16,
+      marginTop: 6,
+    },
+    verMaisButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      alignSelf: 'flex-start',
+      height: 34,
+      paddingHorizontal: 16,
+      borderRadius: 18,
+      overflow: 'hidden',
+      marginTop: 14,
+    },
+    buttonSpecular: {
+      position: 'absolute',
+      top: 0,
+      left: '12%',
+      right: '12%',
+      height: 0.5,
+      backgroundColor: DS.buttonSpecularColor,
+      borderRadius: 0.5,
+    },
+    buttonBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 18,
+      borderWidth: 0.75,
+      borderColor: DS.buttonBorderColor,
+    },
+    verMaisText: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: DS.text,
+      letterSpacing: 1,
+    },
+    cardRight: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    imageGlow: {
+      position: 'absolute',
+      width: 110,
+      height: 110,
+      borderRadius: 60,
+      backgroundColor: DS.imageGlowColor,
+    },
+    cardPlanImage: {
+      width: '100%',
+      height: 130,
+    },
+    specularTopWrap: {
+      position: 'absolute',
+      top: 0,
+      left: '10%',
+      right: '10%',
+      height: 1,
+      borderRadius: 1,
+      overflow: 'hidden',
+    },
+    rimLeftWrap: {
+      position: 'absolute',
+      left: 0,
+      top: '12%',
+      width: 1,
+      height: '60%',
+      borderRadius: 1,
+      overflow: 'hidden',
+    },
+    chromaBottomWrap: {
+      position: 'absolute',
+      bottom: 0,
+      left: '16%',
+      right: '16%',
+      height: 0.75,
+      borderRadius: 0.75,
+      overflow: 'hidden',
+    },
+    borderOuter: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: DS.radius,
+      borderWidth: 0.75,
+      borderColor: DS.borderOuterColor,
+    },
+    borderInner: {
+      position: 'absolute',
+      top: 1.5,
+      left: 1.5,
+      right: 1.5,
+      bottom: 1.5,
+      borderRadius: DS.radius - 1.5,
+      borderWidth: 0.5,
+      borderColor: DS.borderInnerColor,
+    },
+  });
 
-  categoryItem: {
-    alignItems: 'center',
-  },
+// ─────────────────────────────────────────────────────────────────────────────
+// sheetStyles — GlassBottomSheet. Mesma estrutura/valores de layout do
+// StyleSheet.create original — apenas cores/tokens passam a vir de DS.
+// ─────────────────────────────────────────────────────────────────────────────
+export const makeSheetStyles = (DS) =>
+  StyleSheet.create({
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    backdropTint: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: DS.backdropTintColor,
+    },
+    sheetWrap: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      maxHeight: SCREEN_HEIGHT * 0.82,
+    },
+    sheetBody: {
+      borderTopLeftRadius: 32,
+      borderTopRightRadius: 32,
+      overflow: 'hidden',
+      paddingHorizontal: DS.spacing.xl,
+      paddingTop: 14,
+      paddingBottom: 0,
+      minHeight: SCREEN_HEIGHT * 0.6,
+      borderWidth: 0.75,
+      borderBottomWidth: 0,
+      borderColor: DS.sheetBorderColor,
+    },
+    handle: {
+      alignSelf: 'center',
+      width: 38,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: DS.handleColor,
+      marginBottom: 18,
+    },
+    modalPlanTitle: {
+      fontSize: 26,
+      fontWeight: '900',
+      color: DS.text,
+      letterSpacing: -0.6,
+    },
+    modalPlanDescription: {
+      fontSize: 13,
+      color: DS.textDim,
+      lineHeight: 19,
+      marginTop: 8,
+      fontWeight: '400',
+    },
+    imageWrap: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: 22,
+      height: 140,
+    },
+    imageGlowModal: {
+      position: 'absolute',
+      width: 160,
+      height: 160,
+      borderRadius: 80,
+      backgroundColor: DS.imageGlowColor,
+    },
+    modalCardImage: {
+      width: '70%',
+      height: '100%',
+    },
+    beneficiosTitle: {
+      fontSize: 9,
+      fontWeight: '700',
+      color: DS.accentBright,
+      letterSpacing: 2,
+      marginBottom: 12,
+    },
+    beneficiosList: {
+      gap: 11,
+    },
+    beneficioItem: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 10,
+    },
+    bulletDot: {
+      width: 5,
+      height: 5,
+      borderRadius: 3,
+      backgroundColor: DS.beneficioDotColor,
+      marginTop: 5,
+    },
+    beneficioText: {
+      flex: 1,
+      fontSize: 13,
+      color: DS.text,
+      lineHeight: 19,
+      fontWeight: '400',
+    },
+    modalFooter: {
+      paddingTop: 14,
+      paddingBottom: 28,
+      backgroundColor: DS.footerBg,
+    },
+    footerTopLine: {
+      height: 0.5,
+      backgroundColor: DS.footerTopLineColor,
+      marginBottom: 14,
+      marginHorizontal: -DS.spacing.xl,
+    },
+    footerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    modalPrice: {
+      fontSize: 22,
+      fontWeight: '900',
+      color: DS.text,
+      letterSpacing: -0.5,
+    },
+    modalButtons: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    fecharButton: {
+      height: 42,
+      paddingHorizontal: 18,
+      borderRadius: 21,
+      overflow: 'hidden',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    fecharBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 21,
+      borderWidth: 0.75,
+      borderColor: DS.fecharBorderColor,
+    },
+    fecharButtonText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: DS.textDim,
+    },
+    assinarButton: {
+      height: 42,
+      paddingHorizontal: 22,
+      borderRadius: 21,
+      overflow: 'hidden',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    assinarSpecular: {
+      position: 'absolute',
+      top: 0,
+      left: '14%',
+      right: '14%',
+      height: 0.75,
+      backgroundColor: DS.assinarSpecularColor,
+      borderRadius: 0.75,
+    },
+    assinarBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 21,
+      borderWidth: 0.75,
+      borderColor: DS.assinarBorderColor,
+    },
+    assinarButtonText: {
+      fontSize: 13,
+      fontWeight: '800',
+      color: DS.text,
+      letterSpacing: 0.3,
+    },
+    sheetSpecularTop: {
+      position: 'absolute',
+      top: 0,
+      left: '20%',
+      right: '20%',
+      height: 1,
+      borderRadius: 1,
+      overflow: 'hidden',
+    },
+  });
 
-  categoryIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
+// ─────────────────────────────────────────────────────────────────────────────
+// mainStyles — Tela principal (SociosScreen). Mesma estrutura/valores de
+// layout do StyleSheet.create original — apenas cores/tokens passam a vir
+// de DS.
+// ─────────────────────────────────────────────────────────────────────────────
+export const makeMainStyles = (DS) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: DS.bg,
+    },
+    background: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    bgGlow: {
+      position: 'absolute',
+      top: SCREEN_HEIGHT * 0.05,
+      right: -100,
+      width: 300,
+      height: 300,
+      borderRadius: 150,
+      backgroundColor: DS.bgGlowColor,
+      opacity: 0.05,
+      shadowColor: DS.bgGlowColor,
+      shadowOpacity: 1,
+      shadowRadius: 120,
+    },
+    drakosBackground: {
+      position: 'absolute',
+      width: SCREEN_WIDTH * 1.4,
+      height: SCREEN_WIDTH * 1.4,
+      top: SCREEN_HEIGHT * 0.18,
+      left: -SCREEN_WIDTH * 0.3,
+      opacity: DS.scheme === 'dark' ? 0.035 : 0.03,
+    },
+    content: {
+      paddingTop: 60,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      marginLeft: DS.spacing.lg,
+      marginBottom: 22,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
+    backButtonBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 20,
+      borderWidth: 0.75,
+      borderColor: DS.backButtonBorderColor,
+    },
+    titleContainer: {
+      paddingHorizontal: DS.spacing.lg,
+      marginBottom: 28,
+    },
+    titleLine1: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: DS.textFaint,
+      letterSpacing: 4,
+    },
+    titleLine2: {
+      flexDirection: 'row',
+      marginTop: 2,
+    },
+    titleSocio: {
+      fontSize: 38,
+      fontWeight: '900',
+      color: DS.text,
+      letterSpacing: -1,
+    },
+    titleTorcedor: {
+      fontSize: 38,
+      fontWeight: '900',
+      color: DS.accentBright,
+      letterSpacing: -1,
+    },
+    footerNote: {
+      paddingHorizontal: DS.spacing.xl,
+      marginTop: 16,
+      alignItems: 'center',
+    },
+    footerLine: {
+      width: 28,
+      height: 2,
+      backgroundColor: DS.footerLineColor,
+      borderRadius: 1,
+      marginBottom: 14,
+    },
+    footerText: {
+      fontSize: 12,
+      color: DS.textFaint,
+      textAlign: 'center',
+      lineHeight: 18,
+      fontWeight: '400',
+    },
+  });
 
-  // ─────── Card de plano ───────
-  planCard: {
-    flexDirection: 'row',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.05)',
-  },
-
-  cardLeft: {
-    flex: 2,
-    paddingRight: 12,
-  },
-
-  planTitle: {
-    fontSize: scaleFont(30),
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 4,
-  },
-
-  // Badge "Limitado a X vagas" dentro do card
-  cardBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-  
-  cardBadgeText: {
-    fontSize: scaleFont(15),
-    fontWeight: '600',
-    color: '#000',
-    letterSpacing: 0.3,
-  },
-
-  planDescription: {
-    fontSize: scaleFont(16),
-    lineHeight: scaleFont(16),
-    marginBottom: 16,
-  },
-
-  verMaisButton: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-    borderWidth: 0.5,
-    borderColor: '#e0e0e0',
-  },
-
-  verMaisText: {
-    fontSize: scaleFont(16),
-    fontWeight: '600',
-    color: '#333',
-    letterSpacing: 0.5,
-  },
-
-  // ─────── Lado direito do card: imagem do cartão ───────
-  cardRight: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-  // Imagem do cartão de plano)
-  cardPlanImage: {
-    width: 100,
-    height: 69,
-    borderWidth: 1,
-    borderColor: 'rgb(255, 255, 255)',
-    borderRadius: 8,
-  },
-
-  // ─────── Rodapé informativo da tela ───────
-  footerNote: {
-    marginTop: 20,
-    paddingTop: 16,
-    borderTopWidth: 0.5,
-    borderTopColor: '#ddd',
-  },
-
-  footerText: {
-    color: '#888',
-    fontSize: scaleFont(16),
-    textAlign: 'center',
-    lineHeight: scaleFont(18),
-  },
- });
+export default makeMainStyles;

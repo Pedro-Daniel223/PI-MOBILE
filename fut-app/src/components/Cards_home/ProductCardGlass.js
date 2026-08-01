@@ -26,24 +26,6 @@ const resolveImageSource = (value) => {
   return value;
 };
 
-const parsePrice = (value) => {
-  if (typeof value === 'number') {
-    return value;
-  }
-
-  if (typeof value !== 'string') {
-    return 0;
-  }
-
-  const normalized = value
-    .replace(/[^\d,.-]/g, '')
-    .replace(/\./g, '')
-    .replace(',', '.');
-
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
 const normalizeCategory = (value) =>
   String(value ?? '')
     .trim()
@@ -67,14 +49,11 @@ export default function ProductCardGlass({ image, title, price, product }) {
     null;
   const productImage = resolveImageSource(productImageRaw);
   const productTitle = productData.title ?? title ?? 'Produto';
-  const productPrice = productData.priceDisplay ?? productData.price ?? price;
+  const productPrice = productData.preco_final ?? productData.preco ?? price ?? '';
   const productDetails = {
     id: productData.id ?? productTitle,
     nome: productData.nome ?? productTitle,
-    preco:
-      typeof productData.preco === 'number'
-        ? productData.preco
-        : parsePrice(productPrice),
+    preco: productData.preco_final ?? null,
     imagem: productData.imagem ?? productImage,
     imagens: productData.imagens ?? (productImage ? [productImage] : []),
     descricao:
@@ -82,8 +61,14 @@ export default function ProductCardGlass({ image, title, price, product }) {
       productData.description ??
       'Produto em destaque da Home',
     categoria: productData.categoria,
-    precoAntigo: productData.precoAntigo,
+    precoAntigo: productData.preco_original ?? null,
+    preco_original: productData.preco_original ?? null,
+    preco_final: productData.preco_final ?? null,
+    economia: productData.economia ?? null,
     desconto: productData.desconto,
+    desconto_percent: productData.desconto_percent ?? 0,
+    beneficios_plano: productData.beneficios_plano ?? [],
+    plano_atual: productData.plano_atual ?? null,
   };
   const isCamisasFC = normalizeCategory(productDetails.categoria) === 'camisas fc';
 
@@ -150,7 +135,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
       onPressOut={handlePressOut}
     >
       <View style={styles.card}>
-        <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill} />
 
         <LinearGradient
           colors={[
