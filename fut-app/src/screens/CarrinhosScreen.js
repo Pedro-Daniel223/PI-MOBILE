@@ -409,7 +409,7 @@ export default function CarrinhosScreen({ navigation }) {
             </Text>
             <TouchableOpacity
               style={styles.shopButton}
-              onPress={() => navigation.navigate("Loja")}
+              onPress={() => navigation.navigate("Loja", { screen: "LojaHome" })}
             >
               <Text style={styles.shopButtonText}>Explorar Loja</Text>
             </TouchableOpacity>

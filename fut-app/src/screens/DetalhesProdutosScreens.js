@@ -115,7 +115,7 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
   const styles = useMemo(() => makeStyles(DS), [DS]);
 
   const { addItem, totalItems } = useCart();
-  const { getProductById } = useProducts();
+  const { getProductById, products } = useProducts();
 
   const produtoEntrada = route.params?.produto ?? null;
   const produtoId = route.params?.produtoId ?? route.params?.id ?? produtoEntrada?.id ?? null;
@@ -192,6 +192,37 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
       active = false;
     };
   }, [getProductById, produtoEntrada, produtoId]);
+
+  useEffect(() => {
+    if (!produto?.id || !Array.isArray(products) || products.length === 0) {
+      return;
+    }
+
+    const latest = products.find((item) => String(item.id) === String(produto.id));
+    if (!latest) {
+      return;
+    }
+
+    setProduto((prev) => {
+      const merged = {
+        ...prev,
+        ...latest,
+        nome: latest.nome ?? latest.title ?? prev.nome,
+        preco: latest.preco_final ?? prev.preco,
+        preco_final: latest.preco_final ?? prev.preco_final ?? prev.preco,
+        precoAntigo: latest.preco_original ?? prev.precoAntigo ?? null,
+        preco_original: latest.preco_original ?? prev.preco_original ?? null,
+        imagens: normalizeImages(latest),
+        imagem: latest.imagem ?? latest.image ?? normalizeImages(latest)[0] ?? prev.imagem ?? null,
+        descricao: latest.descricao ?? latest.description ?? prev.descricao,
+        economia: latest.economia ?? prev.economia,
+        desconto_percent: latest.desconto_percent ?? prev.desconto_percent,
+        beneficios_plano: Array.isArray(latest.beneficios_plano) ? latest.beneficios_plano : prev.beneficios_plano,
+      };
+
+      return merged;
+    });
+  }, [produto?.id, products]);
 
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(null);
   const [indiceImagem, setIndiceImagem] = useState(0);
@@ -338,11 +369,11 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
           {Number(produto.desconto_percent || 0) > 0 && produto.preco_original != null ? (
             <View style={styles.pricingBlock}>
               <View style={styles.pricingRow}>
-                <Text style={styles.pricingLabel}>Pre?o original</Text>
+                <Text style={styles.pricingLabel}>Preço original</Text>
                 <Text style={styles.pricingValueMuted}>{formatBRL(produto.preco_original)}</Text>
               </View>
               <View style={styles.pricingRow}>
-                <Text style={styles.pricingLabel}>Pre?o final</Text>
+                <Text style={styles.pricingLabel}>Preço final</Text>
                 <Text style={styles.pricingValue}>{formatBRL(produto.preco_final)}</Text>
               </View>
               {produto.economia != null ? (
@@ -351,11 +382,11 @@ export default function DetalhesProdutosScreens({ route, navigation }) {
                   <Text style={styles.economyText}>{formatBRL(produto.economia)}</Text>
                 </View>
               ) : null}
-              {Number(produto.desconto_percent || 0) > 0 ? (
-                <View style={styles.discountRow}>
+              <View style={styles.discountRow}>
+                <View style={styles.discountBadge}>
                   <Text style={styles.discountText}>{produto.desconto_percent}% OFF</Text>
                 </View>
-              ) : null}
+              </View>
             </View>
           ) : (
             <View style={styles.singlePriceRow}>

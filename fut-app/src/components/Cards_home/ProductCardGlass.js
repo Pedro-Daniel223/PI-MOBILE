@@ -33,6 +33,9 @@ const normalizeCategory = (value) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
 
+const formatBRL = (value) =>
+  Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
 export default function ProductCardGlass({ image, title, price, product }) {
   const navigation = useNavigation();
   const { addItem } = useCart();
@@ -50,6 +53,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
   const productImage = resolveImageSource(productImageRaw);
   const productTitle = productData.title ?? title ?? 'Produto';
   const productPrice = productData.preco_final ?? productData.preco ?? price ?? '';
+  const productHasDiscount = Number(productData.desconto_percent || 0) > 0 && productData.preco_original != null;
   const productDetails = {
     id: productData.id ?? productTitle,
     nome: productData.nome ?? productTitle,
@@ -213,7 +217,21 @@ export default function ProductCardGlass({ image, title, price, product }) {
           </Text>
 
           <View style={styles.footer}>
-            <Text style={styles.price}>{productPrice}</Text>
+            <View style={styles.priceWrap}>
+              {productHasDiscount ? (
+                <>
+                  <Text style={styles.priceOld}>{formatBRL(productData.preco_original)}</Text>
+                  <Text style={styles.price}>{formatBRL(productData.preco_final)}</Text>
+                </>
+              ) : (
+                <Text style={styles.price}>{productPrice}</Text>
+              )}
+              {productHasDiscount ? (
+                <Text style={styles.priceSavings}>
+                  {productData.desconto_percent}% OFF
+                </Text>
+              ) : null}
+            </View>
 
             <TouchableOpacity style={styles.addButton} onPress={handleAddToCart} activeOpacity={0.8}>
               <Ionicons name="cart-outline" size={18} color="#a90000" />
@@ -309,11 +327,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  priceWrap: {
+    flex: 1,
+    paddingRight: 8,
+  },
 
   price: {
     fontSize: 18,
     fontWeight: '900',
     color: '#f2f2f2',
+  },
+  priceOld: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.55)',
+    textDecorationLine: 'line-through',
+    marginBottom: 2,
+  },
+  priceSavings: {
+    marginTop: 2,
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#ff7a73',
   },
 
   addButton: {

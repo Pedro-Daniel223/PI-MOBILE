@@ -610,6 +610,13 @@ export default function PerfilScreen({ navigation }) {
   const [purchaseHistory, setPurchaseHistory] = useState([]);
 
   const currentCliente = buildProfileSnapshot(cliente);
+  const activePlanCategory = trimValue(
+    subscription?.title
+      || subscription?.nome_plano
+      || subscription?.nome
+      || subscription?.plan?.title
+      || subscription?.plan?.nome,
+  );
   const currentUser = {
     name: buildDisplayName(currentCliente),
     email: currentCliente.email,
@@ -617,8 +624,8 @@ export default function PerfilScreen({ navigation }) {
     photo: currentCliente.url_foto_clientes,
     cpf: currentCliente.cpf,
     id: currentCliente.id_clientes,
-    category: currentCliente.categoria_clientes || subscription?.title || subscription?.nome_plano,
-    status: currentCliente.categoria_clientes || subscription?.title || user.status,
+    category: activePlanCategory,
+    status: activePlanCategory || user.status,
   };
 
   // ── Derivações puras de apresentação (não criam estado nem tocam contexts) ──
@@ -914,9 +921,6 @@ export default function PerfilScreen({ navigation }) {
           </View>
 
           <Text style={ps.username}>{currentUser.name}</Text>
-          {currentUser.category ? (
-            <Text style={ps.categoryText}>{currentUser.category}</Text>
-          ) : null}
 
           {/* Chip de status — identificação premium do plano do sócio */}
           <View style={ps.statusChip}>
@@ -1585,7 +1589,7 @@ export default function PerfilScreen({ navigation }) {
                 <ReadOnlyField
                   label="Categoria"
                   icon="ribbon-outline"
-                  value={currentUser.category || currentUser.status}
+                  value={currentUser.category}
                   editStyles={editStyles}
                   DS={DS}
                 />

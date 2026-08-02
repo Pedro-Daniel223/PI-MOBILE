@@ -1,5 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { getProductById as fetchProductById, loadProducts as fetchProducts } from '../services/productService';
+import {
+  clearCachedProducts,
+  getProductById as fetchProductById,
+  loadProducts as fetchProducts,
+} from '../services/productService';
+import { useAuth } from './AuthContext';
 
 const ProductContext = createContext(null);
 
@@ -8,6 +13,7 @@ export function ProductProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const requestRef = useRef(0);
+  const { token } = useAuth();
 
   const loadProducts = useCallback(async () => {
     const requestId = ++requestRef.current;
@@ -15,7 +21,7 @@ export function ProductProvider({ children }) {
     setError(null);
 
     try {
-      const nextProducts = await fetchProducts();
+      const nextProducts = await fetchProducts(token);
 
       if (requestId !== requestRef.current) {
         return nextProducts;
@@ -34,7 +40,12 @@ export function ProductProvider({ children }) {
         setLoading(false);
       }
     }
-  }, []);
+  }, [token]);
+
+  const refreshProducts = useCallback(async () => {
+    clearCachedProducts();
+    return loadProducts();
+  }, [loadProducts]);
 
   const getProductById = useCallback(async (id) => {
     if (!id) {
@@ -46,8 +57,8 @@ export function ProductProvider({ children }) {
       return cachedProduct;
     }
 
-    return fetchProductById(id);
-  }, [products]);
+    return fetchProductById(id, token);
+  }, [products, token]);
 
   useEffect(() => {
     loadProducts().catch(() => {
@@ -60,6 +71,7 @@ export function ProductProvider({ children }) {
     loading,
     error,
     loadProducts,
+    refreshProducts,
     getProductById,
   };
 

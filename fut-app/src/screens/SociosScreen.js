@@ -63,6 +63,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import CheckoutModal from './CheckoutModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useProducts } from '../contexts/ProductContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useTheme } from '../contexts/ThemeContext';
 import apiClient from '../services/api';
@@ -469,6 +470,7 @@ export default function SociosScreen({ navigation }) {
   const [planos, setPlanos] = useState(FALLBACK_PLANOS);
 
   const { token } = useAuth();
+  const { refreshProducts } = useProducts();
   const { syncSubscription } = useSubscription();
 
   const openModal = (plan) => {
@@ -571,6 +573,8 @@ export default function SociosScreen({ navigation }) {
       retries: 4,
     });
 
+    await refreshProducts().catch(() => {});
+
     const checkoutResult = normalizeAssinaturaResponse(
       assinaturaFinal || { plano_id: planoId, status: 'ativa' },
       checkoutPlan
@@ -580,7 +584,7 @@ export default function SociosScreen({ navigation }) {
       ...checkoutResult,
       total: parsePlanoValor(checkoutPlan.price),
     };
-  }, [checkoutPlan, syncSubscription, token]);
+  }, [checkoutPlan, refreshProducts, syncSubscription, token]);
 
   useFocusEffect(
     useCallback(() => {
@@ -592,6 +596,14 @@ export default function SociosScreen({ navigation }) {
   // ── Animações compartilhadas (otimização: 1 loop em vez de N) ────────────
   const shimmerAnim = useRef(new Animated.Value(0)).current;
   const floatAnim   = useRef(new Animated.Value(0)).current;
+  const visiblePlanos = useMemo(() => {
+    const source = Array.isArray(planos) && planos.length > 0 ? planos : FALLBACK_PLANOS;
+    return source.filter((plan) => {
+      const tier = String(plan?.tier || '').trim().toLowerCase();
+      const title = String(plan?.title || plan?.nome || '').trim().toLowerCase();
+      return tier !== 'nao-socio' && !/na[o?]\s*s[o?]cio/i.test(title);
+    });
+  }, [planos]);
 
   useEffect(() => {
     const shimmer = Animated.loop(
@@ -644,7 +656,7 @@ export default function SociosScreen({ navigation }) {
         </View>
 
         {/* ─────────── Lista de cards de planos (Liquid Glass) ─────────── */}
-        {(Array.isArray(planos) && planos.length > 0 ? planos : FALLBACK_PLANOS).map((plan) => (
+        {visiblePlanos.map((plan) => (
           <PlanGlassCard
             key={plan.id}
             plan={plan}

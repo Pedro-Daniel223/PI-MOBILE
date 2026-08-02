@@ -181,8 +181,12 @@ const normalizeProduct = (produto = {}, index = 0) => {
 
 let cachedProducts = null;
 
-export const listarProdutos = async () => {
-  const payload = await get('/api/produtos/');
+export const clearCachedProducts = () => {
+  cachedProducts = null;
+};
+
+export const listarProdutos = async (token) => {
+  const payload = await get('/api/produtos/', token);
   const produtos = extractListPayload(payload).map((produto, index) => normalizeProduct(produto, index));
 
   console.log('[productService] listarProdutos', {
@@ -198,7 +202,7 @@ export const listarProdutos = async () => {
   return produtos;
 };
 
-export const buscarProduto = async (id) => {
+export const buscarProduto = async (id, token) => {
   if (id === undefined || id === null || id === '') {
     return null;
   }
@@ -208,7 +212,7 @@ export const buscarProduto = async (id) => {
     return cachedProduct;
   }
 
-  const payload = await get(`/api/produtos/${id}/`);
+  const payload = await get(`/api/produtos/${id}/`, token);
   if (!payload) {
     return null;
   }
@@ -225,6 +229,7 @@ export const getCachedProducts = () => cachedProducts || [];
 export default {
   listarProdutos,
   buscarProduto,
+  clearCachedProducts,
   loadProducts,
   getProductById,
   getCachedProducts,

@@ -650,8 +650,26 @@ const CheckoutModal = ({
                             {item.nome_produtos || item.nome || item.nome_plano || item.title || checkoutCopy.summaryPlaceholderName}
                           </Text>
                           <Text style={s.summaryMeta}>
-                            {(item.tamanho || item.size) ? `${checkoutCopy.summarySizePrefix} ${item.tamanho || item.size} · ` : ""}{checkoutCopy.summaryQuantityPrefix} {item.quantity || item.quantidade || 1}
+                            {(item.tamanho || item.size) ? `${checkoutCopy.summarySizePrefix} ${item.tamanho || item.size} ? ` : ""}{checkoutCopy.summaryQuantityPrefix} {item.quantity || item.quantidade || 1}
                           </Text>
+                          {hasPricingPreview ? (
+                            <View style={s.summaryPricingMeta}>
+                              <Text style={s.summaryPriceLine}>
+                                Original: {formatBRL(item.preco_original_total ?? item.preco_original_unitario ?? item.preco_original ?? 0)}
+                              </Text>
+                              <Text style={s.summaryPriceLine}>
+                                Final: {formatBRL(item.preco_final_total ?? item.preco_final_unitario ?? item.preco_final ?? 0)}
+                              </Text>
+                              {item.economia_total != null ? (
+                                <Text style={s.summaryPriceLine}>
+                                  Economia: {formatBRL(item.economia_total)}
+                                </Text>
+                              ) : null}
+                              {Number(item.desconto_percent || 0) > 0 ? (
+                                <Text style={s.summaryPriceBadge}>{item.desconto_percent}% OFF</Text>
+                              ) : null}
+                            </View>
+                          ) : null}
                         </View>
                         <Text style={s.summaryPrice}>
                           {formatBRL(item.preco_final_total ?? item.total ?? item.preco ?? item.valor ?? 0)}
@@ -1125,6 +1143,26 @@ const s = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     marginLeft: 10,
+  },
+  summaryPricingMeta: {
+    marginTop: 6,
+  },
+  summaryPriceLine: {
+    color: DS.textSecondary,
+    fontSize: 11.5,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  summaryPriceBadge: {
+    alignSelf: 'flex-start',
+    marginTop: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: 'rgba(224,0,15,0.12)',
+    color: DS.discountText,
+    fontSize: 10.5,
+    fontWeight: '700',
   },
 
   divider: {
