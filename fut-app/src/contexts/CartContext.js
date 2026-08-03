@@ -1,6 +1,9 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CartContext = createContext(null);
+
+const CART_STORAGE_KEY = '@fut_app/cart';
 
 const normalizeSize = (value) => {
   if (value === undefined || value === null) {
@@ -88,6 +91,57 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const storedCart = await AsyncStorage.getItem(CART_STORAGE_KEY);
+
+        if (!mounted) {
+          return;
+        }
+
+        if (storedCart) {
+          const parsed = JSON.parse(storedCart);
+
+          if (Array.isArray(parsed)) {
+            setCartItems(parsed);
+          }
+        }
+      } catch {
+        // Ignora falhas de leitura local para não travar a inicialização.
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+      } catch {
+        // Ignora falhas de escrita local para não travar o fluxo.
+      }
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [cartItems, loading]);
 
   const addItem = useCallback((product) => {
     const nextItem = normalizeCartItem(product);
@@ -160,6 +214,7 @@ export const CartProvider = ({ children }) => {
 
   const value = useMemo(() => ({
     cartItems,
+    loading,
     addItem,
     removeItem,
     updateQuantity,
@@ -170,7 +225,7 @@ export const CartProvider = ({ children }) => {
     removeFromCart: removeItem,
     getCartCount: () => totalItems,
     getCartTotal: () => subtotal,
-  }), [addItem, cartItems, clearCart, removeItem, subtotal, totalItems, updateQuantity]);
+  }), [addItem, cartItems, clearCart, loading, removeItem, subtotal, totalItems, updateQuantity]);
 
   return (
     <CartContext.Provider value={value}>

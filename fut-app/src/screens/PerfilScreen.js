@@ -31,6 +31,7 @@ import { fetchPurchaseHistory } from "../services/purchaseService";
 import { useSubscription } from "../contexts/SubscriptionContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { uploadProfilePhoto } from "../services/authService";
 
 const user = defaultUser;
 const DEFAULT_AVATAR = defaultUser.avatar;
@@ -825,6 +826,15 @@ export default function PerfilScreen({ navigation }) {
     }
 
     try {
+      const pendingPhoto = trimValue(changes.url_foto_clientes);
+      const savedPhoto = trimValue(originalDraft.url_foto_clientes);
+      const shouldUploadPhoto = pendingPhoto !== '' && pendingPhoto !== savedPhoto && pendingPhoto.startsWith('file://');
+
+      if (shouldUploadPhoto && token) {
+        const uploadedUrl = await uploadProfilePhoto(pendingPhoto, token);
+        changes.url_foto_clientes = uploadedUrl.url_foto_clientes || uploadedUrl;
+      }
+
       const updatedCliente = await updateCliente(changes);
       const mergedProfile = buildProfileSnapshot(
         updatedCliente || { ...currentCliente, ...changes },

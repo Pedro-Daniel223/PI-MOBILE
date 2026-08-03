@@ -105,10 +105,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
   };
 
   const handlePress = () => {
-    navigation.navigate('Loja', {
-      screen: 'DetalhesProdutos',
-      params: { produto: productDetails },
-    });
+    navigation.navigate('DetalhesProdutos', { produto: productDetails });
   };
 
   const handleAddToCart = () => {

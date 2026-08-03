@@ -199,7 +199,7 @@ export default function CardProfileWelcome() {
         {/* BotÃ£o de configuraÃ§Ãµes â€” zIndex 10, preservado integralmente */}
         <TouchableOpacity
           style={styles.editButton}
-          onPress={() => navigation.navigate('Loja', { screen: 'Carrinho' })}
+          onPress={() => navigation.navigate('Carrinho')}
         >
           <BlurView intensity={5} tint="dark" style={styles.editBlur}>
             <Ionicons name="cart-outline" size={16} color="#fff" />

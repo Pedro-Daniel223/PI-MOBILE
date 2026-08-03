@@ -344,7 +344,7 @@ export default function CarrinhosScreen({ navigation }) {
 
   const handleGoToShop = () => {
     setCheckoutVisible(false);
-    navigation.navigate("Loja");
+    navigation.navigate('MainTabs', { screen: 'Loja' });
   };
 
   return (
@@ -398,9 +398,9 @@ export default function CarrinhosScreen({ navigation }) {
           <View style={styles.emptyState}>
             <View style={styles.emptyIconCircle}>
                 <Ionicons
-                    name="chevron-back"
-                    size={24}
-                    color={DS.colors.black}
+                    name="cart-outline"
+                    size={28}
+                    color={DS.colors.accent}
                 />
             </View>
             <Text style={styles.emptyTitle}>Sacola vazia</Text>
@@ -409,7 +409,7 @@ export default function CarrinhosScreen({ navigation }) {
             </Text>
             <TouchableOpacity
               style={styles.shopButton}
-              onPress={() => navigation.navigate("Loja", { screen: "LojaHome" })}
+              onPress={() => navigation.navigate("Loja")}
             >
               <Text style={styles.shopButtonText}>Explorar Loja</Text>
             </TouchableOpacity>

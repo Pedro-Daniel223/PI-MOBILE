@@ -47,7 +47,7 @@ export const DARK_DS = {
     checkoutIconBg: '#FFFFFF',
     checkoutIconColor: '#090909',
     checkoutTextColor: '#090909',
-    shopButtonTextColor: '#090909',
+    shopButtonTextColor: '#292727',
     cardShadow: '#000',
     cardShadowOpacity: 0.35,
   },

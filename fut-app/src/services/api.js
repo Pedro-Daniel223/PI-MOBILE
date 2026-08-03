@@ -1,5 +1,5 @@
   // const DEFAULT_BASE_URL = 'http://10.44.236.2:8000'; // Substitua pelo seu endereço IP e porta do backend (do curso)
-  const DEFAULT_BASE_URL = 'http://192.168.1.7:8000'; // IP atual da máquina local
+  const DEFAULT_BASE_URL = 'http://172.24.57.2:8000'; // IP atual da máquina local
   const DEFAULT_BASE_URL_PROD = 'https://projeto-futebol.onrender.com'; // url de produção
 
   const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_BASE_URL;
@@ -91,15 +91,23 @@
     const url = buildUrl(path);
     console.log('[API] request start', { method, url, hasBody: typeof data !== 'undefined' });
 
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    const headers = {
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Token ${token}` } : {}),
+      ...extraHeaders,
+    };
+
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    const body = isFormData ? data : JSON.stringify(data);
+
     const response = await fetch(buildUrl(path), {
       method,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Token ${token}` } : {}),
-        ...extraHeaders,
-      },
-      ...(typeof data !== 'undefined' ? { body: JSON.stringify(data) } : {}),
+      headers,
+      ...(typeof data !== 'undefined' ? { body } : {}),
     });
 
     const payload = await parseResponse(response);

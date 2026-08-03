@@ -10,7 +10,8 @@ import BoasVindas3Screen from '../../screens/BoasVindas3Screen';
 
 import AuthStack from './AuthStack';
 import MainTabs from '../tabs/MainTabs';
-import StoreStack from './StoreStack';
+import CarrinhosScreen from '../../screens/CarrinhosScreen';
+import DetalhesProdutosScreens from '../../screens/DetalhesProdutosScreens';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,8 +50,13 @@ export default function MainStack() {
       />
 
       <Stack.Screen
-        name="StoreStack"
-        component={StoreStack}
+        name="Carrinho"
+        component={CarrinhosScreen}
+      />
+
+      <Stack.Screen
+        name="DetalhesProdutos"
+        component={DetalhesProdutosScreens}
       />
 
     </Stack.Navigator>
