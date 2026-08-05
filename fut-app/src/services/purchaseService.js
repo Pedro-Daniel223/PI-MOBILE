@@ -48,45 +48,56 @@ const formatBRL = (value) =>
     currency: "BRL",
   });
 
-const normalizePurchase = (item = {}) => {
-  const produtoNome =
-    item.produto_nome ??
-    item.nome_produto ??
-    item.produtos?.nome_produtos ??
-    "Produto";
-  const produtoImagem =
-    resolveImageSource(
-      item.produto_imagem ??
-        item.imagem_produto ??
-        item.produtos?.imagem_produtos,
-    ) ?? null;
-  const quantidade = Number(item.quantidade ?? item.quantidade_pedido ?? 1);
-  const valor = Number(item.valor ?? item.valor_compra ?? 0);
-  const dataPedido = item.data_pedido ?? item.pedido?.data_pedido ?? null;
-  const statusPedido = item.status_pedido ?? item.pedido?.status ?? "";
-  const tamanho = item.tamanho ?? "";
+export const fetchPurchaseHistory = async (token) => {
+  const payload = await get("/api/minhas-compras/", token);
+  const pedidos = Array.isArray(payload?.pedidos) ? payload.pedidos : extractListPayload(payload);
 
-  return {
-    id: `compra-${item.id_compra ?? item.id ?? Math.random()}`,
-    type: "purchase",
-    items: [produtoNome],
-    itemImages: produtoImagem ? [produtoImagem] : [],
-    price: formatBRL(valor),
-    date: dataPedido,
-    status: statusPedido,
-    quantity: quantidade,
-    size: tamanho,
-    productName: produtoNome,
-    productImage: produtoImagem,
-    rawValue: valor,
-  };
+  return pedidos.map((pedido) => {
+    const itens = Array.isArray(pedido.itens) ? pedido.itens : [];
+    const primeiroItem = itens[0] || {};
+
+    return {
+      id: `pedido-${pedido.id_pedido ?? primeiroItem.id_compra ?? Math.random()}`,
+      type: "purchase",
+      items: itens.map((it) => ({
+        id_compra: it.id_compra ?? null,
+        produto_id: it.produto_id ?? null,
+        produto_nome: it.produto_nome || "Produto",
+        produto_imagem: resolveImageSource(it.produto_imagem),
+        quantidade: Number(it.quantidade || 1),
+        tamanho: it.tamanho || "",
+        valor: Number(it.valor || 0),
+        subtotal: Number(it.subtotal || 0),
+      })),
+      itemImages: itens
+        .map((it) => resolveImageSource(it.produto_imagem))
+        .filter(Boolean),
+      price: formatBRL(pedido.valor_total ?? 0),
+      date: pedido.data_pedido ?? null,
+      status: pedido.status ?? "",
+      quantity: Number(pedido.quantidade_total ?? itens.reduce((sum, it) => sum + Number(it.quantidade || 0), 0)),
+      size: itens.find((it) => it.tamanho)?.tamanho || "",
+      productName: primeiroItem.produto_nome || "Produto",
+      productImage: resolveImageSource(primeiroItem.produto_imagem),
+      rawValue: Number(pedido.valor_total ?? 0),
+      id_pedido: pedido.id_pedido ?? primeiroItem.id_compra ?? null,
+    };
+  });
 };
 
-export const fetchPurchaseHistory = async (token) => {
-  const payload = await get("/api/compras/", token);
-  return extractListPayload(payload).map(normalizePurchase);
+export const getPurchaseDetails = (purchases, purchaseId) => {
+  if (!Array.isArray(purchases) || purchaseId == null) {
+    return null;
+  }
+
+  return (
+    purchases.find((purchase) => purchase.id_pedido === purchaseId) ||
+    purchases.find((purchase) => purchase.id === purchaseId) ||
+    null
+  );
 };
 
 export default {
   fetchPurchaseHistory,
+  getPurchaseDetails,
 };

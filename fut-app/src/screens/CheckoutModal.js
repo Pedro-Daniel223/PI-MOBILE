@@ -629,13 +629,13 @@ const CheckoutModal = ({
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={{ paddingBottom: 6 }}
                 >
-                  {(hasPricingPreview ? previewItems : safeResolvedItems).map((item) => {
+                  {(hasPricingPreview ? previewItems : safeResolvedItems).map((item, idx) => {
                     const img = Array.isArray(item.imagens) && item.imagens.length > 0
                       ? item.imagens[0]
                       : item.imagem_produtos || item.imagem || item.image || item.capa || item.foto || item.imagem_plano || null;
                     const imgSource = typeof img === 'string' ? { uri: img } : img;
                     return (
-                      <View key={`${item.id || item.plano_id || item.nome}-${item.tamanho || item.size || item.quantidade || item.quantity || 0}`} style={s.summaryRow}>
+                        <View key={`${item.id || item.plano_id || item.nome}-${item.tamanho || item.size || item.quantidade || item.quantity || 0}-${idx}`} style={s.summaryRow}>
                         <View style={s.summaryImgWrap}>
                           {imgSource ? (
                             <Image source={imgSource} style={s.summaryImg} resizeMode="cover" />
@@ -713,18 +713,6 @@ const CheckoutModal = ({
                     <Text style={s.grandValue}>{formatBRL(payableTotal)}</Text>
                   </View>
                 </View>
-
-                {Array.isArray(planBenefits) && planBenefits.length > 0 ? (
-                  <View style={s.planBenefitsCard}>
-                    <Text style={s.planBenefitsTitle}>Benefícios do plano</Text>
-                    {planBenefits.map((benefit, index) => (
-                      <View key={`${String(benefit)}-${index}`} style={s.planBenefitLine}>
-                        <Ionicons name="checkmark-circle" size={14} color={DS.success} />
-                        <Text style={s.planBenefitText}>{String(benefit)}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ) : null}
 
                 <TouchableOpacity
                   style={s.primaryBtn}

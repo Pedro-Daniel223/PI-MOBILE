@@ -92,7 +92,8 @@ const CARD_GAP = 14;
 const CARD_W = (SCREEN_WIDTH - 40 - CARD_GAP) / 2;
 const CARD_H = CARD_W * 1.36;
 
-const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios', 'Ingressos'];
+// const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios', 'Ingressos'];
+const CATEGORIES = ['Tudo', 'Camisas', 'Acessórios', 'Ingressos'];
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: TopBar

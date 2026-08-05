@@ -1186,46 +1186,80 @@ export default function PerfilScreen({ navigation }) {
             <Text style={ps.historyListTitle}>Histórico</Text>
 
             {purchaseHistory && purchaseHistory.length > 0 ? (
-              purchaseHistory.map((item, idx) => (
-                <React.Fragment key={item.id}>
-                  <View style={ps.historyRow}>
-                    {item.type === "subscription" ? (
-                      <View style={ps.historyIconWrap}>
-                        <Ionicons
-                          name="shield-checkmark-outline"
-                          size={15}
-                          color={DS.accent}
+              purchaseHistory.map((pedido, idx) => {
+                const isSubscription = pedido.type === 'subscription';
+                const pedidoItens = Array.isArray(pedido.items) ? pedido.items : [];
+                const primeiroItem = pedidoItens[0] || {};
+                const pedidoId = pedido.id || pedido.id_pedido || `pedido-${idx}`;
+                const pedidoData = pedido.date || pedido.data_pedido || null;
+                const pedidoStatus = pedido.status || '';
+                const pedidoValor = pedido.price || pedido.valor_total || '';
+                const pedidoNome =
+                  pedido.planTitle ||
+                  pedido.productName ||
+                  primeiroItem.produto_nome ||
+                  primeiroItem.nome ||
+                  primeiroItem.nome_produtos ||
+                  'Pedido';
+
+                return (
+                  <React.Fragment key={pedidoId}>
+                    <View style={ps.historyRow}>
+                      {isSubscription ? (
+                        <View style={ps.historyIconWrap}>
+                          <Ionicons
+                            name="shield-checkmark-outline"
+                            size={15}
+                            color={DS.accent}
+                          />
+                        </View>
+                      ) : (pedido.itemImages && pedido.itemImages[0]) || primeiroItem.produto_imagem ? (
+                        <Image
+                          source={pedido.itemImages?.[0] || { uri: primeiroItem.produto_imagem }}
+                          style={ps.historyProductImage}
                         />
+                      ) : (
+                        <View style={ps.historyIconWrap}>
+                          <Ionicons name="bag-outline" size={15} color={DS.accent} />
+                        </View>
+                      )}
+                      <View style={ps.historyInfo}>
+                        <Text style={ps.historyPlan} numberOfLines={1}>
+                          {pedidoNome}
+                        </Text>
+                        <Text style={ps.historyDate} numberOfLines={1}>
+                          {isSubscription
+                            ? formatHistoryDate(pedidoData)
+                            : `${formatHistoryDate(pedidoData)}${pedidoStatus ? ` • ${pedidoStatus}` : ''}`}
+                        </Text>
                       </View>
-                    ) : item.itemImages && item.itemImages[0] ? (
-                      <Image
-                        source={item.itemImages[0]}
-                        style={ps.historyProductImage}
-                      />
-                    ) : (
-                      <View style={ps.historyIconWrap}>
-                        <Ionicons name="bag-outline" size={15} color={DS.accent} />
-                      </View>
-                    )}
-                    <View style={ps.historyInfo}>
-                      <Text style={ps.historyPlan}>
-                        {item.type === "subscription"
-                          ? item.planTitle
-                          : item.productName || item.items?.[0] || "Produto"}
-                      </Text>
-                      <Text style={ps.historyDate}>
-                        {item.type === "subscription"
-                          ? formatHistoryDate(item.date)
-                          : buildPurchaseSummary(item)}
-                      </Text>
+                      <Text style={ps.historyPrice}>{pedidoValor}</Text>
                     </View>
-                    <Text style={ps.historyPrice}>{item.price}</Text>
-                  </View>
-                  {idx < purchaseHistory.length - 1 && (
-                    <View style={ps.historyDivider} />
-                  )}
-                </React.Fragment>
-              ))
+
+                    {pedidoItens.length > 1 ? (
+                      <View style={ps.historySubItems}>
+                        {pedidoItens.slice(1).map((subItem, subIdx) => (
+                          <View key={`${pedidoId}-sub-${subIdx}`} style={ps.historySubRow}>
+                            <Text style={ps.historySubItemName} numberOfLines={1}>
+                              {subItem.produto_nome || subItem.nome || subItem.nome_produtos || 'Produto'}
+                            </Text>
+                            {subItem.tamanho ? (
+                              <Text style={ps.historySubItemMeta}>Tam. {subItem.tamanho}</Text>
+                            ) : null}
+                            <Text style={ps.historySubItemQty}>
+                              Qtd. {String(subItem.quantidade || 1).padStart(2, '0')}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    ) : null}
+
+                    {idx < purchaseHistory.length - 1 && (
+                      <View style={ps.historyDivider} />
+                    )}
+                  </React.Fragment>
+                );
+              })
             ) : (
               <View style={ps.historyEmpty}>
                 <Ionicons
@@ -2178,6 +2212,38 @@ const makePs = (DS) =>
       color: DS.textFaint,
       fontSize: 12.5,
       textAlign: "center",
+    },
+    historySubItems: {
+      paddingLeft: 42,
+      paddingRight: 4,
+      paddingBottom: 4,
+      gap: 4,
+    },
+    historySubRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 3,
+    },
+    historySubItemName: {
+      flex: 1,
+      color: DS.textMuted,
+      fontSize: 12,
+      fontWeight: "500",
+      marginRight: 8,
+    },
+    historySubItemMeta: {
+      color: DS.textFaint,
+      fontSize: 11,
+      fontWeight: "500",
+      marginRight: 8,
+    },
+    historySubItemQty: {
+      color: DS.textFaint,
+      fontSize: 11,
+      fontWeight: "600",
+      minWidth: 36,
+      textAlign: "right",
     },
 
     // ── DADOS PESSOAIS ────────────────────────────────────────────────────
