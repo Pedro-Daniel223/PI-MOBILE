@@ -35,6 +35,20 @@ import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { uploadProfilePhoto } from "../services/authService";
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   PERFIL SCREEN — Estrutura principal:
+   1) Hero (avatar + nome + chip de plano + botão de salvar foto)
+   2) Membership card (cartão premium do sócio / promo para virar sócio)
+   3) Boas-vindas (mensagem + notificação)
+   4) Acesso rápido (cards de ação: Compras)
+   5) Dados pessoais (lista de campos + botão editar)
+   6) Sair da conta
+   7) Modal Editar Perfil
+   8) Modal Gerenciar Assinatura (bottom sheet)
+   9) Modal Confirmar Cancelamento
+   10) Modais de compras (PurchaseHistoryModal / PurchaseDetailsModal)
+   ───────────────────────────────────────────────────────────────────────────── */
+
 const user = defaultUser;
 const DEFAULT_AVATAR = defaultUser.avatar;
 const EDITABLE_PROFILE_FIELDS = [
@@ -609,6 +623,12 @@ export default function PerfilScreen({ navigation }) {
   const [showHistory, setShowHistory] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
+
+  // ── Estado exclusivo de UI — bottom sheet "Gerenciar assinatura" e modal
+  // de confirmação de cancelamento. Nenhum dos dois toca em contexts,
+  // services ou lógica de negócio: apenas controlam visibilidade local.
+  const [manageSubscriptionVisible, setManageSubscriptionVisible] = useState(false);
+  const [cancelConfirmVisible, setCancelConfirmVisible] = useState(false);
   const { subscription } = useSubscription();
   const { cliente, token, signOut, updateCliente } = useAuth();
   const [purchaseHistory, setPurchaseHistory] = useState([]);
@@ -745,6 +765,80 @@ export default function PerfilScreen({ navigation }) {
     }).start(() => {
       setEditModalVisible(false);
     });
+  };
+
+  // ── Animação e handlers — bottom sheet "Gerenciar assinatura" ─────────────
+  const manageSheetAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (manageSubscriptionVisible) {
+      manageSheetAnim.setValue(0);
+      Animated.timing(manageSheetAnim, {
+        toValue: 1,
+        duration: 320,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [manageSubscriptionVisible]);
+
+  const openManageSubscription = () => {
+    setManageSubscriptionVisible(true);
+  };
+
+  const closeManageSubscription = () => {
+    Animated.timing(manageSheetAnim, {
+      toValue: 0,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(() => {
+      setManageSubscriptionVisible(false);
+    });
+  };
+
+  // ── Animação e handlers — modal "Confirmar cancelamento" ──────────────────
+  const cancelSheetAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (cancelConfirmVisible) {
+      cancelSheetAnim.setValue(0);
+      Animated.timing(cancelSheetAnim, {
+        toValue: 1,
+        duration: 320,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [cancelConfirmVisible]);
+
+  const openCancelConfirm = () => {
+    setCancelConfirmVisible(true);
+  };
+
+  const closeCancelConfirm = () => {
+    Animated.timing(cancelSheetAnim, {
+      toValue: 0,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(() => {
+      setCancelConfirmVisible(false);
+    });
+  };
+
+  // Confirmação de cancelamento — sem backend/API integrados ainda.
+  // Fecha o modal de confirmação e informa que a integração virá futuramente.
+  const handleConfirmCancelSubscription = () => {
+    closeCancelConfirm();
+    Alert.alert(
+      "Em breve",
+      "O cancelamento de assinatura será integrado em uma próxima atualização.",
+    );
+  };
+
+  // Placeholder do histórico de pagamentos — funcionalidade futura.
+  const handleOpenPaymentHistory = () => {
+    Alert.alert(
+      "Em breve",
+      "O histórico de pagamentos estará disponível em uma próxima atualização.",
+    );
   };
 
   // ── Atualização de campos do formulário (mesmo shape de estado original) ──
@@ -900,7 +994,14 @@ export default function PerfilScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         {/* ══════════════════════════════════════════════════════════════
-            HERO CARD — foto, nome, categoria, status premium do sócio
+            [1] HERO — avatar central, nome do usuário e chip de plano
+            Elementos:
+            - heroWatermark / heroFade: efeitos de fundo
+            - avatarStage + avatarGlow + avatarRing + avatar: foto de perfil
+            - editAvatarBtn: botão de câmera para trocar foto
+            - username: nome do usuário
+            - statusChip: badge premium do plano (sócio / não-sócio)
+            - savePhotoBtn: botão condicional "Salvar alterações" (foto pendente)
         ══════════════════════════════════════════════════════════════ */}
         <View style={ps.hero}>
           <Image
@@ -992,7 +1093,16 @@ export default function PerfilScreen({ navigation }) {
         </View>
 
         {/* ══════════════════════════════════════════════════════════════
-            MEMBERSHIP CARD — cartão de sócio premium independente
+            [2] MEMBERSHIP CARD — cartão premium do sócio
+            Quando existe subscription:
+              - membershipCard: cartão com gradiente do tier + blur
+              - membershipBadge + membershipEmoji: selo MEMBRO ATIVO
+              - membershipTitle / membershipSubtitle: nome do plano
+              - membershipBenefits: lista de benefícios ativos
+              - membershipPrice: valor do plano
+              - membershipManageBtn: abre modal "Gerenciar Assinatura"
+            Quando NÃO existe subscription:
+              - membershipPromo: CTA "Torne-se Sócio Drakos"
         ══════════════════════════════════════════════════════════════ */}
         {subscription ? (
           <View style={ps.membershipCard}>
@@ -1050,7 +1160,7 @@ export default function PerfilScreen({ navigation }) {
             <TouchableOpacity
               style={ps.membershipManageBtn}
               activeOpacity={0.85}
-              onPress={() => navigation.navigate("Socio")}
+              onPress={openManageSubscription}
             >
               <BlurView intensity={24} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
               <View style={ps.membershipManageBorder} />
@@ -1095,7 +1205,12 @@ export default function PerfilScreen({ navigation }) {
         )}
 
         {/* ══════════════════════════════════════════════════════════════
-            BOAS-VINDAS — mensagem leve com notificação
+            [3] BOAS-VINDAS — mensagem personalizada + badge de notificação
+            Elementos:
+            - welcomeCard: container Liquid Glass
+            - welcomeIconWrap: ícone sparkles
+            - welcomeBody: texto de boas-vindas
+            - notifBadge + notifDot: ícone de notificação com dot vermelho
         ══════════════════════════════════════════════════════════════ */}
         <View style={ps.welcomeCard}>
           <BlurView intensity={32} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
@@ -1120,48 +1235,47 @@ export default function PerfilScreen({ navigation }) {
         </View>
 
         {/* ══════════════════════════════════════════════════════════════
-            AÇÕES RÁPIDAS
+            [4] AÇÕES RÁPIDAS — cards de acesso rápido
+            Elementos:
+            - groupLabel: título "Acesso rápido"
+            - actionsRow + actionCardWide: card full-width "Compras"
+              * actionIconWrap: ícone do receipt
+              * actionWideTextGroup: título + subtítulo
+              * chevron-forward: indica navegação
         ══════════════════════════════════════════════════════════════ */}
         <Text style={ps.groupLabel}>Acesso rápido</Text>
         <View style={ps.actionsRow}>
-          <TouchableOpacity style={ps.actionCard} activeOpacity={0.85}>
-            <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
-            <View style={ps.actionBorder} />
-            <View style={ps.actionIconWrap}>
-              <Ionicons name="card-outline" size={19} color={DS.textPrimary} />
-            </View>
-            <Text style={ps.actionLabel}>Meu Cartão</Text>
-          </TouchableOpacity>
-
           <TouchableOpacity
-            style={ps.actionCard}
+            style={ps.actionCardWide}
             activeOpacity={0.85}
             onPress={() => setShowHistory(true)}
           >
             <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
-            <View style={ps.actionBorder} />
-            <View style={ps.actionIconWrap}>
-              <Ionicons name="receipt-outline" size={19} color={DS.textPrimary} />
+            <LinearGradient
+              colors={DS.glassFillGradient}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={ps.actionWideBorder} />
+            <View style={ps.actionWideInner}>
+              <View style={ps.actionIconWrap}>
+                <Ionicons name="receipt-outline" size={19} color={DS.textPrimary} />
+              </View>
+              <View style={ps.actionWideTextGroup}>
+                <Text style={ps.actionWideLabel}>Compras</Text>
+                <Text style={ps.actionWideSubtitle}>Ver histórico e detalhes dos pedidos</Text>
+              </View>
             </View>
-            <Text style={ps.actionLabel}>Compras</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={ps.actionCard}
-            activeOpacity={0.85}
-            onPress={() => navigation.navigate("Socio")}
-          >
-            <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
-            <View style={ps.actionBorder} />
-            <View style={ps.actionIconWrap}>
-              <Ionicons name="people-outline" size={19} color={DS.textPrimary} />
-            </View>
-            <Text style={ps.actionLabel}>Sócio</Text>
+            <Ionicons name="chevron-forward" size={16} color={DS.textMuted} />
           </TouchableOpacity>
         </View>
 
         {/* ══════════════════════════════════════════════════════════════
-            DADOS PESSOAIS
+            [5] DADOS PESSOAIS — lista de informações do usuário
+            Elementos:
+            - sectionHeaderCustom: título "Dados pessoais" + botão editar
+            - infoCard: container Liquid Glass com divisores
+            - infoRow + infoLeft: cada linha (ícone + label + valor)
+            - infoDivider: separador sutil entre campos
         ══════════════════════════════════════════════════════════════ */}
         <View style={ps.sectionHeaderCustom}>
           <Text style={ps.sectionTitle}>Dados pessoais</Text>
@@ -1224,7 +1338,10 @@ export default function PerfilScreen({ navigation }) {
         </View>
 
         {/* ══════════════════════════════════════════════════════════════
-            SAIR
+            [6] SAIR — botão de logout
+            Elementos:
+            - logoutBtn: TouchableOpacity com ícone + texto
+            - logoutBorder / logoutText: estilo do botão de sair
         ══════════════════════════════════════════════════════════════ */}
         <TouchableOpacity
           style={ps.logoutBtn}
@@ -1241,7 +1358,17 @@ export default function PerfilScreen({ navigation }) {
       </ScrollView>
 
 
-      {/* MODAL EDITAR PERFIL — Liquid Glass */}
+      {/* ══════════════════════════════════════════════════════════════
+          [7] MODAL EDITAR PERFIL — Liquid Glass
+          Estrutura:
+          - overlay: fundo escuro semi-transparente
+          - modalCard: cartão animado (scale + translateY)
+          - BlurView + LinearGradient: efeito glass
+          - specularTop + modalBorder: brilho e borda
+          - headerRow: título + subtítulo + botão fechar
+          - ScrollView: campos do formulário (GlassField / ReadOnlyField / SexoSelector)
+          - footerRow: botões Cancelar + Salvar alterações
+      ══════════════════════════════════════════════════════════════ */}
       <Modal
         animationType="none"
         transparent
@@ -1573,9 +1700,10 @@ export default function PerfilScreen({ navigation }) {
       </Modal>
 
       {/* ══════════════════════════════════════════════════════════════
-          MINHAS COMPRAS — Bottom Sheet (lista) → Modal (detalhes)
-          Mesma fonte de dados (purchaseHistory) e mesmo fetch já usados
-          na tela; apenas a apresentação passa a ser em Liquid Glass.
+          [10] MODAIS DE COMPRAS — histórico e detalhes
+          Elementos:
+          - PurchaseHistoryModal: lista de compras (abre pelo card "Compras")
+          - PurchaseDetailsModal: detalhes de uma compra selecionada
       ══════════════════════════════════════════════════════════════ */}
       <PurchaseHistoryModal
         visible={showHistory}
@@ -1632,6 +1760,295 @@ export default function PerfilScreen({ navigation }) {
         dividerColor={DS.dividerColorSoft}
         glassIconBg={DS.glassIconBg}
       />
+
+      {/* ══════════════════════════════════════════════════════════════
+          [8] MODAL GERENCIAR ASSINATURA — bottom sheet / modal
+          Estrutura:
+          - overlay + Animated sheet: mesma animação do modal de editar perfil
+          - manageSheetCard: container principal com sombra modal
+          - manageScrollContent: scroll interno com padding
+          - manageInfoRow / manageInfoLabel / manageInfoValue: linhas de info (Plano, Status, Renovação)
+          - managePlanValue / managePlanEmoji: nome do plano + emoji
+          - manageStatusValue / manageStatusDot: status ativo/inativo
+          - manageBenefitsBlock / manageBenefitsList / manageBenefitItem: lista de benefícios
+          - manageDivider / manageActionsDivider: separadores
+          - manageSecondaryBtn: Histórico de pagamentos
+          - manageDangerBtn: Cancelar assinatura
+      ══════════════════════════════════════════════════════════════ */}
+      <Modal
+        animationType="none"
+        transparent
+        visible={manageSubscriptionVisible}
+        onRequestClose={closeManageSubscription}
+        statusBarTranslucent
+      >
+        <Animated.View
+          style={[
+            editStyles.overlay,
+            {
+              opacity: manageSheetAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1],
+              }),
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={closeManageSubscription}
+          />
+
+          <Animated.View
+            style={[
+              editStyles.modalCard,
+              ps.manageSheetCard,
+              {
+                opacity: manageSheetAnim,
+                transform: [
+                  {
+                    translateY: manageSheetAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [36, 0],
+                    }),
+                  },
+                  {
+                    scale: manageSheetAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.96, 1],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <BlurView
+              intensity={55}
+              tint={DS.modalBlurTint}
+              style={StyleSheet.absoluteFill}
+            />
+            <LinearGradient
+              colors={DS.modalFillGradient}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={editStyles.specularTop} />
+            <View style={editStyles.modalBorder} />
+
+            <View style={editStyles.headerRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={editStyles.modalTitle}>Minha Assinatura</Text>
+                <Text style={editStyles.modalSubtitle}>
+                  Detalhes e opções do seu plano
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={editStyles.closeIconBtn}
+                onPress={closeManageSubscription}
+                activeOpacity={0.75}
+              >
+                <Ionicons name="close" size={18} color={DS.closeBtnIcon} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={ps.manageScrollContent}
+            >
+              {/* ── Plano ─────────────────────────────────────────────── */}
+              <View style={ps.manageInfoRow}>
+                <Text style={ps.manageInfoLabel}>Plano</Text>
+                <View style={ps.managePlanValue}>
+                  {planIdentity.emoji && (
+                    <Text style={ps.managePlanEmoji}>{planIdentity.emoji}</Text>
+                  )}
+                  <Text style={ps.manageInfoValue}>
+                    {planIdentity.title || planIdentity.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={ps.manageDivider} />
+
+              {/* ── Status ────────────────────────────────────────────── */}
+              <View style={ps.manageInfoRow}>
+                <Text style={ps.manageInfoLabel}>Status</Text>
+                <View style={ps.manageStatusValue}>
+                  <View
+                    style={[
+                      ps.manageStatusDot,
+                      { backgroundColor: planIdentity.isSocio ? "#3ecf7a" : DS.textFaint },
+                    ]}
+                  />
+                  <Text style={ps.manageInfoValue}>
+                    {planIdentity.isSocio ? "Ativo" : "Inativo"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={ps.manageDivider} />
+
+              {/* ── Benefícios ────────────────────────────────────────── */}
+              <View style={ps.manageBenefitsBlock}>
+                <Text style={ps.manageInfoLabel}>Benefícios</Text>
+                {beneficiosAtivos.length > 0 ? (
+                  <View style={ps.manageBenefitsList}>
+                    {beneficiosAtivos.map((beneficio, index) => (
+                      <View
+                        key={`manage-beneficio-${index}`}
+                        style={ps.manageBenefitItem}
+                      >
+                        <Ionicons
+                          name="checkmark-circle"
+                          size={14}
+                          color={planIdentity.accent}
+                        />
+                        <Text style={ps.manageBenefitText}>{beneficio}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Text style={ps.manageBenefitsEmpty}>
+                    Nenhum benefício disponível no momento.
+                  </Text>
+                )}
+              </View>
+
+              <View style={ps.manageDivider} />
+
+              {/*
+                Próxima renovação — campo ainda não alimentado pelo
+                backend/subscription (não existe subscription.dataRenovacao
+                ou equivalente hoje). O componente já está preparado para
+                receber uma prop `renewalDate`; enquanto não integrado,
+                exibe um placeholder fixo em vez de calcular ou inventar
+                uma data. Nenhuma lógica fake foi criada.
+              */}
+              <View style={ps.manageInfoRow}>
+                <Text style={ps.manageInfoLabel}>Próxima renovação</Text>
+                <Text style={ps.manageInfoValue}>
+                  {subscription?.renewalDate || "Em breve"}
+                </Text>
+              </View>
+
+              <View style={ps.manageActionsDivider} />
+
+              {/* ── Ações ─────────────────────────────────────────────── */}
+              <TouchableOpacity
+                style={ps.manageSecondaryBtn}
+                activeOpacity={0.85}
+                onPress={handleOpenPaymentHistory}
+              >
+                <Ionicons name="time-outline" size={16} color={DS.textPrimary} />
+                <Text style={ps.manageSecondaryBtnText}>Histórico de pagamentos</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={ps.manageDangerBtn}
+                activeOpacity={0.85}
+                onPress={() => {
+                  closeManageSubscription();
+                  openCancelConfirm();
+                }}
+              >
+                <Ionicons name="close-circle-outline" size={16} color={DS.logoutText} />
+                <Text style={ps.manageDangerBtnText}>Cancelar assinatura</Text>
+              </TouchableOpacity>
+
+              <View style={{ height: 8 }} />
+            </ScrollView>
+          </Animated.View>
+        </Animated.View>
+      </Modal>
+
+      {/* ══════════════════════════════════════════════════════════════
+          [9] MODAL CONFIRMAR CANCELAMENTO — confirmação de saída da assinatura
+          Estrutura:
+          - cancelOverlay: overlay animado
+          - cancelCard: cartão central com escala
+          - título + subtítulo + botão Confirmar cancelamento
+      ══════════════════════════════════════════════════════════════ */}
+      <Modal
+        animationType="none"
+        transparent
+        visible={cancelConfirmVisible}
+        onRequestClose={closeCancelConfirm}
+        statusBarTranslucent
+      >
+        <Animated.View
+          style={[
+            ps.cancelOverlay,
+            {
+              opacity: cancelSheetAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1],
+              }),
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={closeCancelConfirm}
+          />
+
+          <Animated.View
+            style={[
+              ps.cancelCard,
+              {
+                opacity: cancelSheetAnim,
+                transform: [
+                  {
+                    scale: cancelSheetAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.94, 1],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <BlurView
+              intensity={55}
+              tint={DS.modalBlurTint}
+              style={StyleSheet.absoluteFill}
+            />
+            <LinearGradient
+              colors={DS.modalFillGradient}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={ps.cancelBorder} />
+            <View style={ps.cancelSpecularTop} />
+
+            <View style={ps.cancelIconWrap}>
+              <Ionicons name="alert-circle-outline" size={26} color={DS.logoutText} />
+            </View>
+
+            <Text style={ps.cancelTitle}>Cancelar assinatura?</Text>
+            <Text style={ps.cancelBody}>
+              Tem certeza que deseja cancelar sua assinatura?{"\n"}
+              Você continuará com seus benefícios até o término do período vigente.
+            </Text>
+
+            <View style={ps.cancelActionsRow}>
+              <TouchableOpacity
+                style={ps.cancelBackBtn}
+                activeOpacity={0.85}
+                onPress={closeCancelConfirm}
+              >
+                <Text style={ps.cancelBackBtnText}>Voltar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={ps.cancelConfirmBtn}
+                activeOpacity={0.85}
+                onPress={handleConfirmCancelSubscription}
+              >
+                <Text style={ps.cancelConfirmBtnText}>Confirmar cancelamento</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </Animated.View>
+      </Modal>
     </View>
   );
 }
@@ -1646,6 +2063,10 @@ export default function PerfilScreen({ navigation }) {
 // passam a vir de DS. Nenhuma prop, nome de chave ou valor de layout
 // (paddings, tamanhos, radius, gaps) foi alterado.
 // ─────────────────────────────────────────────────────────────────────────────
+// Blocos organizados por seção:
+//  - HERO / MEMBERSHIP / BOAS-VINDAS / AÇÕES RÁPIDAS / DADOS PESSOAIS / SAIR
+//  - HISTÓRICO / MODAIS DE COMPRAS
+//  - GERENCIAR ASSINATURA
 const makePs = (DS) =>
   StyleSheet.create({
     container: {
@@ -2010,7 +2431,7 @@ const makePs = (DS) =>
       marginBottom: -6,
     },
     actionsRow: {
-      flexDirection: "row",
+      flexDirection: "column",
       gap: 10,
     },
     actionCard: {
@@ -2022,11 +2443,27 @@ const makePs = (DS) =>
       justifyContent: "center",
       gap: 8,
     },
+    actionCardWide: {
+      width: "100%",
+      borderRadius: 16,
+      overflow: "hidden",
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+    },
     actionBorder: {
       ...StyleSheet.absoluteFillObject,
       borderRadius: 16,
       borderWidth: 1,
       borderColor: DS.glassBorderSoft,
+    },
+    actionWideBorder: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: DS.glassBorder,
     },
     actionIconWrap: {
       width: 34,
@@ -2041,6 +2478,27 @@ const makePs = (DS) =>
       fontSize: 11.5,
       fontWeight: "600",
       textAlign: "center",
+    },
+    actionWideInner: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+    },
+    actionWideTextGroup: {
+      flex: 1,
+    },
+    actionWideLabel: {
+      color: DS.textPrimary,
+      fontSize: 16,
+      fontWeight: "800",
+      letterSpacing: -0.2,
+    },
+    actionWideSubtitle: {
+      color: DS.textSecondary,
+      fontSize: 12.5,
+      fontWeight: "500",
+      marginTop: 2,
     },
 
     // ── HISTÓRICO ─────────────────────────────────────────────────────────
@@ -2494,6 +2952,127 @@ const makeEditStyles = (DS) => {
     },
     saveTextDisabled: {
       color: DS.saveTextDisabledColor,
+    },
+
+    // ── GERENCIAR ASSINATURA ──────────────────────────────────────────────
+    manageSheetCard: {
+      borderRadius: 28,
+      overflow: "hidden",
+      paddingBottom: 6,
+      shadowColor: DS.shadowColor,
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: DS.shadowOpacityModal,
+      shadowRadius: 30,
+      elevation: 20,
+    },
+    manageScrollContent: {
+      paddingHorizontal: 22,
+      paddingBottom: 18,
+    },
+    manageInfoRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 14,
+      paddingHorizontal: 22,
+    },
+    manageInfoLabel: {
+      color: DS.textFaint,
+      fontSize: 12,
+      fontWeight: "600",
+      textTransform: "uppercase",
+      letterSpacing: 0.7,
+    },
+    manageInfoValue: {
+      color: DS.textPrimary,
+      fontSize: 15,
+      fontWeight: "700",
+      textAlign: "right",
+    },
+    managePlanValue: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    managePlanEmoji: {
+      fontSize: 18,
+    },
+    manageStatusValue: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    manageStatusDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    manageBenefitsBlock: {
+      paddingVertical: 14,
+      paddingHorizontal: 22,
+      gap: 10,
+    },
+    manageBenefitsList: {
+      gap: 10,
+    },
+    manageBenefitItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    manageBenefitText: {
+      color: DS.textSecondary,
+      fontSize: 14,
+      fontWeight: "500",
+      flex: 1,
+    },
+    manageBenefitsEmpty: {
+      color: DS.textFaint,
+      fontSize: 13,
+      fontWeight: "500",
+      fontStyle: "italic",
+    },
+    manageDivider: {
+      height: 1,
+      backgroundColor: DS.dividerColorSoft,
+      marginHorizontal: 22,
+    },
+    manageActionsDivider: {
+      height: 8,
+    },
+    manageSecondaryBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      height: 48,
+      borderRadius: 14,
+      marginHorizontal: 22,
+      backgroundColor: DS.glassIconBg,
+      borderWidth: 0.75,
+      borderColor: DS.glassBorderSoft,
+    },
+    manageSecondaryBtnText: {
+      color: DS.textPrimary,
+      fontSize: 14.5,
+      fontWeight: "700",
+    },
+    manageDangerBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      height: 48,
+      borderRadius: 14,
+      marginHorizontal: 22,
+      backgroundColor: DS.glassIconBg,
+      borderWidth: 0.75,
+      borderColor: DS.logoutBorder,
+    },
+    manageDangerBtnText: {
+      color: DS.logoutText,
+      fontSize: 14.5,
+      fontWeight: "700",
     },
   });
 
