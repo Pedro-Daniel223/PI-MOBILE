@@ -40,14 +40,14 @@ const GlassItemWrapper = React.memo(({ children, shimmerX }) => (
       />
 
       <LinearGradient
-        colors={['transparent']}
+        colors={['transparent', 'transparent']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
 
       <LinearGradient
-        colors={['transparent']}
+        colors={['transparent', 'transparent']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 0.65, y: 0.55 }}
