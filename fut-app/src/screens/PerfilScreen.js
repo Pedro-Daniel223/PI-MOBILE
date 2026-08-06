@@ -27,6 +27,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { styleSocioModal } from "../styles/styleSocios/styleSociosModal";
 import { escudoDrakos, user as defaultUser } from "../data/dataPerfil";
 import { fetchPurchaseHistory } from "../services/purchaseService";
+import PurchaseHistoryModal from "../components/PurchaseHistoryModal";
+import PurchaseDetailsModal from "../components/PurchaseDetailsModal";
 
 import { useSubscription } from "../contexts/SubscriptionContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -605,6 +607,7 @@ export default function PerfilScreen({ navigation }) {
 
   const [editingField, setEditingField] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const { subscription } = useSubscription();
   const { cliente, token, signOut, updateCliente } = useAuth();
@@ -675,6 +678,10 @@ export default function PerfilScreen({ navigation }) {
     originalProfileRef.current = nextProfile;
   }, [cliente]);
 
+  // Estado exclusivo de UI (skeleton do bottom sheet) — não participa da
+  // lógica de negócio, apenas espelha o ciclo de vida do fetch abaixo.
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -685,6 +692,7 @@ export default function PerfilScreen({ navigation }) {
           return;
         }
 
+        setIsLoadingHistory(true);
         try {
           const history = await fetchPurchaseHistory(token);
           if (isActive) {
@@ -693,6 +701,10 @@ export default function PerfilScreen({ navigation }) {
         } catch {
           if (isActive) {
             setPurchaseHistory([]);
+          }
+        } finally {
+          if (isActive) {
+            setIsLoadingHistory(false);
           }
         }
       };
@@ -1124,7 +1136,7 @@ export default function PerfilScreen({ navigation }) {
           <TouchableOpacity
             style={ps.actionCard}
             activeOpacity={0.85}
-            onPress={() => setShowHistory((prev) => !prev)}
+            onPress={() => setShowHistory(true)}
           >
             <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
             <View style={ps.actionBorder} />
@@ -1147,133 +1159,6 @@ export default function PerfilScreen({ navigation }) {
             <Text style={ps.actionLabel}>Sócio</Text>
           </TouchableOpacity>
         </View>
-
-        {/* ══════════════════════════════════════════════════════════════
-            HISTÓRICO — mesmo funcionamento, cartões renovados
-        ══════════════════════════════════════════════════════════════ */}
-        {showHistory && (
-          <View style={ps.historySection}>
-            <BlurView intensity={32} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
-            <LinearGradient
-              colors={DS.glassFillGradient}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={ps.historyBorder} />
-
-            <View style={ps.historyHeader}>
-              <Text style={ps.historyTitle}>Compras e assinaturas</Text>
-              <TouchableOpacity
-                onPress={() => setShowHistory(false)}
-                activeOpacity={0.7}
-                style={ps.historyCloseBtn}
-              >
-                <Ionicons name="close" size={15} color={DS.textPrimary} />
-              </TouchableOpacity>
-            </View>
-
-            {subscription && (
-              <View style={ps.historySubBadge}>
-                {planIdentity.isSocio && (
-                  <Text style={ps.historySubEmoji}>{planIdentity.emoji}</Text>
-                )}
-                <Text style={ps.historySubText}>
-                  Assinatura ativa: {subscription.title}
-                </Text>
-                <Text style={ps.historySubPrice}>{subscription.price}</Text>
-              </View>
-            )}
-
-            <Text style={ps.historyListTitle}>Histórico</Text>
-
-            {purchaseHistory && purchaseHistory.length > 0 ? (
-              purchaseHistory.map((pedido, idx) => {
-                const isSubscription = pedido.type === 'subscription';
-                const pedidoItens = Array.isArray(pedido.items) ? pedido.items : [];
-                const primeiroItem = pedidoItens[0] || {};
-                const pedidoId = pedido.id || pedido.id_pedido || `pedido-${idx}`;
-                const pedidoData = pedido.date || pedido.data_pedido || null;
-                const pedidoStatus = pedido.status || '';
-                const pedidoValor = pedido.price || pedido.valor_total || '';
-                const pedidoNome =
-                  pedido.planTitle ||
-                  pedido.productName ||
-                  primeiroItem.produto_nome ||
-                  primeiroItem.nome ||
-                  primeiroItem.nome_produtos ||
-                  'Pedido';
-
-                return (
-                  <React.Fragment key={pedidoId}>
-                    <View style={ps.historyRow}>
-                      {isSubscription ? (
-                        <View style={ps.historyIconWrap}>
-                          <Ionicons
-                            name="shield-checkmark-outline"
-                            size={15}
-                            color={DS.accent}
-                          />
-                        </View>
-                      ) : (pedido.itemImages && pedido.itemImages[0]) || primeiroItem.produto_imagem ? (
-                        <Image
-                          source={pedido.itemImages?.[0] || { uri: primeiroItem.produto_imagem }}
-                          style={ps.historyProductImage}
-                        />
-                      ) : (
-                        <View style={ps.historyIconWrap}>
-                          <Ionicons name="bag-outline" size={15} color={DS.accent} />
-                        </View>
-                      )}
-                      <View style={ps.historyInfo}>
-                        <Text style={ps.historyPlan} numberOfLines={1}>
-                          {pedidoNome}
-                        </Text>
-                        <Text style={ps.historyDate} numberOfLines={1}>
-                          {isSubscription
-                            ? formatHistoryDate(pedidoData)
-                            : `${formatHistoryDate(pedidoData)}${pedidoStatus ? ` • ${pedidoStatus}` : ''}`}
-                        </Text>
-                      </View>
-                      <Text style={ps.historyPrice}>{pedidoValor}</Text>
-                    </View>
-
-                    {pedidoItens.length > 1 ? (
-                      <View style={ps.historySubItems}>
-                        {pedidoItens.slice(1).map((subItem, subIdx) => (
-                          <View key={`${pedidoId}-sub-${subIdx}`} style={ps.historySubRow}>
-                            <Text style={ps.historySubItemName} numberOfLines={1}>
-                              {subItem.produto_nome || subItem.nome || subItem.nome_produtos || 'Produto'}
-                            </Text>
-                            {subItem.tamanho ? (
-                              <Text style={ps.historySubItemMeta}>Tam. {subItem.tamanho}</Text>
-                            ) : null}
-                            <Text style={ps.historySubItemQty}>
-                              Qtd. {String(subItem.quantidade || 1).padStart(2, '0')}
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
-                    ) : null}
-
-                    {idx < purchaseHistory.length - 1 && (
-                      <View style={ps.historyDivider} />
-                    )}
-                  </React.Fragment>
-                );
-              })
-            ) : (
-              <View style={ps.historyEmpty}>
-                <Ionicons
-                  name="document-text-outline"
-                  size={30}
-                  color={DS.scheme === "dark" ? "rgba(255,255,255,0.22)" : "rgba(26,20,20,0.20)"}
-                />
-                <Text style={ps.historyEmptyText}>
-                  Nenhuma compra ou assinatura ainda
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
 
         {/* ══════════════════════════════════════════════════════════════
             DADOS PESSOAIS
@@ -1686,6 +1571,67 @@ export default function PerfilScreen({ navigation }) {
           </KeyboardAvoidingView>
         </Animated.View>
       </Modal>
+
+      {/* ══════════════════════════════════════════════════════════════
+          MINHAS COMPRAS — Bottom Sheet (lista) → Modal (detalhes)
+          Mesma fonte de dados (purchaseHistory) e mesmo fetch já usados
+          na tela; apenas a apresentação passa a ser em Liquid Glass.
+      ══════════════════════════════════════════════════════════════ */}
+      <PurchaseHistoryModal
+        visible={showHistory}
+        onClose={() => setShowHistory(false)}
+        purchases={purchaseHistory}
+        onSelectPurchase={(pedido) => {
+          setSelectedPurchase(pedido);
+          setShowHistory(false);
+        }}
+        loading={isLoadingHistory}
+        textPrimary={DS.textPrimary}
+        textSecondary={DS.textSecondary}
+        textMuted={DS.textMuted}
+        textFaint={DS.textFaint}
+        accent={DS.accent}
+        modalOverlay={DS.modalOverlay}
+        modalBg={DS.modalBg}
+        modalBlurTint={DS.modalBlurTint}
+        modalBorder={DS.modalBorder}
+        modalFillGradient={DS.modalFillGradient}
+        modalTitleColor={DS.modalTitleColor}
+        modalSubtitleColor={DS.modalSubtitleColor}
+        closeBtnBg={DS.closeBtnBg}
+        closeBtnBorder={DS.closeBtnBorder}
+        closeBtnIcon={DS.closeBtnIcon}
+        glassBorder={DS.glassBorder}
+        glassIconBg={DS.glassIconBg}
+        dividerColor={DS.dividerColorSoft}
+      />
+
+      <PurchaseDetailsModal
+        visible={!!selectedPurchase}
+        onClose={() => setSelectedPurchase(null)}
+        onBack={() => {
+          setSelectedPurchase(null);
+          setShowHistory(true);
+        }}
+        purchase={selectedPurchase}
+        textPrimary={DS.textPrimary}
+        textSecondary={DS.textSecondary}
+        textMuted={DS.textMuted}
+        textFaint={DS.textFaint}
+        accent={DS.accent}
+        modalOverlay={DS.modalOverlay}
+        modalBg={DS.modalBg}
+        modalBlurTint={DS.modalBlurTint}
+        modalBorder={DS.modalBorder}
+        modalFillGradient={DS.modalFillGradient}
+        modalTitleColor={DS.modalTitleColor}
+        modalSubtitleColor={DS.modalSubtitleColor}
+        closeBtnBg={DS.closeBtnBg}
+        closeBtnBorder={DS.closeBtnBorder}
+        closeBtnIcon={DS.closeBtnIcon}
+        dividerColor={DS.dividerColorSoft}
+        glassIconBg={DS.glassIconBg}
+      />
     </View>
   );
 }
