@@ -229,6 +229,62 @@ Todas as rotas abaixo são acessíveis sob o prefixo `api/`, ou seja, `GET /api/
 - Resposta:
   - `detail`
 
+### `GET /api/ingressos/`
+- Descrição: lista jogos futuros com ingressos disponíveis em estoque
+- Resposta:
+  - `success`
+  - `message`
+  - `detail`
+  - `jogos`
+    - `id_jogos`
+    - `dia_jogo`
+    - `hora_jogo`
+    - `local_jogo`
+    - `casa_fora`
+    - `times`
+    - `ingressos`
+      - dados do produto de ingresso
+      - `jogo`
+
+### `POST /api/ingressos/preview/`
+- Descrição: calcula o resumo da compra de ingressos antes da confirmação
+- Entrada:
+  - `itens`: lista com
+    - `produto_id`
+    - `quantidade`
+- Resposta:
+  - `success`
+  - `message`
+  - `detail`
+  - `itens`
+  - `subtotal_original`
+  - `economia_total`
+  - `total_final`
+  - `desconto_total`
+  - `desconto_percent`
+  - `quantidade_total`
+  - `plano_atual`
+  - `beneficios_plano`
+
+### `POST /api/ingressos/comprar/`
+- Descrição: finaliza a compra de ingressos e cria pedido + itens
+- Entrada:
+  - mesma de `/api/ingressos/preview/`
+- Resposta:
+  - `success`
+  - `message`
+  - `detail`
+  - `pedido_id`
+  - `total`
+  - `total_bruto`
+  - `desconto_percent`
+  - `desconto`
+  - `plano_atual`
+  - `beneficios_plano`
+  - `itens`
+  - `quantidade_total`
+  - `status`
+
 ### `POST /api/checkout-preview/`
 - Descrição: calcula resumo da compra antes de finalizar
 - Entrada:

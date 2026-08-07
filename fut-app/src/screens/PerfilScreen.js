@@ -10,6 +10,7 @@ import {
   Text,
   StyleSheet,
   Image,
+  Pressable,
   TouchableOpacity,
   ScrollView,
   Modal,
@@ -25,12 +26,19 @@ import { BlurView } from "expo-blur";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect } from "@react-navigation/native";
 import { styleSocioModal } from "../styles/styleSocios/styleSociosModal";
+import {
+  DARK_DS as DARK_DS_SHARED,
+  LIGHT_DS as LIGHT_DS_SHARED,
+  makeEditStyles as makeEditStylesShared,
+  makePs as makePsShared,
+} from "../styles/stylePerfil/stylePerfil";
 import { escudoDrakos, user as defaultUser } from "../data/dataPerfil";
 import { fetchPurchaseHistory } from "../services/purchaseService";
 import PurchaseHistoryModal from "../components/PurchaseHistoryModal";
 import PurchaseDetailsModal from "../components/PurchaseDetailsModal";
 
 import { useSubscription } from "../contexts/SubscriptionContext";
+import { useProducts } from "../contexts/ProductContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { uploadProfilePhoto } from "../services/authService";
@@ -613,11 +621,11 @@ const SexoSelector = React.memo(function SexoSelector({
 export default function PerfilScreen({ navigation }) {
   const { isDark } = useTheme();
   const DS = useMemo(
-    () => (isDark ? DARK_DS : LIGHT_DS),
+    () => (isDark ? DARK_DS_SHARED : LIGHT_DS_SHARED),
     [isDark],
   );
-  const ps = useMemo(() => makePs(DS), [DS]);
-  const editStyles = useMemo(() => makeEditStyles(DS), [DS]);
+  const ps = useMemo(() => makePsShared(DS), [DS]);
+  const editStyles = useMemo(() => makeEditStylesShared(DS), [DS]);
 
   const [editingField, setEditingField] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -629,9 +637,21 @@ export default function PerfilScreen({ navigation }) {
   // services ou lógica de negócio: apenas controlam visibilidade local.
   const [manageSubscriptionVisible, setManageSubscriptionVisible] = useState(false);
   const [cancelConfirmVisible, setCancelConfirmVisible] = useState(false);
-  const { subscription } = useSubscription();
+  const { subscription, cancelSubscription } = useSubscription();
+  const { refreshProducts } = useProducts();
   const { cliente, token, signOut, updateCliente } = useAuth();
   const [purchaseHistory, setPurchaseHistory] = useState([]);
+  const [isCancellingSubscription, setIsCancellingSubscription] = useState(false);
+  const renderCountRef = useRef(0);
+  renderCountRef.current += 1;
+  console.log('[PerfilScreen] render', {
+    render: renderCountRef.current,
+    hasSubscription: Boolean(subscription),
+    subscriptionTitle: subscription?.title || subscription?.nome_plano || subscription?.nome || subscription?.plan?.title || null,
+    manageSubscriptionVisible,
+    cancelConfirmVisible,
+    isCancellingSubscription,
+  });
 
   const currentCliente = buildProfileSnapshot(cliente);
   const activePlanCategory = trimValue(
@@ -693,6 +713,10 @@ export default function PerfilScreen({ navigation }) {
   const complementoRef = useRef(null);
 
   useEffect(() => {
+    console.log('[PerfilScreen] sync profileDraft effect', {
+      hasCliente: Boolean(cliente),
+      editModalVisible,
+    });
     const nextProfile = buildProfileSnapshot(cliente);
     setProfileDraft(nextProfile);
     originalProfileRef.current = nextProfile;
@@ -705,20 +729,32 @@ export default function PerfilScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
+      console.log('[PerfilScreen] useFocusEffect purchaseHistory start', {
+        hasToken: Boolean(token),
+      });
 
       const loadPurchaseHistory = async () => {
         if (!token) {
           setPurchaseHistory([]);
+          console.log('[PerfilScreen] purchaseHistory skipped - no token');
           return;
         }
 
         setIsLoadingHistory(true);
         try {
           const history = await fetchPurchaseHistory(token);
+          console.log('[PerfilScreen] purchaseHistory fetched', {
+            hasHistory: Array.isArray(history),
+            length: Array.isArray(history) ? history.length : null,
+          });
           if (isActive) {
             setPurchaseHistory(history);
           }
-        } catch {
+        } catch (error) {
+          console.log('[PerfilScreen] purchaseHistory error', {
+            status: error?.status,
+            message: error?.message,
+          });
           if (isActive) {
             setPurchaseHistory([]);
           }
@@ -733,11 +769,16 @@ export default function PerfilScreen({ navigation }) {
 
       return () => {
         isActive = false;
+        console.log('[PerfilScreen] useFocusEffect purchaseHistory cleanup');
       };
     }, [token]),
   );
 
   useEffect(() => {
+    console.log('[PerfilScreen] edit modal sync effect', {
+      clienteChanged: Boolean(cliente),
+      editModalVisible,
+    });
     if (!editModalVisible) {
       setProfileDraft(buildProfileSnapshot(cliente));
       originalProfileRef.current = buildProfileSnapshot(cliente);
@@ -785,13 +826,16 @@ export default function PerfilScreen({ navigation }) {
     setManageSubscriptionVisible(true);
   };
 
-  const closeManageSubscription = () => {
+  const closeManageSubscription = (onClosed) => {
     Animated.timing(manageSheetAnim, {
       toValue: 0,
       duration: 220,
       useNativeDriver: true,
     }).start(() => {
       setManageSubscriptionVisible(false);
+      if (typeof onClosed === "function") {
+        onClosed();
+      }
     });
   };
 
@@ -799,6 +843,9 @@ export default function PerfilScreen({ navigation }) {
   const cancelSheetAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    console.log('[PerfilScreen] cancelConfirmVisible effect', {
+      cancelConfirmVisible,
+    });
     if (cancelConfirmVisible) {
       cancelSheetAnim.setValue(0);
       Animated.timing(cancelSheetAnim, {
@@ -810,27 +857,65 @@ export default function PerfilScreen({ navigation }) {
   }, [cancelConfirmVisible]);
 
   const openCancelConfirm = () => {
+    console.log('[PerfilScreen] openCancelConfirm');
     setCancelConfirmVisible(true);
   };
 
   const closeCancelConfirm = () => {
+    console.log('[PerfilScreen] closeCancelConfirm start');
     Animated.timing(cancelSheetAnim, {
       toValue: 0,
       duration: 220,
       useNativeDriver: true,
     }).start(() => {
+      console.log('[PerfilScreen] closeCancelConfirm finished');
       setCancelConfirmVisible(false);
     });
   };
 
-  // Confirmação de cancelamento — sem backend/API integrados ainda.
-  // Fecha o modal de confirmação e informa que a integração virá futuramente.
-  const handleConfirmCancelSubscription = () => {
-    closeCancelConfirm();
-    Alert.alert(
-      "Em breve",
-      "O cancelamento de assinatura será integrado em uma próxima atualização.",
-    );
+  // Confirmação de cancelamento — atualiza o backend e limpa o estado global.
+  const handleConfirmCancelSubscription = async () => {
+    if (isCancellingSubscription) {
+      console.log('[PerfilScreen] cancel handler skipped - already cancelling');
+      return;
+    }
+
+    console.log('[PerfilScreen] cancel handler start', {
+      hasToken: Boolean(token),
+    });
+    setIsCancellingSubscription(true);
+
+    try {
+      console.log('[PerfilScreen] before cancelSubscription()');
+      const response = await cancelSubscription(token);
+      console.log('[PerfilScreen] after cancelSubscription()', {
+        hasResponse: Boolean(response),
+        message: response?.message,
+      });
+      await refreshProducts().catch((error) => {
+        console.log('[PerfilScreen] refreshProducts after cancel failed', {
+          status: error?.status,
+          message: error?.message,
+        });
+      });
+      closeCancelConfirm();
+      Alert.alert(
+        "Assinatura cancelada",
+        response?.message || "Sua assinatura foi cancelada com sucesso.",
+      );
+    } catch (error) {
+      console.log('[PerfilScreen] cancel handler error', {
+        status: error?.status,
+        message: error?.message,
+      });
+      Alert.alert(
+        "Não foi possível cancelar",
+        error?.message || "Tente novamente em instantes.",
+      );
+    } finally {
+      console.log('[PerfilScreen] cancel handler finally');
+      setIsCancellingSubscription(false);
+    }
   };
 
   // Placeholder do histórico de pagamentos — funcionalidade futura.
@@ -1265,7 +1350,9 @@ export default function PerfilScreen({ navigation }) {
                 <Text style={ps.actionWideSubtitle}>Ver histórico e detalhes dos pedidos</Text>
               </View>
             </View>
-            <Ionicons name="chevron-forward" size={16} color={DS.textMuted} />
+            <View style={ps.actionWideTrailing}>
+              <Ionicons name="chevron-forward" size={16} color={DS.textMuted} />
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -1946,8 +2033,7 @@ export default function PerfilScreen({ navigation }) {
                 style={ps.manageDangerBtn}
                 activeOpacity={0.85}
                 onPress={() => {
-                  closeManageSubscription();
-                  openCancelConfirm();
+                  closeManageSubscription(openCancelConfirm);
                 }}
               >
                 <Ionicons name="close-circle-outline" size={16} color={DS.logoutText} />
@@ -1971,10 +2057,14 @@ export default function PerfilScreen({ navigation }) {
         animationType="none"
         transparent
         visible={cancelConfirmVisible}
-        onRequestClose={closeCancelConfirm}
+        onRequestClose={() => {
+          console.log('[PerfilScreen] cancel modal onRequestClose');
+          closeCancelConfirm();
+        }}
         statusBarTranslucent
       >
         <Animated.View
+          pointerEvents="box-none"
           style={[
             ps.cancelOverlay,
             {
@@ -1985,10 +2075,12 @@ export default function PerfilScreen({ navigation }) {
             },
           ]}
         >
-          <TouchableOpacity
+          <Pressable
             style={StyleSheet.absoluteFill}
-            activeOpacity={1}
-            onPress={closeCancelConfirm}
+            onPress={() => {
+              console.log('[PerfilScreen] cancel backdrop press');
+              closeCancelConfirm();
+            }}
           />
 
           <Animated.View
@@ -2033,7 +2125,10 @@ export default function PerfilScreen({ navigation }) {
               <TouchableOpacity
                 style={ps.cancelBackBtn}
                 activeOpacity={0.85}
-                onPress={closeCancelConfirm}
+                onPress={() => {
+                  console.log('[PerfilScreen] cancel back button press');
+                  closeCancelConfirm();
+                }}
               >
                 <Text style={ps.cancelBackBtnText}>Voltar</Text>
               </TouchableOpacity>
@@ -2041,7 +2136,11 @@ export default function PerfilScreen({ navigation }) {
               <TouchableOpacity
                 style={ps.cancelConfirmBtn}
                 activeOpacity={0.85}
-                onPress={handleConfirmCancelSubscription}
+                disabled={isCancellingSubscription}
+                onPress={() => {
+                  console.log('[PerfilScreen] cancel confirm button press');
+                  handleConfirmCancelSubscription();
+                }}
               >
                 <Text style={ps.cancelConfirmBtnText}>Confirmar cancelamento</Text>
               </TouchableOpacity>
@@ -2067,7 +2166,7 @@ export default function PerfilScreen({ navigation }) {
 //  - HERO / MEMBERSHIP / BOAS-VINDAS / AÇÕES RÁPIDAS / DADOS PESSOAIS / SAIR
 //  - HISTÓRICO / MODAIS DE COMPRAS
 //  - GERENCIAR ASSINATURA
-const makePs = (DS) =>
+const makePsLegacy = (DS) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -2751,7 +2850,7 @@ const makePs = (DS) =>
 // Convertido para factory makeEditStyles(DS). O popup mantém a MESMA estrutura,
 // mesmo layout e mesmo comportamento — apenas os tokens de cor mudam com o tema.
 // ─────────────────────────────────────────────────────────────────────────────
-const makeEditStyles = (DS) => {
+const makeEditStylesLegacy = (DS) => {
   const styles = StyleSheet.create({
     overlay: {
       flex: 1,

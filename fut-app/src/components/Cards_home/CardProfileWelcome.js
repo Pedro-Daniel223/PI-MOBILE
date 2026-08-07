@@ -61,6 +61,14 @@ export default function CardProfileWelcome() {
   const { cliente } = useAuth();
   const { subscription, loadingSubscription } = useSubscription();
   const { isDark, toggleTheme } = useTheme();
+  const renderCountRef = useRef(0);
+  renderCountRef.current += 1;
+  console.log('[CardProfileWelcome] render', {
+    render: renderCountRef.current,
+    loadingSubscription,
+    hasSubscription: Boolean(subscription),
+    subscriptionTitle: subscription?.title || subscription?.nome_plano || subscription?.plan?.title || null,
+  });
   const avatarUri = cliente?.url_foto_clientes?.trim() || 'https://i.pravatar.cc/150?img=12';
 
   // â”€â”€ LÃ³gica original â€” intacta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

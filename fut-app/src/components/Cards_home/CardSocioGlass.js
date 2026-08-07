@@ -62,6 +62,13 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
   // â”€â”€ LÃ³gica original â€” intacta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const { subscription } = useSubscription();
+  const renderCountRef = useRef(0);
+  renderCountRef.current += 1;
+  console.log('[CardSocioGlass] render', {
+    render: renderCountRef.current,
+    hasSubscription: Boolean(subscription),
+    subscriptionTitle: subscription?.title || subscription?.nome_plano || subscription?.plan?.title || null,
+  });
   const floatAnim = useRef(new Animated.Value(0)).current;
   const pressAnim = useRef(new Animated.Value(1)).current;
   const planoAtivo = subscription?.title

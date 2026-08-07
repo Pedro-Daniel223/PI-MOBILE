@@ -1,6 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useAuth } from './AuthContext';
-import { getMinhaAssinatura } from '../services/subscriptionService';
+import { cancelarAssinatura, getMinhaAssinatura } from '../services/subscriptionService';
 
 const SubscriptionContext = createContext(null);
 
@@ -12,6 +12,25 @@ const normalizeSubscriptionPayload = (payload) => {
   const source = payload.assinatura || payload.subscription || payload.plano || payload.plan || payload.categoria || payload;
 
   if (!source) {
+    return null;
+  }
+
+  const hasMeaningfulPlanData = Boolean(
+    source.title
+    || source.nome_plano
+    || source.nome
+    || source.nome_categoria_clientes
+    || source.price
+    || source.valor
+    || source.preco
+    || source.preco_categ
+    || source.tier
+    || source.plano_id
+    || source.id
+    || source.id_categoria_cliente
+  );
+
+  if (!hasMeaningfulPlanData) {
     return null;
   }
 
@@ -57,16 +76,38 @@ export function SubscriptionProvider({ children }) {
   const [purchaseHistory, setPurchaseHistory] = useState([]);
   const [loadingSubscription, setLoadingSubscription] = useState(true);
   const { authenticated, token } = useAuth();
+  const renderCountRef = useRef(0);
+  renderCountRef.current += 1;
+  console.log('[SubscriptionContext] render', {
+    render: renderCountRef.current,
+    authenticated,
+    hasToken: Boolean(token),
+    loadingSubscription,
+    hasSubscription: Boolean(subscription),
+    subscriptionTitle: subscription?.title || subscription?.nome_plano || subscription?.nome || subscription?.plan?.title || null,
+  });
 
   const fetchSubscriptionFromServer = useCallback(async (providedToken) => {
     const currentToken = providedToken || token;
 
     if (!currentToken || !authenticated) {
+      console.log('[SubscriptionContext] fetchSubscriptionFromServer skipped', {
+        hasToken: Boolean(currentToken),
+        authenticated,
+      });
       return null;
     }
 
+    console.log('[SubscriptionContext] fetchSubscriptionFromServer start', {
+      authenticated,
+      hasToken: Boolean(currentToken),
+    });
     const response = await getMinhaAssinatura(currentToken);
     const normalized = normalizeSubscriptionPayload(response);
+    console.log('[SubscriptionContext] fetchSubscriptionFromServer success', {
+      normalized: Boolean(normalized),
+      title: normalized?.title || normalized?.nome_plano || normalized?.nome || normalized?.plan?.title || null,
+    });
     setSubscription(normalized);
     return normalized;
   }, [authenticated, token]);
@@ -75,16 +116,33 @@ export function SubscriptionProvider({ children }) {
     const currentToken = providedToken || token;
 
     if (!currentToken || !authenticated) {
+      console.log('[SubscriptionContext] refreshSubscription skipped', {
+        hasToken: Boolean(currentToken),
+        authenticated,
+      });
       setSubscription(null);
       setLoadingSubscription(false);
       return null;
     }
 
+    console.log('[SubscriptionContext] refreshSubscription start', {
+      authenticated,
+      hasToken: Boolean(currentToken),
+    });
     setLoadingSubscription(true);
 
     try {
-      return await fetchSubscriptionFromServer(currentToken);
+      const result = await fetchSubscriptionFromServer(currentToken);
+      console.log('[SubscriptionContext] refreshSubscription resolved', {
+        hasResult: Boolean(result),
+        title: result?.title || result?.nome_plano || result?.nome || result?.plan?.title || null,
+      });
+      return result;
     } catch (error) {
+      console.log('[SubscriptionContext] refreshSubscription error', {
+        status: error?.status,
+        message: error?.message,
+      });
       if (error?.status === 404) {
         setSubscription(null);
         return null;
@@ -107,20 +165,40 @@ export function SubscriptionProvider({ children }) {
     const retries = Number.isFinite(Number(options?.retries)) ? Number(options.retries) : 3;
 
     if (!providedToken || !authenticated) {
+      console.log('[SubscriptionContext] syncSubscription skipped', {
+        hasToken: Boolean(providedToken),
+        authenticated,
+      });
       setSubscription(null);
       setLoadingSubscription(false);
       return null;
     }
 
+    console.log('[SubscriptionContext] syncSubscription start', {
+      authenticated,
+      hasToken: Boolean(providedToken),
+      expectedPlanId,
+      retries,
+    });
     setLoadingSubscription(true);
 
     try {
       let normalized = null;
 
       for (let attempt = 0; attempt < retries; attempt += 1) {
+        console.log('[SubscriptionContext] syncSubscription attempt', {
+          attempt: attempt + 1,
+          retries,
+        });
         normalized = await fetchSubscriptionFromServer(providedToken);
 
         const activePlanId = Number(normalized?.plano_id ?? normalized?.id ?? normalized?.id_categoria_cliente);
+        console.log('[SubscriptionContext] syncSubscription attempt result', {
+          attempt: attempt + 1,
+          activePlanId,
+          expectedPlanId,
+          matched: !Number.isFinite(expectedPlanId) || activePlanId === expectedPlanId,
+        });
         if (!Number.isFinite(expectedPlanId) || activePlanId === expectedPlanId) {
           break;
         }
@@ -132,6 +210,10 @@ export function SubscriptionProvider({ children }) {
 
       return normalized;
     } catch (error) {
+      console.log('[SubscriptionContext] syncSubscription error', {
+        status: error?.status,
+        message: error?.message,
+      });
       if (error?.status === 404) {
         setSubscription(null);
         return null;
@@ -148,26 +230,87 @@ export function SubscriptionProvider({ children }) {
     }
   }, [authenticated, fetchSubscriptionFromServer, token]);
 
+  const cancelSubscription = useCallback(async (providedToken) => {
+    const currentToken = providedToken || token;
+
+    if (!currentToken || !authenticated) {
+      console.log('[SubscriptionContext] cancelSubscription skipped', {
+        hasToken: Boolean(currentToken),
+        authenticated,
+      });
+      setSubscription(null);
+      setLoadingSubscription(false);
+      return null;
+    }
+
+    console.log('[SubscriptionContext] cancelSubscription start', {
+      authenticated,
+      hasToken: Boolean(currentToken),
+    });
+    setLoadingSubscription(true);
+
+    try {
+      const response = await cancelarAssinatura(currentToken);
+      console.log('[SubscriptionContext] cancelSubscription api resolved', {
+        ok: Boolean(response),
+        message: response?.message,
+      });
+      setSubscription(null);
+      await refreshSubscription(currentToken);
+      console.log('[SubscriptionContext] cancelSubscription after setSubscription(null)');
+      return response;
+    } catch (error) {
+      console.log('[SubscriptionContext] cancelSubscription error', {
+        status: error?.status,
+        message: error?.message,
+      });
+      if (error?.status === 401) {
+        setSubscription(null);
+        return null;
+      }
+
+      throw error;
+    } finally {
+      setLoadingSubscription(false);
+    }
+  }, [authenticated, refreshSubscription, token]);
+
   useEffect(() => {
     let cancelled = false;
 
     const loadSubscription = async () => {
+      console.log('[SubscriptionContext] loadSubscription effect start', {
+        authenticated,
+        hasToken: Boolean(token),
+      });
       if (!authenticated || !token) {
         setSubscription(null);
         if (!cancelled) {
           setLoadingSubscription(false);
         }
+        console.log('[SubscriptionContext] loadSubscription effect skipped');
         return;
       }
 
       try {
-        await refreshSubscription(token);
-      } catch {
+        const result = await refreshSubscription(token);
+        console.log('[SubscriptionContext] loadSubscription effect resolved', {
+          hasResult: Boolean(result),
+          title: result?.title || result?.nome_plano || result?.nome || result?.plan?.title || null,
+        });
+      } catch (error) {
+        console.log('[SubscriptionContext] loadSubscription effect error', {
+          status: error?.status,
+          message: error?.message,
+        });
         // Mantém o estado anterior e deixa a UI seguir com a sessão atual.
       } finally {
         if (!cancelled) {
           setLoadingSubscription(false);
         }
+        console.log('[SubscriptionContext] loadSubscription effect finally', {
+          cancelled,
+        });
       }
     };
 
@@ -219,6 +362,7 @@ export function SubscriptionProvider({ children }) {
     loadingSubscription,
     refreshSubscription,
     syncSubscription,
+    cancelSubscription,
     purchaseHistory,
     confirmSubscription,
     addToPurchaseHistory,
