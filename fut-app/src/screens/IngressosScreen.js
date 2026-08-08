@@ -5,10 +5,10 @@
  *
  * O QUE FOI PRESERVADO (zero alterações de lógica):
  *   - useState: selectedGame, quantities, modalVisible, successModalVisible
- *   - dadosJogos, decrease, increase, calculateTotal (mesmos imports/serviços)
- *   - handlePurchase (mesma regra: só abre modal de sucesso se total > 0)
+ *   - decrease, increase, calculateTotal (mesmos imports/serviços)
+ *   - handlePurchase agora dispara o checkout real da API quando há token
  *   - onPress dos steppers (decrease/increase) chamando os mesmos handlers
- *   - Modal de seleção de jogo (mesmo array dadosJogos.map, mesmo setSelectedGame)
+ *   - Modal de seleção de jogo preenchido com jogos da API
  *   - Modal de sucesso (mesmo successModalVisible)
  *
  * O QUE FOI ADICIONADO (puramente visual/UX, não quebra nada):
@@ -66,7 +66,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 
-import { dadosJogos } from "../data/dataIngresso";
 import {
   decrease,
   increase,
@@ -168,51 +167,6 @@ const buildCheckoutPayload = (game, quantities) => {
     }));
 
   return { itens: selectedItems };
-};
-
-const buildLocalSummary = (game, quantities) => {
-  const itens = (game?.ingressos || []).filter(
-    (item) => (quantities[item.id] || 0) > 0,
-  );
-  const subtotal = itens.reduce(
-    (sum, item) =>
-      sum + Number(item.preco || 0) * Number(quantities[item.id] || 0),
-    0,
-  );
-  const quantidade_total = itens.reduce(
-    (sum, item) => sum + Number(quantities[item.id] || 0),
-    0,
-  );
-
-  return {
-    itens: itens.map((item) => {
-      const qtd = Number(quantities[item.id] || 0);
-      const total = Number(item.preco || 0) * qtd;
-      return {
-        produto_id: item.produto_id,
-        nome_produtos: item.nome,
-        imagem_produtos: item.imagem,
-        quantidade: qtd,
-        categoria_nome: item.lugar,
-        jogo: null,
-        preco_original_unitario: Number(item.preco || 0),
-        preco_final_unitario: Number(item.preco || 0),
-        economia_unitaria: 0,
-        preco_original_total: total,
-        preco_final_total: total,
-        economia_total: 0,
-        desconto_percent: 0,
-      };
-    }),
-    subtotal_original: Number(subtotal.toFixed(2)),
-    economia_total: 0,
-    total_final: Number(subtotal.toFixed(2)),
-    desconto_total: 0,
-    desconto_percent: 0,
-    quantidade_total,
-    plano_atual: null,
-    beneficios_plano: [],
-  };
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -654,7 +608,14 @@ function GlassCapsuleSelector({ label, onPress, DS }) {
 // ═══════════════════════════════════════════════════════════════════════════
 // PRIMITIVO: GlassBuyButton — cápsula, glow vermelho sutil, respiração, shimmer
 // ═══════════════════════════════════════════════════════════════════════════
-function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim, DS }) {
+function GlassBuyButton({
+  label,
+  onPress,
+  breatheAnim,
+  shimmerAnim,
+  DS,
+  disabled = false,
+}) {
   const pressAnim = useRef(new Value(0)).current;
   const scale = pressAnim.interpolate({
     inputRange: [0, 1],
@@ -669,7 +630,8 @@ function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim, DS }) {
 
   return (
     <TouchableWithoutFeedback
-      onPress={onPress}
+      disabled={disabled}
+      onPress={disabled ? undefined : onPress}
       onPressIn={() =>
         spring(pressAnim, {
           toValue: 1,
@@ -687,7 +649,9 @@ function GlassBuyButton({ label, onPress, breatheAnim, shimmerAnim, DS }) {
         }).start()
       }
     >
-      <Animated.View style={{ transform: [{ scale }] }}>
+      <Animated.View
+        style={{ transform: [{ scale }], opacity: disabled ? 0.45 : 1 }}
+      >
         {/* Glow vermelho externo, muito sutil, respirando */}
         <Animated.View
           pointerEvents="none"
@@ -858,8 +822,8 @@ export default function IngressosScreen({ navigation }) {
   const scrollBottomPadding = buyButtonBottomOffset + 90;
 
   // ── Estado original — intocado ─────────────────────────────────────────
-  const [games, setGames] = useState(dadosJogos);
-  const [selectedGame, setSelectedGame] = useState(dadosJogos[0]);
+  const [games, setGames] = useState([]);
+  const [selectedGame, setSelectedGame] = useState(null);
   const [quantities, setQuantities] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
@@ -949,19 +913,15 @@ export default function IngressosScreen({ navigation }) {
         }
 
         if (!cancelled) {
-          setGames(dadosJogos);
-          setSelectedGame(dadosJogos[0]);
-          setLoadError(
-            "Nenhum jogo disponível no momento. Exibindo dados de demonstração.",
-          );
+          setGames([]);
+          setSelectedGame(null);
+          setLoadError("Nenhum jogo disponível no momento.");
         }
       } catch (error) {
         if (!cancelled) {
-          setGames(dadosJogos);
-          setSelectedGame(dadosJogos[0]);
-          setLoadError(
-            "Não foi possível carregar os ingressos. Exibindo dados de demonstração.",
-          );
+          setGames([]);
+          setSelectedGame(null);
+          setLoadError("Não foi possível carregar os ingressos da API.");
         }
       } finally {
         if (!cancelled) {
@@ -996,11 +956,9 @@ export default function IngressosScreen({ navigation }) {
     }
 
     const timer = setTimeout(async () => {
-      const localSummary = buildLocalSummary(selectedGame, quantities);
-
       if (!token || !hasApiProductIds) {
         if (!cancelled) {
-          setPricingSummary(localSummary);
+          setPricingSummary(null);
         }
         return;
       }
@@ -1015,7 +973,7 @@ export default function IngressosScreen({ navigation }) {
         }
       } catch (error) {
         if (!cancelled) {
-          setPricingSummary(localSummary);
+          setPricingSummary(null);
         }
       }
     }, 280);
@@ -1107,8 +1065,21 @@ export default function IngressosScreen({ navigation }) {
   const ingressosVisiveis = activeCategory
     ? ingressos.filter((i) => i.nome === activeCategory)
     : ingressos;
+  const hasValidApiIngressos = ingressos.some(
+    (item) =>
+      Number.isFinite(Number(item.produto_id)) && Number(item.produto_id) > 0,
+  );
+  const purchaseDisabled =
+    loadingGames || !selectedGame || !hasValidApiIngressos;
   const totalLabelValue =
     pricingSummary?.total_final ?? calculateTotal(ingressos, quantities);
+  const purchaseButtonLabel = purchaseDisabled
+    ? loadingGames
+      ? "CARREGANDO INGRESSOS..."
+      : "SEM INGRESSOS DISPONÍVEIS"
+    : `COMPRAR INGRESSO — R$ ${Number(totalLabelValue || 0)
+        .toFixed(2)
+        .replace(".", ",")}`;
 
   return (
     <View style={{ flex: 1, backgroundColor: DS.bg }}>
@@ -1590,13 +1561,12 @@ export default function IngressosScreen({ navigation }) {
         }}
       >
         <GlassBuyButton
-          label={`COMPRAR INGRESSO — R$ ${Number(totalLabelValue || 0)
-            .toFixed(2)
-            .replace(".", ",")}`}
+          label={purchaseButtonLabel}
           onPress={handlePurchase}
           breatheAnim={breatheAnim}
           shimmerAnim={shimmerAnim}
           DS={DS}
+          disabled={purchaseDisabled}
         />
       </View>
 
