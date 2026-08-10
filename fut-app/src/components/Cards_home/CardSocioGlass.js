@@ -47,6 +47,7 @@ import {
   Image,
   Animated,
   Dimensions,
+  Platform,
 } from 'react-native';
 
 import { BlurView } from 'expo-blur';
@@ -173,19 +174,35 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
           ]}
         >
 
-          {/* G1: BlurView primÃ¡rio â€” translÃºcido neutro */}
+          {/* G1: BlurView primário — translúcido neutro.
+              Android: fallback de BlurView desenha backgroundColor sólido
+              (sem compositor de blur real). Empilhar dois BlurViews aqui
+              somava duas camadas opacas e gerava o "quadrado" visível
+              atrás do card. Mantemos só 1 blur real no Android. */}
           <BlurView
-            intensity={50}
+            intensity={Platform.OS === 'android' ? 45 : 50}
             tint="dark"
             style={StyleSheet.absoluteFill}
           />
 
-          {/* G2: BlurView secundÃ¡rio â€” profundidade, mÃ­nimo */}
-          <BlurView
-            intensity={0}
-            tint="dark"
-            style={[StyleSheet.absoluteFill, { opacity: 0.42 }]}
-          />
+          {/* G2: BlurView secundário — profundidade, mínimo.
+              No Android substituído por gradiente translúcido puro
+              (não é outro blur), preservando a leitura de profundidade
+              sem duplicar a camada de fallback opaca. */}
+          {Platform.OS === 'android' ? (
+            <LinearGradient
+              colors={['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)']}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+          ) : (
+            <BlurView
+              intensity={0}
+              tint="dark"
+              style={[StyleSheet.absoluteFill, { opacity: 0.42 }]}
+            />
+          )}
 
           {/* G3: Tom base do vidro â€” branco-frio, opacidade mÃ­nima
               Neutro puro: sem amarelos, vermelhos ou acinzentados pesados.
@@ -305,7 +322,7 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
             {/* BOTÃƒO â€” estrutura preservada, acabamento refinado */}
             <View style={styles.button}>
               <BlurView
-                intensity={40}
+                intensity={Platform.OS === 'android' ? 55 : 40}
                 tint="dark"
                 style={StyleSheet.absoluteFill}
               />
@@ -512,25 +529,33 @@ export default function CardSocioGlass({ onPress, flatLeft, flatRight, style }) 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const styles = StyleSheet.create({
 
-  // Container externo de transformaÃ§Ã£o â€” sem overflow:hidden.
+  // Container externo de transformação — sem overflow:hidden.
   // Sombras aqui renderizam corretamente no iOS (overflow as cancelaria).
-  // Sombra: neutra, soft, premium â€” sem tonalidades quentes ou avermelhadas.
+  // Sombra: neutra, soft, premium — sem tonalidades quentes ou avermelhadas.
+  // Android: elevation com borderRadius e sem backgroundColor opaco pinta
+  // um retângulo sólido atrás do card (bug de composição do Material
+  // Design quando a view "dona" do elevation é visualmente transparente).
+  // Fix: backgroundColor 'transparent' explícito + elevation reduzida,
+  // deixando a sombra suave (shadow*) carregar o efeito de profundidade.
   outerContainer: {
     height:       250,
     borderRadius: 22,
+    backgroundColor: 'transparent',
     shadowColor:   '#182040',
     shadowOpacity: 0.15,
     shadowRadius:  28,
     shadowOffset:  { width: 0, height: 14 },
-    elevation:     12,
+    elevation: Platform.OS === 'android' ? 6 : 12,
   },
 
-  // Corpo do vidro â€” overflow:hidden para clip do blur e shimmer.
+  // Corpo do vidro — overflow:hidden para clip do blur e shimmer.
+  // Android: fundo levemente mais opaco compensa o blur fraco/fallback,
+  // evitando aspecto "cru"/artificial de transparência mal resolvida.
   glassBody: {
     flex:            1,
     borderRadius:    22,
     overflow:        'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    backgroundColor: Platform.OS === 'android' ? '#151519' : 'rgba(255, 255, 255, 0.02)',
   },
 
   // â”€â”€ ConteÃºdo â€” preservado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -631,5 +656,3 @@ const styles = StyleSheet.create({
   },
 
 });
-
-

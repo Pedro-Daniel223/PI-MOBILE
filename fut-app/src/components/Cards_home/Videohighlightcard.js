@@ -29,6 +29,7 @@ import {
   ImageBackground,
   StyleSheet,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -38,6 +39,8 @@ import PremiumGlassCard from './PremiumGlassCard';
 // Placeholder — substitua pela URL real da thumbnail do vídeo/partida.
 const PLACEHOLDER_THUMB =
   'https://img.youtube.com/vi/K1qcPok3kjQ/maxresdefault.jpg';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const VideoHighlightCard = ({
   onPress,
@@ -51,11 +54,14 @@ const VideoHighlightCard = ({
   borderRadius = 26,
   style,
 }) => {
+  const resolvedWidth = Math.min(width, SCREEN_WIDTH - 40);
+  const resolvedHeight = Math.round((resolvedWidth * height) / width);
+
   return (
     <PremiumGlassCard
       onPress={onPress}
-      width={width}
-      height={height}
+      width={resolvedWidth}
+      height={resolvedHeight}
       borderRadius={borderRadius}
       blurIntensity={55}
       tint="dark"

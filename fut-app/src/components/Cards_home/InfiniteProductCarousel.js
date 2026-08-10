@@ -10,6 +10,8 @@ import {
   View,
   ScrollView,
   StyleSheet,
+  Platform,
+  Dimensions,
 } from 'react-native';
 
 import { BlurView }       from 'expo-blur';
@@ -17,7 +19,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useProducts } from '../../contexts/ProductContext';
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
-const ITEM_WIDTH  = 280;
+// ITEM_WIDTH responsivo: 280 fixo causava overflow em telas Android
+// pequenas (<320px de largura útil). Agora é limitado por uma fração da
+// largura da tela, preservando a proporção visual em telas médias/grandes.
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const ITEM_WIDTH  = Math.min(280, SCREEN_WIDTH * 0.72);
 const CARD_RADIUS = 20;
 const CARD_MARGIN = 8;
 
@@ -27,17 +33,31 @@ const GlassItemWrapper = React.memo(({ children, shimmerX }) => (
 
     <View style={styles.glassBody}>
 
+      {/* Android: BlurView sem compositor nativo desenha um
+          backgroundColor sólido de fallback. Dois BlurViews com
+          intensity=0 empilhados somavam duas camadas opacas idênticas,
+          aparecendo como um "quadrado" atrás do card. Mantemos 1 blur
+          real no Android; a 2ª camada vira gradiente translúcido puro. */}
       <BlurView
-        intensity={0}
+        intensity={Platform.OS === 'android' ? 30 : 0}
         tint="dark"
         style={StyleSheet.absoluteFill}
       />
 
-      <BlurView
-        intensity={0}
-        tint="dark"
-        style={[StyleSheet.absoluteFill, { opacity: 0.20 }]}
-      />
+      {Platform.OS === 'android' ? (
+        <LinearGradient
+          colors={['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+      ) : (
+        <BlurView
+          intensity={0}
+          tint="dark"
+          style={[StyleSheet.absoluteFill, { opacity: 0.20 }]}
+        />
+      )}
 
       <LinearGradient
         colors={['transparent', 'transparent']}
@@ -177,21 +197,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: CARD_MARGIN,
   },
 
+  // Android: elevation com borderRadius e backgroundColor 'transparent'
+  // pinta um retângulo sólido atrás do card (bug de composição do
+  // Material Design). Fix: backgroundColor 'transparent' explícito
+  // + elevation reduzida, sombra suave carrega o efeito de profundidade.
   glassOuter: {
     marginHorizontal: CARD_MARGIN,
     marginVertical:   10,
     borderRadius:     CARD_RADIUS,
+    backgroundColor:  'transparent',
     shadowColor:      '#182040',
     shadowOpacity:    0.14,
     shadowRadius:     24,
     shadowOffset:     { width: 0, height: 12 },
-    elevation:        10,
+    elevation: Platform.OS === 'android' ? 5 : 10,
   },
 
+  // Android: fundo levemente opaco compensa o blur fraco/fallback,
+  // evitando aspecto "cru" de transparência mal resolvida.
   glassBody: {
     borderRadius:    CARD_RADIUS,
     overflow:        'hidden',
-    backgroundColor: 'transparent',
+    backgroundColor: Platform.OS === 'android' ? '#131317' : 'transparent',
   },
 
   glassContent: {

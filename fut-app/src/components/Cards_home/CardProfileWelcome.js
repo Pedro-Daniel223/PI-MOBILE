@@ -43,6 +43,7 @@ import {
   Image,
   Animated,
   Dimensions,
+  Platform,
 } from 'react-native';
 
 import { BlurView } from 'expo-blur';
@@ -51,9 +52,11 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { DEFAULT_AVATAR_URL } from '../../data/dataPerfil';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const { Value, timing, loop, sequence, delay } = Animated;
+const IS_SMALL_SCREEN = SCREEN_WIDTH < 360;
 
 
 export default function CardProfileWelcome() {
@@ -69,7 +72,7 @@ export default function CardProfileWelcome() {
     hasSubscription: Boolean(subscription),
     subscriptionTitle: subscription?.title || subscription?.nome_plano || subscription?.plan?.title || null,
   });
-  const avatarUri = cliente?.url_foto_clientes?.trim() || 'https://i.pravatar.cc/150?img=12';
+  const avatarUri = cliente?.url_foto_clientes?.trim() || DEFAULT_AVATAR_URL;
 
   // â”€â”€ LÃ³gica original â€” intacta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const nomeCompleto = [
@@ -209,7 +212,7 @@ export default function CardProfileWelcome() {
           style={styles.editButton}
           onPress={() => navigation.navigate('Carrinho')}
         >
-          <BlurView intensity={5} tint="dark" style={styles.editBlur}>
+          <BlurView intensity={Platform.OS === 'android' ? 35 : 5} tint="dark" style={styles.editBlur}>
             <Ionicons name="cart-outline" size={16} color="#fff" />
           </BlurView>
         </TouchableOpacity>
@@ -218,7 +221,7 @@ export default function CardProfileWelcome() {
           style={styles.themeButton}
           onPress={toggleTheme}
         >
-          <BlurView intensity={5} tint="dark" style={styles.editBlur}>
+          <BlurView intensity={Platform.OS === 'android' ? 35 : 5} tint="dark" style={styles.editBlur}>
             <Ionicons
               name={isDark ? 'sunny-outline' : 'moon-outline'}
               size={16}
@@ -228,19 +231,35 @@ export default function CardProfileWelcome() {
         </TouchableOpacity>
 
 {/* ------------------------importante---------------------- */}
-        {/* G1: BlurView primÃ¡rio â€” base fosca principal */}
+        {/* G1: BlurView primário — base fosca principal.
+            Android: BlurView não usa compositor nativo (fallback com
+            backgroundColor sólido), então empilhar 2 BlurViews aqui
+            criava um bloco opaco visível ("quadrado" atrás do card).
+            Mantemos apenas 1 BlurView real no Android. */}
         <BlurView
-          intensity={10}
+          intensity={Platform.OS === 'android' ? 40 : 10}
           tint="dark"
           style={StyleSheet.absoluteFill}
         />
 
-        {/* G2: BlurView secundÃ¡rio â€” profundidade adicional */}
-        <BlurView
-          intensity={22}
-          tint="dark"
-          style={[StyleSheet.absoluteFill, { opacity: 0.55 }]}
-        />
+        {/* G2: BlurView secundário — profundidade adicional.
+            No Android isso é substituído por um LinearGradient escuro
+            translúcido puro (sem 2º blur), preservando a leitura de
+            profundidade sem duplicar a camada opaca de fallback. */}
+        {Platform.OS === 'android' ? (
+          <LinearGradient
+            colors={['rgba(10,10,14,0.30)', 'rgba(10,10,14,0.20)']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        ) : (
+          <BlurView
+            intensity={22}
+            tint="dark"
+            style={[StyleSheet.absoluteFill, { opacity: 0.55 }]}
+          />
+        )}
 
         {/* G3: Tom base escuro â€” diagonal para dinamismo */}
         <LinearGradient
@@ -542,26 +561,35 @@ export default function CardProfileWelcome() {
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const styles = StyleSheet.create({
 
-  // Container externo â€” sem overflow:hidden para receber camadas especulares.
-  // Sombras movidas para cÃ¡ pois overflow:hidden as anula no iOS.
+  // Container externo — sem overflow:hidden para receber camadas especulares.
+  // Sombras movidas para cá pois overflow:hidden as anula no iOS.
+  // Android: elevation com borderRadius grande e sem backgroundColor opaco
+  // pinta um retângulo sólido atrás do card (bug de composição do Material
+  // Design). A correção é declarar backgroundColor 'transparent' explícito
+  // (em vez de herdado) e reduzir a elevation, deixando o volume visual
+  // ser feito pela sombra suave em vez do bloco de elevation.
   outerContainer: {
     marginTop:  50,
     borderRadius: 28,
+    backgroundColor: 'transparent',
 
-    // S1: Sombra de levitaÃ§Ã£o â€” grande, difusa
+    // S1: Sombra de levitação — grande, difusa
     shadowColor:   '#1a0a0a',
     shadowOpacity: 0.42,
     shadowRadius:  36,
     shadowOffset:  { width: 0, height: 18 },
-    elevation:     18,
+    elevation: Platform.OS === 'android' ? 8 : 18,
   },
 
-  // Corpo do vidro â€” overflow:hidden necessÃ¡rio para clicar o shimmer e blurs
+  // Corpo do vidro — overflow:hidden necessário para clip do shimmer e blurs.
+  // Android: BlurView não refrata o fundo como no iOS, então um
+  // backgroundColor sólido escuro evita o aspecto "vazio"/artificial que
+  // aparecia atrás do blur fraco do Android.
   wrapper: {
     padding:         20,
     borderRadius:    28,
     overflow:        'hidden',
-    backgroundColor: 'transparent',
+    backgroundColor: Platform.OS === 'android' ? '#101014' : 'transparent',
   },
 
   // â”€â”€ ConteÃºdo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -624,9 +652,9 @@ const styles = StyleSheet.create({
 
   text: {
     color:      '#fff',
-    fontSize:   22,
+    fontSize:   IS_SMALL_SCREEN ? 19 : 22,
     fontWeight: '500',
-    lineHeight: 28,
+    lineHeight: IS_SMALL_SCREEN ? 24 : 28,
   },
 
   // Nome em vermelho â€” preservado integralmente
@@ -669,6 +697,7 @@ const styles = StyleSheet.create({
     overflow:     'hidden',
     borderWidth:  0.75,
     borderColor:  'rgba(255,255,255,0.18)',
+    backgroundColor: Platform.OS === 'android' ? 'rgba(20,20,24,0.55)' : 'transparent',
   },
 
   // â”€â”€ AÃ§Ãµes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -691,6 +720,7 @@ const styles = StyleSheet.create({
     overflow:        'hidden',
     borderWidth:     0.75,
     borderColor:     'rgba(255,255,255,0.16)',
+    backgroundColor: Platform.OS === 'android' ? 'rgba(20,20,24,0.55)' : 'transparent',
   },
 
   // Linha especular interna do botÃ£o â€” aresta de vidro
@@ -713,4 +743,3 @@ const styles = StyleSheet.create({
   },
 
 });
-

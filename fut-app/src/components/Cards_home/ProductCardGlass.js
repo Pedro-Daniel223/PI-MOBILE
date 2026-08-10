@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Animated,
   Alert,
+  Platform,
+  Dimensions,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -136,7 +138,11 @@ export default function ProductCardGlass({ image, title, price, product }) {
       onPressOut={handlePressOut}
     >
       <View style={styles.card}>
-        <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill} />
+        {/* Android: BlurView com intensity muito baixa (10) some quase
+            por completo e deixa só o backgroundColor de fallback plano,
+            reforçando o aspecto artificial. Ajustamos a intensidade só
+            no Android para manter o efeito de vidro perceptível. */}
+        <BlurView intensity={Platform.OS === 'android' ? 30 : 10} tint="dark" style={StyleSheet.absoluteFill} />
 
         <LinearGradient
           colors={[
@@ -207,9 +213,9 @@ export default function ProductCardGlass({ image, title, price, product }) {
 
         {/* INFO */}
         <View style={styles.infoContainer}>
-          <Text style={styles.title}>{productTitle}</Text>
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{productTitle}</Text>
 
-          <Text style={styles.description}>
+          <Text style={styles.description} numberOfLines={2} ellipsizeMode="tail">
             Edição clássica retrô com tecido premium
           </Text>
 
@@ -240,17 +246,28 @@ export default function ProductCardGlass({ image, title, price, product }) {
   );
 }
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+// width responsivo: 260 fixo causava overflow em telas Android estreitas.
+// Limitado por uma fração da largura da tela, preservando a proporção
+// visual original em telas médias/grandes.
+const CARD_WIDTH = Math.min(260, SCREEN_WIDTH * 0.68);
+
 const styles = StyleSheet.create({
   card: {
     borderRadius: 26,
-    width: 260,
+    width: CARD_WIDTH,
     marginRight: 15,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    // Android: elevation com shadowColor custom é ignorado (Android
+    // sempre usa preto para elevation), e um backgroundColor quase
+    // transparente ('0.06') deixa o retângulo de elevation visível como
+    // um "quadrado" atrás do card. Um fundo levemente mais opaco no
+    // Android resolve isso sem alterar a aparência no iOS.
+    backgroundColor: Platform.OS === 'android' ? 'rgba(18,18,22,0.85)' : 'rgba(255,255,255,0.06)',
     shadowColor: '#ff2b2b',
     shadowOpacity: 0.2,
     shadowRadius: 20,
-    elevation: 8,
+    elevation: Platform.OS === 'android' ? 4 : 8,
   },
 
   imageContainer: {

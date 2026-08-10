@@ -1,4 +1,5 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
+import { platformPick } from '../platformUiTokens';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -58,12 +59,15 @@ export const DARK_DS = {
   cardShadowOpacity: 0.30,
 
   // Bottom sheet (GlassBottomSheet)
-  backdropTintColor: 'rgba(0,0,0,0.30)',
-  sheetBorderColor: 'rgba(255,255,255,0.16)',
-  sheetGradientColors: ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)', 'rgba(0,0,0,0.12)'],
+  backdropTintColor: platformPick('rgba(0,0,0,0.30)', 'rgba(0,0,0,0.72)'),
+  sheetBorderColor: platformPick('rgba(255,255,255,0.16)', 'rgba(255,255,255,0.10)'),
+  sheetGradientColors: platformPick(
+    ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)', 'rgba(0,0,0,0.12)'],
+    ['rgba(8,8,8,0.96)', 'rgba(8,8,8,0.90)', 'rgba(0,0,0,0.94)'],
+  ),
   handleColor: 'rgba(255,255,255,0.25)',
   beneficioDotColor: '#e8000f',
-  footerBg: 'rgba(10,10,10,0.55)',
+  footerBg: platformPick('rgba(10,10,10,0.55)', 'rgba(6,6,6,0.92)'),
   footerTopLineColor: 'rgba(255,255,255,0.10)',
   fecharBorderColor: 'rgba(255,255,255,0.25)',
   assinarSpecularColor: 'rgba(255,255,255,0.45)',
@@ -124,12 +128,15 @@ export const LIGHT_DS = {
   cardShadowOpacity: 0.12,
 
   // Bottom sheet (GlassBottomSheet)
-  backdropTintColor: 'rgba(30,15,15,0.28)',
-  sheetBorderColor: 'rgba(20,10,10,0.10)',
-  sheetGradientColors: ['rgba(255,255,255,0.65)', 'rgba(255,255,255,0.35)', 'rgba(20,10,10,0.04)'],
+  backdropTintColor: platformPick('rgba(30,15,15,0.28)', 'rgba(0,0,0,0.72)'),
+  sheetBorderColor: platformPick('rgba(20,10,10,0.10)', 'rgba(255,255,255,0.10)'),
+  sheetGradientColors: platformPick(
+    ['rgba(255,255,255,0.65)', 'rgba(255,255,255,0.35)', 'rgba(20,10,10,0.04)'],
+    ['rgba(8,8,8,0.96)', 'rgba(8,8,8,0.90)', 'rgba(0,0,0,0.94)'],
+  ),
   handleColor: 'rgba(20,10,10,0.18)',
   beneficioDotColor: '#a3000a',
-  footerBg: 'rgba(255,251,250,0.75)',
+  footerBg: platformPick('rgba(255,251,250,0.75)', 'rgba(6,6,6,0.92)'),
   footerTopLineColor: 'rgba(20,10,10,0.08)',
   fecharBorderColor: 'rgba(20,10,10,0.14)',
   assinarSpecularColor: 'rgba(255,255,255,0.55)',
@@ -327,7 +334,15 @@ export const makeSheetStyles = (DS) =>
       bottom: 0,
       left: 0,
       right: 0,
-      maxHeight: SCREEN_HEIGHT * 0.82,
+      ...Platform.select({
+        ios: {
+          maxHeight: SCREEN_HEIGHT * 0.82,
+        },
+        android: {
+          height: SCREEN_HEIGHT * 0.88,
+          maxHeight: SCREEN_HEIGHT * 0.88,
+        },
+      }),
     },
     sheetBody: {
       borderTopLeftRadius: 32,
@@ -336,10 +351,18 @@ export const makeSheetStyles = (DS) =>
       paddingHorizontal: DS.spacing.xl,
       paddingTop: 14,
       paddingBottom: 0,
-      minHeight: SCREEN_HEIGHT * 0.6,
       borderWidth: 0.75,
       borderBottomWidth: 0,
       borderColor: DS.sheetBorderColor,
+      ...Platform.select({
+        ios: {
+          minHeight: SCREEN_HEIGHT * 0.6,
+        },
+        android: {
+          flex: 1,
+          minHeight: 0,
+        },
+      }),
     },
     handle: {
       alignSelf: 'center',
@@ -412,6 +435,7 @@ export const makeSheetStyles = (DS) =>
       paddingTop: 14,
       paddingBottom: 28,
       backgroundColor: DS.footerBg,
+      flexShrink: 0,
     },
     footerTopLine: {
       height: 0.5,

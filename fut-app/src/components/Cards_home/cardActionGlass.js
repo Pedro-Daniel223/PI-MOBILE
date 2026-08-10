@@ -42,6 +42,7 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Platform,
 } from 'react-native';
 
 import { BlurView } from 'expo-blur';
@@ -157,19 +158,33 @@ export default function CardActionGlass({
           ]}
         >
 
-          {/* G1: BlurView primário — base translúcida leve */}
+          {/* G1: BlurView primário — base translúcida leve.
+              Android: BlurView usa fallback com backgroundColor sólido
+              (sem compositor de blur real). Empilhar 2 BlurViews aqui
+              somava duas camadas opacas e gerava o "quadrado" atrás
+              do card. Mantemos 1 blur real no Android. */}
           <BlurView
-            intensity={50}
+            intensity={Platform.OS === 'android' ? 45 : 50}
             tint="dark"
             style={StyleSheet.absoluteFill}
           />
 
-          {/* G2: BlurView secundário — camada de profundidade, muito sutil */}
-          <BlurView
-            intensity={0}
-            tint="dark"
-            style={[StyleSheet.absoluteFill, { opacity: 0.42 }]}
-          />
+          {/* G2: BlurView secundário — camada de profundidade, muito sutil.
+              No Android substituído por gradiente translúcido puro. */}
+          {Platform.OS === 'android' ? (
+            <LinearGradient
+              colors={['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)']}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+          ) : (
+            <BlurView
+              intensity={0}
+              tint="dark"
+              style={[StyleSheet.absoluteFill, { opacity: 0.42 }]}
+            />
+          )}
 
           {/* G3: Tom base do vidro — branco-frio, opacidade mínima
               O vidro Apple tem um tint frio discreto; aqui muito sutil
@@ -294,7 +309,7 @@ export default function CardActionGlass({
             {/* BOTÃO GLASS — estrutura preservada, acabamento refinado */}
             <View style={styles.button}>
               <BlurView
-                intensity={15}
+                intensity={Platform.OS === 'android' ? 55 : 15}
                 tint="dark"
                 style={StyleSheet.absoluteFill}
               />
@@ -501,24 +516,31 @@ const styles = StyleSheet.create({
 
   // Container de transformação — sem overflow:hidden.
   // Sombras aqui funcionam corretamente no iOS (overflow:hidden as cancelaria).
+  // Android: elevation com borderRadius e sem backgroundColor opaco pinta
+  // um retângulo sólido atrás do card (bug de composição do Material
+  // Design). Fix: backgroundColor 'transparent' explícito + elevation
+  // reduzida, sombra suave (shadow*) carrega o efeito de profundidade.
   outerContainer: {
     height:       250,
     borderRadius: 22,
+    backgroundColor: 'transparent',
     // Sombra premium: soft, difusa, neutral — levitação sem peso
     shadowColor:   '#182040',
     shadowOpacity: 0.16,
     shadowRadius:  28,
     shadowOffset:  { width: 0, height: 14 },
-    elevation:     12,
+    elevation: Platform.OS === 'android' ? 6 : 12,
   },
 
   // Corpo do vidro — overflow:hidden para clip do blur e shimmer.
   // Mesmas dimensões do outerContainer via flex: 1.
+  // Android: fundo levemente mais opaco compensa o blur fraco/fallback,
+  // evitando aspecto "cru" de transparência mal resolvida.
   glassBody: {
     flex:            1,
     borderRadius:    22,
     overflow:        'hidden',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: Platform.OS === 'android' ? '#141418' : 'rgba(255,255,255,0.03)',
   },
 
   // ── Conteúdo — preservado ─────────────────────────────────────────────

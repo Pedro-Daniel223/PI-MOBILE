@@ -10,6 +10,7 @@ import {
   Easing,
   Dimensions,
 } from "react-native";
+import { platformPick } from "../styles/platformUiTokens";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -119,7 +120,10 @@ const PurchaseDetailsModal = React.memo(function PurchaseDetailsModal({
       <Animated.View
         style={[
           styles.overlay,
-          { backgroundColor: modalOverlay || "rgba(0,0,0,0.55)", opacity: overlayAnim },
+          {
+            backgroundColor: modalOverlay || platformPick("rgba(0,0,0,0.55)", "rgba(0,0,0,0.80)"),
+            opacity: overlayAnim,
+          },
         ]}
       >
         <TouchableOpacity
@@ -131,19 +135,31 @@ const PurchaseDetailsModal = React.memo(function PurchaseDetailsModal({
         <Animated.View
           style={[
             styles.modalCard,
+            {
+              backgroundColor:
+                platformPick("transparent", modalBg || "rgba(6,6,6,0.94)"),
+            },
             { transform: [{ translateY: sheetAnim }] },
           ]}
         >
           <BlurView
-            intensity={60}
+            intensity={platformPick(60, 52)}
             tint={modalBlurTint || "dark"}
             style={StyleSheet.absoluteFill}
           />
           <LinearGradient
-            colors={modalFillGradient || ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]}
+            colors={modalFillGradient || platformPick(
+              ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"],
+              ["rgba(10,10,10,0.96)", "rgba(6,6,6,0.90)"],
+            )}
             style={StyleSheet.absoluteFill}
           />
-          <View style={[styles.modalBorder, { borderColor: modalBorder || "rgba(255,255,255,0.16)" }]} />
+          <View
+            style={[
+              styles.modalBorder,
+              { borderColor: modalBorder || platformPick("rgba(255,255,255,0.16)", "rgba(255,255,255,0.10)") },
+            ]}
+          />
           <View style={styles.specularTop} />
 
           <View style={styles.handleWrap}>

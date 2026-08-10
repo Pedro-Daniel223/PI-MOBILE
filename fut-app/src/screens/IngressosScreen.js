@@ -62,6 +62,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { platformPick } from "../styles/platformUiTokens";
 
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -1594,6 +1595,8 @@ export default function IngressosScreen({ navigation }) {
                 borderRadius={28}
                 padding={20}
                 enableShimmer={false}
+                style={{ backgroundColor: platformPick("transparent", "rgba(6,6,8,0.92)") }}
+                innerStyle={{ backgroundColor: platformPick("transparent", "rgba(6,6,8,0.94)") }}
                 DS={DS}
               >
                 <Text
@@ -1671,6 +1674,8 @@ export default function IngressosScreen({ navigation }) {
                 borderRadius={26}
                 padding={26}
                 enableShimmer={false}
+                style={{ backgroundColor: platformPick("transparent", "rgba(6,6,8,0.92)") }}
+                innerStyle={{ backgroundColor: platformPick("transparent", "rgba(6,6,8,0.94)") }}
                 DS={DS}
               >
                 <View style={{ alignItems: "center" }}>

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { platformPick } from '../platformUiTokens';
 
 // ─────────────────────────────────────────────────────────────────────────
 // DESIGN TOKENS — IngressosScreen (Liquid Glass, Light/Dark)
@@ -99,8 +100,8 @@ export const DARK_DS = {
   dividerColorSoft: 'rgba(255,255,255,0.08)',
 
   // Modal
-  modalBackdrop: 'rgba(0,0,0,0.55)',
-  successBackdrop: 'rgba(0,0,0,0.6)',
+  modalBackdrop: platformPick('rgba(0,0,0,0.55)', 'rgba(0,0,0,0.78)'),
+  successBackdrop: platformPick('rgba(0,0,0,0.6)', 'rgba(0,0,0,0.80)'),
   successIconColor: 'rgba(120,255,170,0.9)',
   cancelTextColor: 'rgba(255,120,120,0.9)',
   okButtonBg: 'rgba(255,255,255,0.12)',
@@ -178,8 +179,8 @@ export const LIGHT_DS = {
   dividerColorSoft: 'rgba(30,38,58,0.08)',
 
   // Modal
-  modalBackdrop: 'rgba(20,24,36,0.42)',
-  successBackdrop: 'rgba(20,24,36,0.46)',
+  modalBackdrop: platformPick('rgba(20,24,36,0.42)', 'rgba(0,0,0,0.78)'),
+  successBackdrop: platformPick('rgba(20,24,36,0.46)', 'rgba(0,0,0,0.80)'),
   successIconColor: '#1f8a4c',
   cancelTextColor: '#8b0009',
   okButtonBg: 'rgba(30,38,58,0.06)',

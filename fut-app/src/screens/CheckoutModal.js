@@ -46,6 +46,7 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
+import { platformPick } from '../styles/platformUiTokens';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -74,10 +75,10 @@ const DS = {
   textPrimary: 'rgba(255,255,255,0.94)',
   textSecondary: 'rgba(255,255,255,0.58)',
   textTertiary: 'rgba(255,255,255,0.38)',
-  glassFillTop: 'rgba(255,255,255,0.12)',
-  glassFillBottom: 'rgba(255,255,255,0.04)',
-  borderOuter: 'rgba(255,255,255,0.14)',
-  borderInner: 'rgba(255,255,255,0.07)',
+  glassFillTop: platformPick('rgba(255,255,255,0.12)', 'rgba(255,255,255,0.06)'),
+  glassFillBottom: platformPick('rgba(255,255,255,0.04)', 'rgba(255,255,255,0.02)'),
+  borderOuter: platformPick('rgba(255,255,255,0.14)', 'rgba(255,255,255,0.10)'),
+  borderInner: platformPick('rgba(255,255,255,0.07)', 'rgba(255,255,255,0.05)'),
   success: '#3ddc84',
 };
 
@@ -178,7 +179,11 @@ const resolveCopyValue = (value, context) => (typeof value === 'function' ? valu
 const GlassSurface = ({ style, innerStyle, intensity = 42, tint = 'dark', children }) => (
   <View style={[stylesGlass.outer, style]}>
     <View style={[stylesGlass.inner, innerStyle]}>
-      <BlurView intensity={intensity} tint={tint} style={StyleSheet.absoluteFill} />
+      <BlurView
+        intensity={platformPick(intensity, Math.max(22, intensity - 10))}
+        tint={tint}
+        style={StyleSheet.absoluteFill}
+      />
       <BlurView
         intensity={Math.max(10, intensity - 26)}
         tint="dark"
@@ -211,6 +216,7 @@ const stylesGlass = StyleSheet.create({
   inner: {
     borderRadius: 24,
     overflow: 'hidden',
+    backgroundColor: platformPick('transparent', 'rgba(5,5,7,0.94)'),
   },
   borderOuter: {
     position: 'absolute',
@@ -1005,7 +1011,7 @@ const s = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   backdrop: {
-    backgroundColor: 'rgba(0,0,0,0.62)',
+    backgroundColor: platformPick('rgba(0,0,0,0.62)', 'rgba(0,0,0,0.80)'),
   },
   panel: {
     width: '100%',
@@ -1022,7 +1028,7 @@ const s = StyleSheet.create({
     borderTopRightRadius: 28,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    backgroundColor: DS.bg0,
+    backgroundColor: platformPick(DS.bg0, 'rgba(5,5,7,0.96)'),
   },
 
   header: {

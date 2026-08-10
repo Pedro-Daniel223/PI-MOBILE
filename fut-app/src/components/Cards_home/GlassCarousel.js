@@ -45,6 +45,7 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
@@ -81,7 +82,12 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           SHADOW SYSTEM — S1 + S2 + S3
       ══════════════════════════════════════════════════════════════════ */}
 
-      {/* S1. Levitação: grande, difusa */}
+      {/* S1. Levitação: grande, difusa.
+          Android: backgroundColor 'transparent' + elevation alto é a
+          combinação que faz o Material Design pintar um retângulo sólido
+          atrás do card com borderRadius (bug de composição do elevation).
+          No Android reduzimos bastante a elevation e confiamos na
+          sombra suave (shadow*) para o efeito de profundidade. */}
       <View
         pointerEvents="none"
         style={{
@@ -94,12 +100,14 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           shadowOffset: { width: 0, height: 22 },
           shadowOpacity: 0.55,
           shadowRadius: 44,
-          elevation: 30,
+          elevation: Platform.OS === 'android' ? 4 : 30,
           marginHorizontal: 10,
         }}
       />
 
-      {/* S2. Contato: próxima, sharp */}
+      {/* S2. Contato: próxima, sharp.
+          Android: mesma correção — elevation reduzida para evitar somar
+          um 2º retângulo sólido por cima do S1. */}
       <View
         pointerEvents="none"
         style={{
@@ -113,6 +121,7 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           shadowOffset: { width: 0, height: 6 },
           shadowOpacity: 0.28,
           shadowRadius: 12,
+          elevation: Platform.OS === 'android' ? 0 : 0,
           marginHorizontal: 10,
           left: CARD_WIDTH * 0.09,
         }}
@@ -153,22 +162,39 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           borderRadius: CARD_RADIUS,
           overflow: 'hidden',
           marginHorizontal: 0,
+          // Android: fundo levemente opaco compensa o blur fraco/fallback,
+          // evitando aspecto "cru" de transparência mal resolvida.
+          backgroundColor: Platform.OS === 'android' ? '#0d0d11' : 'transparent',
         }}
       >
 
-        {/* G1. BlurView primário — base fosca principal */}
+        {/* G1. BlurView primário — base fosca principal.
+            Android: BlurView usa fallback com backgroundColor sólido
+            (sem compositor de blur real). Empilhar 2 BlurViews aqui
+            somava duas camadas opacas, criando o "quadrado" atrás do
+            card. Mantemos 1 blur real no Android. */}
         <BlurView
-          intensity={10}
+          intensity={Platform.OS === 'android' ? 40 : 10}
           tint="dark"
           style={StyleSheet.absoluteFill}
         />
 
-        {/* G2. BlurView secundário — camada de profundidade */}
-        <BlurView
-          intensity={28}
-          tint="dark"
-          style={[StyleSheet.absoluteFill, { opacity: 0.55 }]}
-        />
+        {/* G2. BlurView secundário — camada de profundidade.
+            No Android substituído por gradiente translúcido puro. */}
+        {Platform.OS === 'android' ? (
+          <LinearGradient
+            colors={['rgba(10,10,14,0.30)', 'rgba(10,10,14,0.20)']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        ) : (
+          <BlurView
+            intensity={28}
+            tint="dark"
+            style={[StyleSheet.absoluteFill, { opacity: 0.55 }]}
+          />
+        )}
 
         {/* G3. Tom base naval escuro — identidade premium */}
         <LinearGradient
