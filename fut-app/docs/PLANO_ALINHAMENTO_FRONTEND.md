@@ -11,7 +11,7 @@
 | Home | `HomeScreen.js` | mock em `dataHeroSlide.js` |
 | Loja | `LojaScreens.js`, `DetalhesProdutosScreens.js` | mocks locais |
 | Carrinho | `CarrinhosScreen.js` | estado local via `CartContext` |
-| Ingressos | `IngressosScreen.js` | `dataIngresso.js` (mock) |
+| Ingressos | `IngressosScreen.js` | API (`/api/ingressos/`, `/api/ingressos/preview/`, `/api/ingressos/comprar/`) |
 | Sócios | `SociosScreen.js` | dado fixo |
 | Autenticação | `LoginScreen.js` (+ biometria), `CadastroScreen.js` | localStorage |
 | Recuperação de senha | `EsqueceuSenhaScreen.js`, `VerificarCodigoScreens.js`, `NovaSenhaScreen.js` | sem integração |
@@ -85,7 +85,7 @@ Não entrará neste app: área de funcionários/staff (será outro sistema).
 ### 4) Ingressos
 - [ ] Backend: `JogosViewSet`, `TimesViewSet`.
 - [ ] Frontend:
-  - [ ] `IngressosScreen.js`: substituir `dataIngresso.js` por `/api/jogos/` + `/api/times/`.
+  - [x] `IngressosScreen.js`: substituir `dataIngresso.js` por `/api/ingressos/`, `/api/ingressos/preview/` e `/api/ingressos/comprar/`.
   - [ ] Garantir que os campos usados (`dia`, `hora`, `local`, `casa`, `times`) vem do serializer do backend.
 
 ### 5) Carrinho + Checkout
