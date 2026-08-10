@@ -10,6 +10,24 @@ const formatCurrencyBRL = (value) =>
     currency: 'BRL',
   });
 
+const normalizeCategory = (value) =>
+  String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+const isIngressoProduct = (produto = {}) => {
+  const rawCategory =
+    produto.categoria_produtos ??
+    produto.categoria ??
+    produto.category ??
+    produto.cat ??
+    '';
+
+  return normalizeCategory(rawCategory).includes('ingresso');
+};
+
 const extractListPayload = (payload) => {
   if (Array.isArray(payload)) {
     return payload;
@@ -187,7 +205,9 @@ export const clearCachedProducts = () => {
 
 export const listarProdutos = async (token) => {
   const payload = await get('/api/produtos/', token);
-  const produtos = extractListPayload(payload).map((produto, index) => normalizeProduct(produto, index));
+  const produtos = extractListPayload(payload)
+    .map((produto, index) => normalizeProduct(produto, index))
+    .filter((produto) => !isIngressoProduct(produto));
 
   console.log('[productService] listarProdutos', {
     total: produtos.length,

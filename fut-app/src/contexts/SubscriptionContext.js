@@ -34,11 +34,13 @@ const normalizeSubscriptionPayload = (payload) => {
     return null;
   }
 
-  const title = source.title
+  const title = String(
+    source.title
     || source.nome_plano
     || source.nome
     || source.nome_categoria_clientes
-    || null;
+    || ''
+  ).toUpperCase();
 
   const price = source.price
     ?? source.valor

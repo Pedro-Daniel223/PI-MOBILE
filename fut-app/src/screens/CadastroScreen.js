@@ -66,12 +66,13 @@ const formatCEP = (value) => {
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 const isValidPassword = (value) => {
-    const password = String(value || '');
-    return (
-        password.length >= 8 &&
-        /[A-Z]/.test(password) &&
-        /\d/.test(password)
-    );
+  const password = String(value || '');
+  return (
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /\d/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  );
 };
 
 export default function CadastroScreen({ navigation }) {
@@ -170,7 +171,7 @@ export default function CadastroScreen({ navigation }) {
         if (!telefone.trim()) next.telefone = 'Informe seu telefone';
         if (!senha) next.senha = 'Informe uma senha';
         else if (!isValidPassword(senha)) {
-            next.senha = 'A senha deve ter 8 caracteres, 1 letra maiúscula e 1 número';
+          next.senha = 'A senha deve ter 8 caracteres, 1 letra maiúscula, 1 número e 1 caractere especial';
         }
         if (!confirm) next.confirm = 'Confirme sua senha';
         else if (senha !== confirm) next.confirm = 'As senhas não coincidem';
@@ -453,6 +454,7 @@ export default function CadastroScreen({ navigation }) {
                                             clearError('senha');
                                         }}
                                         secureTextEntry={!showPass}
+                                        keyboardType="default"
                                         style={[styles.inputStyle, errors.senha && localStyles.inputErrorBorder]}
                                         rightComponent={
                                             <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.iconContainer}>
@@ -475,6 +477,7 @@ export default function CadastroScreen({ navigation }) {
                                             clearError('confirm');
                                         }}
                                         secureTextEntry={!showConfirm}
+                                        keyboardType="default"
                                         style={[styles.inputStyle, errors.confirm && localStyles.inputErrorBorder]}
                                         rightComponent={
                                             <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)} style={styles.iconContainer}>

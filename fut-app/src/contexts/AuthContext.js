@@ -224,11 +224,15 @@ export function AuthProvider({ children }) {
   }, [cliente, mergeCliente, token]);
 
   const signIn = useCallback(async (email, senha) => {
-    authRequestRef.current += 1;
+    const requestId = ++authRequestRef.current;
     setLoading(true);
 
     try {
       const response = await login({ email, senha });
+      if (requestId !== authRequestRef.current) {
+        return response;
+      }
+
       const nextToken = extractToken(response);
       const nextCliente = extractCliente(response);
 
@@ -250,19 +254,27 @@ export function AuthProvider({ children }) {
 
       return response;
     } catch (error) {
-      await clearAuthState(true);
+      if (requestId === authRequestRef.current) {
+        await clearAuthState(true);
+      }
       throw error;
     } finally {
-      setLoading(false);
+      if (requestId === authRequestRef.current) {
+        setLoading(false);
+      }
     }
   }, [applySession, clearAuthState, loadUser, persistToken]);
 
   const signUp = useCallback(async (dadosCadastro) => {
-    authRequestRef.current += 1;
+    const requestId = ++authRequestRef.current;
     setLoading(true);
 
     try {
       const response = await cadastro(dadosCadastro);
+      if (requestId !== authRequestRef.current) {
+        return response;
+      }
+
       const nextToken = extractToken(response);
       const nextCliente = extractCliente(response);
 
@@ -280,10 +292,14 @@ export function AuthProvider({ children }) {
 
       return response;
     } catch (error) {
-      await clearAuthState(true);
+      if (requestId === authRequestRef.current) {
+        await clearAuthState(true);
+      }
       throw error;
     } finally {
-      setLoading(false);
+      if (requestId === authRequestRef.current) {
+        setLoading(false);
+      }
     }
   }, [applySession, clearAuthState, loadUser, persistToken]);
 

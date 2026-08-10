@@ -3,7 +3,8 @@ const DEFAULT_BASE_URL = "https://projeto-futebol.onrender.com"; // fallback de 
 const DEFAULT_BASE_URL_PROD = "https://projeto-futebol.onrender.com"; // url de produção
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_BASE_URL;
-console.log("[API] BASE_URL =", BASE_URL);
+
+const REQUEST_TIMEOUT = 30000;
 
 const buildUrl = (path) => {
   if (!path) {
@@ -93,11 +94,6 @@ const parseResponse = async (response) => {
 
 const request = async (method, path, data, token, extraHeaders = {}) => {
   const url = buildUrl(path);
-  console.log("[API] request start", {
-    method,
-    url,
-    hasBody: typeof data !== "undefined",
-  });
 
   const isFormData =
     typeof FormData !== "undefined" && data instanceof FormData;
@@ -113,32 +109,39 @@ const request = async (method, path, data, token, extraHeaders = {}) => {
 
   const body = isFormData ? data : JSON.stringify(data);
 
-  const response = await fetch(buildUrl(path), {
-    method,
-    headers,
-    ...(typeof data !== "undefined" ? { body } : {}),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
-  const payload = await parseResponse(response);
-  console.log("[API] response", {
-    method,
-    url,
-    status: response.status,
-    ok: response.ok,
-  });
+  try {
+    const response = await fetch(buildUrl(path), {
+      method,
+      headers,
+      ...(typeof data !== "undefined" ? { body } : {}),
+      signal: controller.signal,
+    });
 
-  if (!response.ok) {
-    const fallbackMessage =
-      response.statusText || `Erro HTTP ${response.status}`;
-    console.log("[API] request error payload", payload);
-    const error = new Error(normalizeErrorMessage(payload, fallbackMessage));
-    error.status = response.status;
-    error.payload = payload;
+    clearTimeout(timeoutId);
+
+    const payload = await parseResponse(response);
+
+    if (!response.ok) {
+      const fallbackMessage =
+        response.statusText || `Erro HTTP ${response.status}`;
+      const error = new Error(normalizeErrorMessage(payload, fallbackMessage));
+      error.status = response.status;
+      throw error;
+    }
+
+    return payload;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      const timeoutError = new Error('A requisição demorou muito tempo. Tente novamente.');
+      timeoutError.status = 0;
+      throw timeoutError;
+    }
     throw error;
   }
-
-  console.log("[API] request success", { method, url });
-  return payload;
 };
 
 export const get = (path, token, headers) =>

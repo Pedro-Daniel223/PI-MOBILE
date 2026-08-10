@@ -97,6 +97,12 @@ const parsePlanoValor = (valor) => {
   return Number(match[1].replace(/\./g, '').replace(',', '.')) || 0;
 };
 
+const formatBRL = (value) =>
+  Number(value || 0).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+
 const buildSubscriptionCheckoutItem = (plan) => ({
   id: plan?.id,
   plano_id: plan?.id,
@@ -133,7 +139,7 @@ const resolveRemoteImageUri = (value) => {
 
 const normalizePlano = (plan, fallback = {}) => {
   const id = Number(plan?.plano_id ?? plan?.id ?? plan?.id_categoria_cliente ?? fallback.id ?? fallback.plano_id);
-  const title = plan?.title || plan?.nome_plano || plan?.nome || fallback.title || fallback.nome || '';
+  const title = String(plan?.title || plan?.nome_plano || plan?.nome || fallback.title || fallback.nome || '').toUpperCase();
   const price = plan?.price ?? plan?.valor ?? plan?.preco ?? fallback.price ?? fallback.preco ?? 0;
   const description = plan?.description || plan?.descricao || fallback.description || fallback.descricao || '';
   const benefits = Array.isArray(plan?.beneficios) && plan.beneficios.length > 0
@@ -405,7 +411,7 @@ const GlassBottomSheet = memo(({ visible, plan, onClose, onAssinar, DS, sheetSty
         <View style={sheetStyles.modalFooter}>
           <View style={sheetStyles.footerTopLine} />
           <View style={sheetStyles.footerRow}>
-            <Text style={sheetStyles.modalPrice}>{plan?.price}</Text>
+             <Text style={sheetStyles.modalPrice}>{formatBRL(parsePlanoValor(plan?.price))}</Text>
 
             <View style={sheetStyles.modalButtons}>
               {/* Fechar — glass neutro */}

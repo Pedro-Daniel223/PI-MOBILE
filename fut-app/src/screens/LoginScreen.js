@@ -9,8 +9,27 @@ import { escudoDrakos, colors } from '../data/dataLogin';
 import { useAuth } from '../contexts/AuthContext';
 import { stylesLogin } from '../styles/styleLogin/styleLogin';
 
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value ?? '').trim());
+
+const onlyDigits = (value = '') => value.replace(/\D/g, '');
+const formatCPF = (value) => {
+  return onlyDigits(value)
+    .slice(0, 11)
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+};
+const isValidCPF = (value) => onlyDigits(value).length === 11;
+
+const detectIdentifierType = (value) => {
+  const digits = onlyDigits(value);
+  if (digits.length >= 11) return 'cpf';
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'email';
+  return digits.length > 0 ? 'cpf' : 'email';
+};
+
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [senha, setSenha] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
@@ -28,22 +47,23 @@ export default function LoginScreen({ navigation }) {
     })();
   }, []);
 
-  const emailValid = email.includes('@') && email.includes('.');
+  const identifierType = detectIdentifierType(identifier);
+  const identifierValid = identifierType === 'email' ? isValidEmail(identifier) : isValidCPF(identifier);
 
   const handleLogin = async () => {
-    if (!email || !senha) {
+    if (!identifier || !senha) {
       Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
 
-    if (!emailValid) {
-      Alert.alert('Erro', 'Email inválido!');
+    if (!identifierValid) {
+      Alert.alert('Erro', identifierType === 'email' ? 'Email inválido!' : 'CPF inválido!');
       return;
     }
 
     try {
       setIsSubmitting(true);
-      await signIn(email, senha);
+      await signIn(identifier.trim(), senha);
     } catch (error) {
       Alert.alert('Erro', error?.message || 'Não foi possível realizar o login.');
     } finally {
@@ -64,14 +84,14 @@ export default function LoginScreen({ navigation }) {
     });
 
     if (result.success) {
-      if (!email || !senha) {
-        Alert.alert('Erro', 'Preencha email e senha para continuar.');
+      if (!identifier || !senha) {
+        Alert.alert('Erro', 'Preencha email/CPF e senha para continuar.');
         return;
       }
 
       try {
         setIsSubmitting(true);
-        await signIn(email, senha);
+        await signIn(identifier.trim(), senha);
       } catch (error) {
         Alert.alert('Erro', error?.message || 'Não foi possível realizar o login.');
       } finally {
@@ -108,16 +128,22 @@ export default function LoginScreen({ navigation }) {
             <Text style={stylesLogin.formTitle}>Login</Text>
 
             <View style={stylesLogin.formContent}>
-              <Text style={stylesLogin.label}>Seu EMAIL/CPF:</Text>
+              <Text style={stylesLogin.label}>Email / CPF</Text>
               <CustomInput
-                placeholder="email@exemplo.com"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
+                placeholder="Digite seu email ou CPF"
+                value={identifier}
+                onChangeText={(text) => {
+                  if (identifierType === 'cpf') {
+                    setIdentifier(formatCPF(text));
+                  } else {
+                    setIdentifier(text);
+                  }
+                }}
+                keyboardType={identifierType === 'cpf' ? 'numeric' : 'email-address'}
                 autoCapitalize="none"
                 style={stylesLogin.inputStyle}
                 rightComponent={
-                  emailValid && (
+                  identifierValid && identifier.length > 0 && (
                     <View style={stylesLogin.iconContainer}>
                       <Text style={stylesLogin.checkIcon}>✓</Text>
                     </View>
@@ -131,6 +157,7 @@ export default function LoginScreen({ navigation }) {
                 value={senha}
                 onChangeText={setSenha}
                 secureTextEntry={!showPass}
+                keyboardType="default"
                 style={stylesLogin.inputStyle}
                 rightComponent={
                   <TouchableOpacity onPress={() => setShowPass(!showPass)} style={stylesLogin.iconContainer}>

@@ -93,7 +93,7 @@ const CARD_W = (SCREEN_WIDTH - 40 - CARD_GAP) / 2;
 const CARD_H = CARD_W * 1.36;
 
 // const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios', 'Ingressos'];
-const CATEGORIES = ['Tudo', 'Camisas', 'Acessórios', 'Ingressos'];
+const CATEGORIES = ['Tudo', 'Camisas', 'Acessórios'];
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: TopBar
@@ -537,9 +537,15 @@ function LojaContent({ navigation }) {
     });
   }, [products]);
 
+  const isIngressoCategory = useCallback((product) => {
+    const rawCategory = product.cat ?? product.category ?? product.categoria ?? '';
+    const normalized = normalizeCategory(rawCategory);
+    return normalized.includes('ingresso');
+  }, []);
+
   const filtered = useMemo(() => (
-    products.filter((p) => matchesCategory(p.cat ?? p.category ?? p.categoria, category))
-  ), [category, products]);
+    products.filter((p) => !isIngressoCategory(p) && matchesCategory(p.cat ?? p.category ?? p.categoria, category))
+  ), [category, products, isIngressoCategory]);
 
   const goToDetail = useCallback(
     (item) => {
