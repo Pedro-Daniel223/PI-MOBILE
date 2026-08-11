@@ -50,6 +50,11 @@ Django / Render
 MySQL / Aiven
 
 
+
+<!-- √ The package @expo/ngrok@^4.1.0 is required to use tunnels, would you like to install it globally? ... yes
+Installing @expo/ngrok@^4.1.0... -->
+<!-- fica atento a isso, pode gerar problemas futuros -->
+
 ----------------------------------------------------------
 
 3) npx expo start -c
