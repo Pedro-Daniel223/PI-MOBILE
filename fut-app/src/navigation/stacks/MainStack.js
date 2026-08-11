@@ -12,6 +12,7 @@ import AuthStack from './AuthStack';
 import MainTabs from '../tabs/MainTabs';
 import CarrinhosScreen from '../../screens/CarrinhosScreen';
 import DetalhesProdutosScreens from '../../screens/DetalhesProdutosScreens';
+import CarroselLoja from '../../screens/CarroselLoja';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +48,11 @@ export default function MainStack() {
       <Stack.Screen
         name="MainTabs"
         component={MainTabs}
+      />
+
+      <Stack.Screen
+        name="CarroselLoja"
+        component={CarroselLoja}
       />
 
       <Stack.Screen

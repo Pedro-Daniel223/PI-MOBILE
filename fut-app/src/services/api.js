@@ -1,6 +1,4 @@
-// const DEFAULT_BASE_URL = 'http://10.44.236.2:8000'; // Substitua pelo seu endereço IP e porta do backend (do curso)
-const DEFAULT_BASE_URL = "https://projeto-futebol.onrender.com"; // fallback de produção
-const DEFAULT_BASE_URL_PROD = "https://projeto-futebol.onrender.com"; // url de produção
+const DEFAULT_BASE_URL = "https://projeto-futebol.onrender.com";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_BASE_URL;
 

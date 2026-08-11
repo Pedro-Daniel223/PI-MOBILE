@@ -17,7 +17,14 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  memo,
+} from "react";
 import {
   View,
   Text,
@@ -30,60 +37,71 @@ import {
   Easing,
   Dimensions,
   Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useProducts } from '../contexts/ProductContext';
-import { useCart } from '../contexts/CartContext';
-import { useTheme } from '../contexts/ThemeContext';
-import CartBadge from '../components/CartBadge';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { useProducts } from "../contexts/ProductContext";
+import { useCart } from "../contexts/CartContext";
+import { useTheme } from "../contexts/ThemeContext";
+import CartBadge from "../components/CartBadge";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DESIGN TOKENS — paleta clara e escura
 // A hierarquia e o crimson permanecem idênticos; só a base "papel" inverte.
 // ═══════════════════════════════════════════════════════════════════════════════
 const FONT = {
-  display: Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia' }),
-  mono: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
+  display: Platform.select({
+    ios: "Georgia",
+    android: "serif",
+    default: "Georgia",
+  }),
+  mono: Platform.select({
+    ios: "Menlo",
+    android: "monospace",
+    default: "monospace",
+  }),
 };
 
 const LIGHT = {
-  mode: 'light',
-  bg: '#F6F4F0',
-  bgWarm: '#EFEBE3',
-  paper: '#FFFFFF',
-  ink: '#15130F',
-  inkSoft: '#5B584F',
-  inkFaint: '#9C978A',
-  hairline: 'rgba(21, 19, 15, 0.10)',
-  hairlineStrong: 'rgba(21, 19, 15, 0.16)',
-  crimson: '#B4020F',
-  crimsonDeep: '#6E0009',
-  cream: '#EDE6D6',
-  cardMarkAlpha: 'rgba(21,19,15,0.14)',
-  statusBarStyle: 'light-content', // hero sempre escuro, então a status bar inicial é sempre clara
+  mode: "light",
+  bg: "#F6F4F0",
+  bgWarm: "#EFEBE3",
+  paper: "#FFFFFF",
+  ink: "#15130F",
+  inkSoft: "#5B584F",
+  inkFaint: "#9C978A",
+  hairline: "rgba(21, 19, 15, 0.10)",
+  hairlineStrong: "rgba(21, 19, 15, 0.16)",
+  crimson: "#B4020F",
+  crimsonDeep: "#6E0009",
+  cream: "#EDE6D6",
+  cardMarkAlpha: "rgba(21,19,15,0.14)",
+  statusBarStyle: "light-content", // hero sempre escuro, então a status bar inicial é sempre clara
   ...FONT,
 };
 
 const DARK = {
-  mode: 'dark',
-  bg: '#121110',
-  bgWarm: '#1B1917',
-  paper: '#1D1B19',
-  ink: '#F3F0EA',
-  inkSoft: '#B7B2A7',
-  inkFaint: '#726D63',
-  hairline: 'rgba(243, 240, 234, 0.08)',
-  hairlineStrong: 'rgba(243, 240, 234, 0.14)',
-  crimson: '#E23A2E',
-  crimsonDeep: '#8A0009',
-  cream: '#2A2622',
-  cardMarkAlpha: 'rgba(243,240,234,0.10)',
-  statusBarStyle: 'light-content',
+  mode: "dark",
+  bg: "#121110",
+  bgWarm: "#1B1917",
+  paper: "#1D1B19",
+  ink: "#F3F0EA",
+  inkSoft: "#B7B2A7",
+  inkFaint: "#726D63",
+  hairline: "rgba(243, 240, 234, 0.08)",
+  hairlineStrong: "rgba(243, 240, 234, 0.14)",
+  crimson: "#E23A2E",
+  crimsonDeep: "#8A0009",
+  cream: "#2A2622",
+  cardMarkAlpha: "rgba(243,240,234,0.10)",
+  statusBarStyle: "light-content",
   ...FONT,
 };
 
@@ -93,7 +111,7 @@ const CARD_W = (SCREEN_WIDTH - 40 - CARD_GAP) / 2;
 const CARD_H = CARD_W * 1.36;
 
 // const CATEGORIES = ['Tudo', 'Camisas', 'Calçados', 'Acessórios', 'Ingressos'];
-const CATEGORIES = ['Tudo', 'Camisas', 'Acessórios'];
+const CATEGORIES = ["Tudo", "Camisas", "Acessórios"];
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUBCOMPONENTE: TopBar
@@ -107,7 +125,11 @@ const TopBar = memo(({ onCartPress, DS, s, cartCount }) => (
       <Text style={s.topWordmark}>Loja Oficial</Text>
     </View>
     <View style={s.topActions}>
-      <TouchableOpacity onPress={onCartPress} style={s.cartBtn} activeOpacity={0.6}>
+      <TouchableOpacity
+        onPress={onCartPress}
+        style={s.cartBtn}
+        activeOpacity={0.6}
+      >
         <Ionicons name="bag-outline" size={19} color={DS.ink} />
         <CartBadge count={cartCount} />
       </TouchableOpacity>
@@ -134,13 +156,16 @@ const Hero = memo(({ DS, s }) => {
     }).start();
   }, []);
 
-  const translateY = enter.interpolate({ inputRange: [0, 1], outputRange: [26, 0] });
+  const translateY = enter.interpolate({
+    inputRange: [0, 1],
+    outputRange: [26, 0],
+  });
   const opacity = enter;
 
   return (
     <View style={s.hero}>
       <LinearGradient
-        colors={['#1C1A16', '#0E0C0A']}
+        colors={["#1C1A16", "#0E0C0A"]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0.2, y: 0 }}
         end={{ x: 0.9, y: 1 }}
@@ -149,12 +174,16 @@ const Hero = memo(({ DS, s }) => {
       {/* Textura de linhas de campo — sutil, geométrica */}
       <View style={s.heroFieldLines} pointerEvents="none">
         <View style={s.fieldLine} />
-        <View style={[s.fieldLine, { top: '50%' }]} />
+        <View style={[s.fieldLine, { top: "50%" }]} />
         <View style={s.fieldCircle} />
       </View>
 
       <LinearGradient
-        colors={['transparent', 'transparent', DS.mode === 'dark' ? 'rgba(18,17,16,0.97)' : 'rgba(14,12,10,0.94)']}
+        colors={[
+          "transparent",
+          "transparent",
+          DS.mode === "dark" ? "rgba(18,17,16,0.97)" : "rgba(14,12,10,0.94)",
+        ]}
         locations={[0, 0.45, 1]}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
@@ -167,11 +196,13 @@ const Hero = memo(({ DS, s }) => {
         </View>
 
         <Text style={s.heroTitle}>
-          NASCIDOS{'\n'}PARA{'\n'}<Text style={{ color: DS.crimson }}>VENCER</Text>
+          NASCIDOS{"\n"}PARA{"\n"}
+          <Text style={{ color: DS.crimson }}>VENCER</Text>
         </Text>
 
         <Text style={s.heroSub}>
-          A nova coleção titular chegou. Tecido de performance,{'\n'}corte anatômico, brasão bordado.
+          A nova coleção titular chegou. Tecido de performance,{"\n"}corte
+          anatômico, brasão bordado.
         </Text>
 
         <TouchableOpacity style={s.heroCta} activeOpacity={0.85}>
@@ -220,7 +251,7 @@ const resolveImageSource = (value) => {
     return null;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return { uri: value };
   }
 
@@ -228,17 +259,20 @@ const resolveImageSource = (value) => {
 };
 
 const normalizeCategory = (value) =>
-  String(value ?? '')
+  String(value ?? "")
     .trim()
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
 const formatBRL = (value) =>
-  Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  Number(value || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 
 const matchesCategory = (productCategory, selectedCategory) => {
-  if (selectedCategory === 'Tudo') {
+  if (selectedCategory === "Tudo") {
     return true;
   }
 
@@ -253,12 +287,12 @@ const matchesCategory = (productCategory, selectedCategory) => {
     return true;
   }
 
-  if (selectedValue === 'camisas') {
-    return productValue.includes('camisa');
+  if (selectedValue === "camisas") {
+    return productValue.includes("camisa");
   }
 
-  if (selectedValue === 'ingressos') {
-    return productValue.includes('ingresso');
+  if (selectedValue === "ingressos") {
+    return productValue.includes("ingresso");
   }
 
   return productValue.includes(selectedValue);
@@ -281,9 +315,17 @@ const CampaignGlass = memo(({ DS, s }) => {
     const loop = Animated.loop(
       Animated.sequence([
         Animated.delay(3800),
-        Animated.timing(shimmer, { toValue: 1, duration: 1300, useNativeDriver: true }),
-        Animated.timing(shimmer, { toValue: 0, duration: 0, useNativeDriver: true }),
-      ])
+        Animated.timing(shimmer, {
+          toValue: 1,
+          duration: 1300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmer, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]),
     );
     loop.start();
     return () => loop.stop();
@@ -297,22 +339,27 @@ const CampaignGlass = memo(({ DS, s }) => {
   return (
     <View style={[s.campWrap, { width, height, borderRadius: radius }]}>
       <LinearGradient
-        colors={['#1A0304', '#0C0203', '#050101']}
+        colors={["#1A0304", "#0C0203", "#050101"]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
 
-      <View style={[StyleSheet.absoluteFill, { overflow: 'hidden', borderRadius: radius }]}>
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          { overflow: "hidden", borderRadius: radius },
+        ]}
+      >
         <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
         <LinearGradient
-          colors={['rgba(180,2,15,0.30)', 'transparent']}
+          colors={["rgba(180,2,15,0.30)", "transparent"]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 0.75, y: 0.9 }}
         />
         <LinearGradient
-          colors={['rgba(255,255,255,0.10)', 'transparent']}
+          colors={["rgba(255,255,255,0.10)", "transparent"]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 0.5, y: 0.5 }}
@@ -322,15 +369,15 @@ const CampaignGlass = memo(({ DS, s }) => {
         <Animated.View
           pointerEvents="none"
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: -height * 0.5,
             bottom: -height * 0.5,
             width: width * 0.28,
-            transform: [{ translateX: shimmerX }, { skewX: '-16deg' }],
+            transform: [{ translateX: shimmerX }, { skewX: "-16deg" }],
           }}
         >
           <LinearGradient
-            colors={['transparent', 'rgba(255,255,255,0.12)', 'transparent']}
+            colors={["transparent", "rgba(255,255,255,0.12)", "transparent"]}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
@@ -345,10 +392,12 @@ const CampaignGlass = memo(({ DS, s }) => {
       <View style={s.campContent}>
         <View>
           <Text style={s.campEyebrow}>OFERTA DA SEMANA</Text>
-          <Text style={s.campTitle}>ATÉ 50%{'\n'}DE DESCONTO</Text>
+          <Text style={s.campTitle}>ATÉ 50%{"\n"}DE DESCONTO</Text>
         </View>
         <View style={s.campFooter}>
-          <Text style={s.campFootnote}>Em peças selecionadas · até domingo</Text>
+          <Text style={s.campFootnote}>
+            Em peças selecionadas · até domingo
+          </Text>
           <View style={s.campArrow}>
             <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
           </View>
@@ -359,12 +408,12 @@ const CampaignGlass = memo(({ DS, s }) => {
       <View
         pointerEvents="none"
         style={{
-          position: 'absolute',
+          position: "absolute",
           width,
           height,
           borderRadius: radius,
           borderWidth: 0.75,
-          borderColor: 'rgba(255,255,255,0.16)',
+          borderColor: "rgba(255,255,255,0.16)",
         }}
       />
     </View>
@@ -403,13 +452,26 @@ const ProductCard = memo(({ item, onPress, DS, s }) => {
   const productImage = resolveImageSource(productImageRaw);
 
   const onIn = () =>
-    Animated.spring(press, { toValue: 1, tension: 380, friction: 24, useNativeDriver: true }).start();
+    Animated.spring(press, {
+      toValue: 1,
+      tension: 380,
+      friction: 24,
+      useNativeDriver: true,
+    }).start();
   const onOut = () =>
-    Animated.spring(press, { toValue: 0, tension: 220, friction: 18, useNativeDriver: true }).start();
+    Animated.spring(press, {
+      toValue: 0,
+      tension: 220,
+      friction: 18,
+      useNativeDriver: true,
+    }).start();
 
-  const scale = press.interpolate({ inputRange: [0, 1], outputRange: [1, 0.975] });
+  const scale = press.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0.975],
+  });
 
-  console.log('[LojaScreens] product card image payload', {
+  console.log("[LojaScreens] product card image payload", {
     id: item.id,
     image: item.image ?? null,
     imagem: item.imagem ?? null,
@@ -442,13 +504,13 @@ const ProductCard = memo(({ item, onPress, DS, s }) => {
               style={StyleSheet.absoluteFill}
               resizeMode="contain"
               onLoad={() => {
-                console.log('[LojaScreens] product card image loaded', {
+                console.log("[LojaScreens] product card image loaded", {
                   id: item.id,
                   source: productImage,
                 });
               }}
               onError={(event) => {
-                console.log('[LojaScreens] product card image error', {
+                console.log("[LojaScreens] product card image error", {
                   id: item.id,
                   source: productImage,
                   error: event?.nativeEvent,
@@ -462,8 +524,10 @@ const ProductCard = memo(({ item, onPress, DS, s }) => {
           </View>
 
           {item.tag && (
-            <View style={[s.cardTag, item.tag === 'NOVO' && s.cardTagInk]}>
-              <Text style={[s.cardTagText, item.tag === 'NOVO' && s.cardTagTextInk]}>
+            <View style={[s.cardTag, item.tag === "NOVO" && s.cardTagInk]}>
+              <Text
+                style={[s.cardTagText, item.tag === "NOVO" && s.cardTagTextInk]}
+              >
                 {item.tag}
               </Text>
             </View>
@@ -472,16 +536,22 @@ const ProductCard = memo(({ item, onPress, DS, s }) => {
 
         <View style={s.cardInfo}>
           <Text style={s.cardCat}>{item.cat.toUpperCase()}</Text>
-          <Text style={s.cardName} numberOfLines={2}>{item.name}</Text>
+          <Text style={s.cardName} numberOfLines={2}>
+            {item.name}
+          </Text>
           <View style={s.cardPriceRow}>
             <Text style={s.cardPrice}>{formatBRL(item.preco_final)}</Text>
-            {Number(item.desconto_percent || 0) > 0 && item.preco_original != null ? (
-              <Text style={s.cardOldPrice}>{formatBRL(item.preco_original)}</Text>
+            {Number(item.desconto_percent || 0) > 0 &&
+            item.preco_original != null ? (
+              <Text style={s.cardOldPrice}>
+                {formatBRL(item.preco_original)}
+              </Text>
             ) : null}
           </View>
           {Number(item.desconto_percent || 0) > 0 ? (
             <Text style={s.cardSavings}>
-              {item.desconto_percent}% OFF · Economia {formatBRL(item.economia ?? 0)}
+              {item.desconto_percent}% OFF · Economia{" "}
+              {formatBRL(item.economia ?? 0)}
             </Text>
           ) : null}
         </View>
@@ -496,7 +566,13 @@ const ProductCard = memo(({ item, onPress, DS, s }) => {
 const ProductGrid = memo(({ products, onPressItem, DS, s }) => (
   <View style={s.grid}>
     {products.map((item) => (
-      <ProductCard key={item.id} item={item} onPress={() => onPressItem(item)} DS={DS} s={s} />
+      <ProductCard
+        key={item.id}
+        item={item}
+        onPress={() => onPressItem(item)}
+        DS={DS}
+        s={s}
+      />
     ))}
   </View>
 ));
@@ -512,7 +588,7 @@ function LojaContent({ navigation }) {
   const DS = isDark ? DARK : LIGHT;
   const s = useMemo(() => makeStyles(DS), [DS]);
 
-  const [category, setCategory] = useState('Tudo');
+  const [category, setCategory] = useState("Tudo");
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -522,7 +598,7 @@ function LojaContent({ navigation }) {
   }, [loadProducts, products.length]);
 
   useEffect(() => {
-    console.log('[LojaScreens] products snapshot', {
+    console.log("[LojaScreens] products snapshot", {
       total: products.length,
       sample: products.slice(0, 5).map((item) => ({
         id: item.id,
@@ -538,40 +614,50 @@ function LojaContent({ navigation }) {
   }, [products]);
 
   const isIngressoCategory = useCallback((product) => {
-    const rawCategory = product.cat ?? product.category ?? product.categoria ?? '';
+    const rawCategory =
+      product.cat ?? product.category ?? product.categoria ?? "";
     const normalized = normalizeCategory(rawCategory);
-    return normalized.includes('ingresso');
+    return normalized.includes("ingresso");
   }, []);
 
-  const filtered = useMemo(() => (
-    products.filter((p) => !isIngressoCategory(p) && matchesCategory(p.cat ?? p.category ?? p.categoria, category))
-  ), [category, products, isIngressoCategory]);
+  const filtered = useMemo(
+    () =>
+      products.filter(
+        (p) =>
+          !isIngressoCategory(p) &&
+          matchesCategory(p.cat ?? p.category ?? p.categoria, category),
+      ),
+    [category, products, isIngressoCategory],
+  );
 
   const goToDetail = useCallback(
     (item) => {
-      if (navigation?.navigate) navigation.navigate('DetalhesProdutos', { produto: item });
+      if (navigation?.navigate)
+        navigation.navigate("DetalhesProdutos", { produto: item });
     },
-    [navigation]
+    [navigation],
   );
 
   const goToCart = useCallback(() => {
-    if (navigation?.navigate) navigation.navigate('Carrinho');
+    if (navigation?.navigate) navigation.navigate("Carrinho");
   }, [navigation]);
 
   return (
     <View style={[s.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle={DS.statusBarStyle} backgroundColor="transparent" translucent />
+      <StatusBar
+        barStyle={DS.statusBarStyle}
+        backgroundColor="transparent"
+        translucent
+      />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={s.scrollContent}
+      >
         <Hero DS={DS} s={s} />
 
         <View style={s.body}>
-        <TopBar
-          onCartPress={goToCart}
-          DS={DS}
-          s={s}
-          cartCount={totalItems}
-        />
+          <TopBar onCartPress={goToCart} DS={DS} s={s} cartCount={totalItems} />
 
           <CategoryRail selected={category} onSelect={setCategory} s={s} />
 
@@ -585,7 +671,12 @@ function LojaContent({ navigation }) {
             subtitle="Peças em destaque nesta temporada"
             s={s}
           />
-          <ProductGrid products={filtered} onPressItem={goToDetail} DS={DS} s={s} />
+          <ProductGrid
+            products={filtered}
+            onPressItem={goToDetail}
+            DS={DS}
+            s={s}
+          />
 
           <View style={s.closing}>
             <View style={s.closingRule} />
@@ -630,33 +721,33 @@ function makeStyles(DS) {
       marginTop: -1,
       paddingHorizontal: 24,
       paddingBottom: 30,
-      justifyContent: 'flex-end',
-      overflow: 'hidden',
+      justifyContent: "flex-end",
+      overflow: "hidden",
     },
     heroFieldLines: {
       ...StyleSheet.absoluteFillObject,
     },
     fieldLine: {
-      position: 'absolute',
+      position: "absolute",
       left: 0,
       right: 0,
-      top: '22%',
+      top: "22%",
       height: StyleSheet.hairlineWidth,
-      backgroundColor: 'rgba(255,255,255,0.08)',
+      backgroundColor: "rgba(255,255,255,0.08)",
     },
     fieldCircle: {
-      position: 'absolute',
+      position: "absolute",
       width: 260,
       height: 260,
       borderRadius: 130,
       borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.06)',
-      top: '30%',
+      borderColor: "rgba(255,255,255,0.06)",
+      top: "30%",
       right: -90,
     },
     heroKicker: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       marginBottom: 18,
     },
     heroKickerDash: {
@@ -667,30 +758,30 @@ function makeStyles(DS) {
     },
     heroKickerText: {
       fontSize: 11,
-      fontWeight: '700',
+      fontWeight: "700",
       letterSpacing: 2.2,
-      color: 'rgba(255,255,255,0.65)',
+      color: "rgba(255,255,255,0.65)",
     },
     heroTitle: {
       fontFamily: DS.display,
       fontSize: 58,
       lineHeight: 56,
-      fontWeight: '700',
-      color: '#FFFFFF',
+      fontWeight: "700",
+      color: "#FFFFFF",
       letterSpacing: -1,
     },
     heroSub: {
       fontSize: 14.5,
       lineHeight: 21,
-      color: 'rgba(255,255,255,0.62)',
+      color: "rgba(255,255,255,0.62)",
       marginTop: 20,
-      maxWidth: '92%',
+      maxWidth: "92%",
     },
     heroCta: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      alignSelf: 'flex-start',
-      backgroundColor: '#FFFFFF',
+      flexDirection: "row",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      backgroundColor: "#FFFFFF",
       borderRadius: 2,
       paddingLeft: 20,
       paddingRight: 6,
@@ -699,9 +790,9 @@ function makeStyles(DS) {
     },
     heroCtaText: {
       fontSize: 11.5,
-      fontWeight: '800',
+      fontWeight: "800",
       letterSpacing: 1.6,
-      color: '#15130F',
+      color: "#15130F",
       marginRight: 14,
     },
     heroCtaIcon: {
@@ -709,24 +800,24 @@ function makeStyles(DS) {
       height: 30,
       borderRadius: 15,
       backgroundColor: DS.cream,
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: "center",
+      justifyContent: "center",
     },
     heroFootnote: {
-      position: 'absolute',
+      position: "absolute",
       top: 20,
       right: 24,
       fontFamily: DS.mono,
       fontSize: 9.5,
       letterSpacing: 0.6,
-      color: 'rgba(255,255,255,0.32)',
+      color: "rgba(255,255,255,0.32)",
     },
 
     // ── TopBar ──────────────────────────────────────────────────────────────
     topBar: {
-      flexDirection: 'row',
-      alignItems: 'flex-end',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "flex-end",
+      justifyContent: "space-between",
       paddingTop: 26,
       paddingBottom: 20,
       borderBottomWidth: StyleSheet.hairlineWidth,
@@ -735,7 +826,7 @@ function makeStyles(DS) {
     },
     topEyebrow: {
       fontSize: 10,
-      fontWeight: '700',
+      fontWeight: "700",
       letterSpacing: 1.8,
       color: DS.inkFaint,
       marginBottom: 6,
@@ -743,21 +834,21 @@ function makeStyles(DS) {
     topWordmark: {
       fontFamily: DS.display,
       fontSize: 24,
-      fontWeight: '700',
+      fontWeight: "700",
       color: DS.ink,
       letterSpacing: -0.3,
     },
     topActions: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: 10,
     },
     cartBtn: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: "center",
+      justifyContent: "center",
       backgroundColor: DS.paper,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: DS.hairlineStrong,
@@ -776,16 +867,16 @@ function makeStyles(DS) {
     },
     railText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: DS.inkFaint,
       letterSpacing: 0.2,
     },
     railTextActive: {
       color: DS.ink,
-      fontWeight: '700',
+      fontWeight: "700",
     },
     railUnderline: {
-      position: 'absolute',
+      position: "absolute",
       bottom: 0,
       left: 0,
       right: 0,
@@ -796,62 +887,62 @@ function makeStyles(DS) {
     // ── CampaignGlass ───────────────────────────────────────────────────────
     campSection: {
       marginBottom: 38,
-      alignItems: 'center',
+      alignItems: "center",
     },
     campWrap: {
-      overflow: 'hidden',
-      shadowColor: '#000',
+      overflow: "hidden",
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 14 },
-      shadowOpacity: DS.mode === 'dark' ? 0.32 : 0.16,
+      shadowOpacity: DS.mode === "dark" ? 0.32 : 0.16,
       shadowRadius: 24,
       elevation: 8,
     },
     campSpecular: {
-      position: 'absolute',
+      position: "absolute",
       top: 0,
-      left: '10%',
-      right: '10%',
+      left: "10%",
+      right: "10%",
       height: 1,
-      backgroundColor: 'rgba(255,255,255,0.35)',
+      backgroundColor: "rgba(255,255,255,0.35)",
     },
     campContent: {
       flex: 1,
-      justifyContent: 'space-between',
+      justifyContent: "space-between",
       padding: 24,
     },
     campEyebrow: {
       fontSize: 10.5,
-      fontWeight: '700',
+      fontWeight: "700",
       letterSpacing: 2,
-      color: 'rgba(255,255,255,0.55)',
+      color: "rgba(255,255,255,0.55)",
       marginBottom: 10,
     },
     campTitle: {
       fontFamily: DS.display,
       fontSize: 30,
       lineHeight: 30,
-      fontWeight: '700',
-      color: '#FFFFFF',
+      fontWeight: "700",
+      color: "#FFFFFF",
       letterSpacing: -0.5,
     },
     campFooter: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
     },
     campFootnote: {
       fontSize: 11.5,
-      color: 'rgba(255,255,255,0.5)',
+      color: "rgba(255,255,255,0.5)",
     },
     campArrow: {
       width: 34,
       height: 34,
       borderRadius: 17,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(255,255,255,0.12)',
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "rgba(255,255,255,0.12)",
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: 'rgba(255,255,255,0.25)',
+      borderColor: "rgba(255,255,255,0.25)",
     },
 
     // ── SectionHeader ───────────────────────────────────────────────────────
@@ -859,8 +950,8 @@ function makeStyles(DS) {
       marginBottom: 20,
     },
     sectionRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
+      flexDirection: "row",
+      alignItems: "flex-start",
       marginBottom: 12,
     },
     sectionIndex: {
@@ -869,12 +960,12 @@ function makeStyles(DS) {
       color: DS.crimson,
       marginRight: 12,
       marginTop: 4,
-      fontWeight: '700',
+      fontWeight: "700",
     },
     sectionTitle: {
       fontFamily: DS.display,
       fontSize: 21,
-      fontWeight: '700',
+      fontWeight: "700",
       color: DS.ink,
       letterSpacing: -0.2,
     },
@@ -890,31 +981,31 @@ function makeStyles(DS) {
 
     // ── Grid / ProductCard ──────────────────────────────────────────────────
     grid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
       rowGap: 28,
       marginTop: 6,
     },
     cardImage: {
       borderRadius: 2,
-      overflow: 'hidden',
+      overflow: "hidden",
       marginBottom: 12,
     },
     cardImageMark: {
       ...StyleSheet.absoluteFillObject,
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: "center",
+      justifyContent: "center",
     },
     cardImageMarkText: {
       fontFamily: DS.display,
       fontSize: 15,
-      fontWeight: '700',
+      fontWeight: "700",
       letterSpacing: 3,
       color: DS.cardMarkAlpha,
     },
     cardTag: {
-      position: 'absolute',
+      position: "absolute",
       top: 10,
       left: 10,
       backgroundColor: DS.crimson,
@@ -926,55 +1017,55 @@ function makeStyles(DS) {
     },
     cardTagText: {
       fontSize: 9.5,
-      fontWeight: '800',
+      fontWeight: "800",
       letterSpacing: 0.6,
-      color: '#FFFFFF',
+      color: "#FFFFFF",
     },
     cardTagTextInk: {
-      color: DS.mode === 'dark' ? DS.bg : '#FFFFFF',
+      color: DS.mode === "dark" ? DS.bg : "#FFFFFF",
     },
     cardInfo: {
       paddingRight: 4,
     },
     cardCat: {
       fontSize: 9,
-      fontWeight: '700',
+      fontWeight: "700",
       letterSpacing: 1,
       color: DS.inkFaint,
       marginBottom: 5,
     },
     cardName: {
       fontSize: 13.5,
-      fontWeight: '600',
+      fontWeight: "600",
       color: DS.ink,
       lineHeight: 18,
       marginBottom: 8,
     },
     cardPriceRow: {
-      flexDirection: 'row',
-      alignItems: 'baseline',
+      flexDirection: "row",
+      alignItems: "baseline",
       gap: 8,
     },
     cardPrice: {
       fontSize: 14.5,
-      fontWeight: '800',
+      fontWeight: "800",
       color: DS.ink,
     },
     cardOldPrice: {
       fontSize: 11.5,
       color: DS.inkFaint,
-      textDecorationLine: 'line-through',
+      textDecorationLine: "line-through",
     },
     cardSavings: {
       marginTop: 4,
       fontSize: 10.5,
-      fontWeight: '600',
+      fontWeight: "600",
       color: DS.crimson,
     },
 
     // ── Closing ─────────────────────────────────────────────────────────────
     closing: {
-      alignItems: 'center',
+      alignItems: "center",
       marginTop: 48,
     },
     closingRule: {
