@@ -204,13 +204,6 @@ const Hero = memo(({ DS, s }) => {
           A nova coleção titular chegou. Tecido de performance,{"\n"}corte
           anatômico, brasão bordado.
         </Text>
-
-        <TouchableOpacity style={s.heroCta} activeOpacity={0.85}>
-          <Text style={s.heroCtaText}>EXPLORAR COLEÇÃO</Text>
-          <View style={s.heroCtaIcon}>
-            <Ionicons name="arrow-forward" size={13} color={DS.ink} />
-          </View>
-        </TouchableOpacity>
       </Animated.View>
 
       <Text style={s.heroFootnote}>Nº 09 · EDIÇÃO LIMITADA · 500 UNIDADES</Text>
@@ -398,9 +391,6 @@ const CampaignGlass = memo(({ DS, s }) => {
           <Text style={s.campFootnote}>
             Em peças selecionadas · até domingo
           </Text>
-          <View style={s.campArrow}>
-            <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
-          </View>
         </View>
       </View>
 

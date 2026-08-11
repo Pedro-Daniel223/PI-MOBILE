@@ -442,14 +442,7 @@ export default function CardProfileWelcome() {
 
         {/* AÇÕES — eventos e estrutura preservados */}
         <View style={styles.actionsContainer}>
-          <TouchableOpacity style={styles.actionButton}>
-            <BlurView intensity={30} tint="dark" style={styles.actionBlur}>
-              {/* Linha especular interna do botão */}
-              <View style={styles.actionBlurSpecular} />
-              <Ionicons name="card-outline" size={16} color="#fff" />
-              <Text style={styles.actionText}>Plano</Text>
-            </BlurView>
-          </TouchableOpacity>
+
         </View>
 
       </View>
