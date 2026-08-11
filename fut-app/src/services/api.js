@@ -1,5 +1,4 @@
 const DEFAULT_BASE_URL = "https://projeto-futebol.onrender.com";
-
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_BASE_URL;
 
 const REQUEST_TIMEOUT = 30000;
