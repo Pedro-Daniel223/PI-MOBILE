@@ -22,6 +22,8 @@ const formatCPF = (value) => {
 const isValidCPF = (value) => onlyDigits(value).length === 11;
 
 const detectIdentifierType = (value) => {
+  if (/[A-Za-z]/.test(String(value ?? ''))) return 'email';
+
   const digits = onlyDigits(value);
   if (digits.length >= 11) return 'cpf';
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'email';

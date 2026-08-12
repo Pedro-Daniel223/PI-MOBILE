@@ -1,4 +1,4 @@
-<!-- /*
+
 ==========================================================
 COMANDOS EXPO - DESENVOLVIMENTO MOBILE
 ==========================================================
@@ -34,7 +34,8 @@ O tunnel cria um endereço público temporário para o Metro.
 Arquitetura:
 
 Celular
-   ↓ Internet
+   ↓ 
+Internet
 Expo Tunnel
    ↓
 Metro no computador
@@ -98,4 +99,4 @@ SE HOUVER PROBLEMA DE CACHE:
 
 npm start -c
 ==========================================================
-*/ -->
+*/
