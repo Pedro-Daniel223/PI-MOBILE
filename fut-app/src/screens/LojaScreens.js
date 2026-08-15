@@ -143,7 +143,7 @@ const TopBar = memo(({ onCartPress, DS, s, cartCount }) => (
 // Um único slide fixo: intenção > variedade. Já é escuro por natureza, então
 // muda muito pouco entre os temas — só a intensidade da vinheta final.
 // ═══════════════════════════════════════════════════════════════════════════════
-const Hero = memo(({ DS, s }) => {
+const Hero = memo(({ DS, s, onExplorePress }) => {
   const enter = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -205,6 +205,17 @@ const Hero = memo(({ DS, s }) => {
           anatômico, brasão bordado.
         </Text>
       </Animated.View>
+
+      <TouchableOpacity
+        onPress={onExplorePress}
+        activeOpacity={0.85}
+        style={s.heroCta}
+      >
+        <Text style={s.heroCtaText}>Explorar Coleção</Text>
+        <View style={s.heroCtaIcon}>
+          <Ionicons name="arrow-forward" size={16} color="#15130F" />
+        </View>
+      </TouchableOpacity>
 
       <Text style={s.heroFootnote}>Nº 09 · EDIÇÃO LIMITADA · 500 UNIDADES</Text>
     </View>
@@ -632,6 +643,19 @@ function LojaContent({ navigation }) {
     if (navigation?.navigate) navigation.navigate("Carrinho");
   }, [navigation]);
 
+  const goToCarousel = useCallback(() => {
+    const parentNavigation = navigation?.getParent?.();
+
+    if (parentNavigation?.navigate) {
+      parentNavigation.navigate("CarroselLoja");
+      return;
+    }
+
+    if (navigation?.navigate) {
+      navigation.navigate("CarroselLoja");
+    }
+  }, [navigation]);
+
   return (
     <View style={[s.container, { paddingTop: insets.top }]}>
       <StatusBar
@@ -644,7 +668,7 @@ function LojaContent({ navigation }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={s.scrollContent}
       >
-        <Hero DS={DS} s={s} />
+        <Hero DS={DS} s={s} onExplorePress={goToCarousel} />
 
         <View style={s.body}>
           <TopBar onCartPress={goToCart} DS={DS} s={s} cartCount={totalItems} />

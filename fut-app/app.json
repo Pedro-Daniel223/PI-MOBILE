@@ -2,10 +2,10 @@
   "expo": {
     "name": "Drakos-app",
     "slug": "Drakos-app",
-    "icon": "./src/assets/img/icon_escudo_drakos.png",
+    "icon": "./src/assets/img/Escudo_Drakos.png",
     "version": "1.0.0",
     "splash": {
-      "image": "./src/assets/img/icon_escudo_drakos.png",
+      "image": "./src/assets/img/Escudo_Drakos.png",
       "resizeMode": "contain"
     },
     "plugins": [
