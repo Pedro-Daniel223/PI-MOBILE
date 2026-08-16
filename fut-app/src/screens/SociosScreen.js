@@ -66,6 +66,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useProducts } from '../contexts/ProductContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { formatSocioPlanTitle } from '../utils/formatSocioPlanTitle';
 import apiClient from '../services/api';
 import { dadosPlano } from '../data/dataSocios/dataSocios';
 import NavbarGlass from '../components/NavbarGlass';
@@ -139,7 +140,9 @@ const resolveRemoteImageUri = (value) => {
 
 const normalizePlano = (plan, fallback = {}) => {
   const id = Number(plan?.plano_id ?? plan?.id ?? plan?.id_categoria_cliente ?? fallback.id ?? fallback.plano_id);
-  const title = String(plan?.title || plan?.nome_plano || plan?.nome || fallback.title || fallback.nome || '').toUpperCase();
+  const title = formatSocioPlanTitle(
+    plan?.title || plan?.nome_plano || plan?.nome || fallback.title || fallback.nome || '',
+  );
   const price = plan?.price ?? plan?.valor ?? plan?.preco ?? fallback.price ?? fallback.preco ?? 0;
   const description = plan?.description || plan?.descricao || fallback.description || fallback.descricao || '';
   const benefits = Array.isArray(plan?.beneficios) && plan.beneficios.length > 0
@@ -171,7 +174,9 @@ const normalizeAssinaturaResponse = (payload, fallbackPlan = null) => {
 
   const plano = payload.plano || payload.plan || payload.categoria_plano || payload.categoria || fallbackPlan || null;
   const planoId = payload.plano_id ?? payload.id_plano ?? plano?.id ?? fallbackPlan?.id ?? null;
-  const titulo = payload.title || payload.nome || payload.nome_plano || plano?.title || fallbackPlan?.title || null;
+  const titulo = formatSocioPlanTitle(
+    payload.title || payload.nome || payload.nome_plano || plano?.title || fallbackPlan?.title || '',
+  ) || null;
   const preco = payload.price || payload.valor || payload.preco || plano?.price || fallbackPlan?.price || null;
 
   return {

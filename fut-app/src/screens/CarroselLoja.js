@@ -193,8 +193,8 @@ const CarouselImage = memo(({ source, uri, style }) => {
     <View style={[style, styles.imageContainer]}>
       <Image
         source={imageSource}
-        resizeMode="contain"
-        style={styles.heroImage}
+        resizeMode={IS_ANDROID ? "cover" : "contain"}
+        style={[styles.heroImage, IS_ANDROID && styles.heroImageAndroid]}
         fadeDuration={Platform.OS === "android" ? 180 : 0}
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
@@ -810,6 +810,14 @@ const styles = StyleSheet.create({
 
         alignSelf: "center",
       },
+
+  heroImageAndroid: {
+    width: "100%",
+    height: "100%",
+    minWidth: "100%",
+    minHeight: "100%",
+    alignSelf: "center",
+  },
 
   imageLoading: {
     ...StyleSheet.absoluteFillObject,

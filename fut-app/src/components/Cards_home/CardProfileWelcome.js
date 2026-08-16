@@ -17,6 +17,7 @@ import {
   Animated,
   Dimensions,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 
 import { BlurView } from 'expo-blur';
@@ -30,21 +31,17 @@ import { DEFAULT_AVATAR_URL } from '../../data/dataPerfil';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const { Value, timing, loop, sequence, delay } = Animated;
 const IS_SMALL_SCREEN = SCREEN_WIDTH < 360;
+const IS_ANDROID = Platform.OS === 'android';
 
 
 export default function CardProfileWelcome() {
   const navigation = useNavigation();
+  const { width: windowWidth } = useWindowDimensions();
   const { cliente } = useAuth();
   const { subscription, loadingSubscription } = useSubscription();
   const { isDark, toggleTheme } = useTheme();
   const renderCountRef = useRef(0);
   renderCountRef.current += 1;
-  console.log('[CardProfileWelcome] render', {
-    render: renderCountRef.current,
-    loadingSubscription,
-    hasSubscription: Boolean(subscription),
-    subscriptionTitle: subscription?.title || subscription?.nome_plano || subscription?.plan?.title || null,
-  });
   const avatarUri = cliente?.url_foto_clientes?.trim() || DEFAULT_AVATAR_URL;
 
   // ── Lógica original — intacta ──────────────────────────────────────────
@@ -70,12 +67,19 @@ export default function CardProfileWelcome() {
   const [charIndex, setCharIndex]         = useState(0);
 
   useEffect(() => {
+    if (IS_ANDROID) {
+      return;
+    }
     setDisplayedText(['', '', '']);
     setLineIndex(0);
     setCharIndex(0);
   }, [nomeCompleto, avatarUri]);
 
   useEffect(() => {
+    if (IS_ANDROID) {
+      return undefined;
+    }
+
     const typingSpeed = 40;
 
     const interval = setInterval(() => {
@@ -143,8 +147,12 @@ export default function CardProfileWelcome() {
   });
   // ── fim animações ──────────────────────────────────────────────────────
 
+  // windowWidth (reativo a mudanças de orientação/tamanho) define o
+  // breakpoint de fonte do novo bloco de texto Android.
+  const androidIsCompact = windowWidth < 360;
+
   return (
-    <View style={styles.outerContainer}>
+    <View style={[styles.outerContainer, IS_ANDROID && styles.outerContainerAndroid]}>
 
       {/* ══════════════════════════════════════════════════════════════════
           CAMADA 0 — Glow de respiro vermelho
@@ -174,7 +182,10 @@ export default function CardProfileWelcome() {
       {/* ══════════════════════════════════════════════════════════════════
           CORPO DE VIDRO — overflow:hidden (clip do shimmer)
       ══════════════════════════════════════════════════════════════════ */}
-      <View style={styles.wrapper}>
+      <View style={[
+        styles.wrapper,
+        IS_ANDROID && styles.wrapperAndroid,
+      ]}>
 
         {/* Botão de configurações — zIndex 10, preservado integralmente */}
         <TouchableOpacity
@@ -405,7 +416,7 @@ export default function CardProfileWelcome() {
         {/* ── CONTEÚDO — preservado integralmente ──────────────────────── */}
 
         {/* HEADER */}
-        <View style={styles.topRow}>
+        <View style={[styles.topRow, IS_ANDROID && styles.topRowAndroid]}>
 
           {/* Avatar com anel premium e halo de luz */}
           <View style={styles.avatarRing}>
@@ -421,24 +432,59 @@ export default function CardProfileWelcome() {
             />
           </View>
 
-          <View>
-            <Text style={styles.statusTitle}>Status atual:</Text>
-            <View style={styles.statusChip}>
-              <Text style={styles.statusText}>{statusAssinatura}</Text>
+          <View style={[styles.statusBlock, IS_ANDROID && styles.statusBlockAndroid]}>
+            <Text style={[styles.statusTitle, IS_ANDROID && styles.statusTitleAndroid]}>Status atual:</Text>
+            <View style={[styles.statusChip, IS_ANDROID && styles.statusChipAndroid]}>
+              <Text style={[styles.statusText, IS_ANDROID && styles.statusTextAndroid]}>{statusAssinatura}</Text>
             </View>
           </View>
         </View>
 
-        {/* TEXTO ANIMADO — states e lógica 100% intactos */}
-        <View style={styles.textContainer}>
-          <Text style={styles.text}>{displayedText[0]}</Text>
+        {/* TEXTO ANIMADO — states e lógica 100% intactos.
+            Android: layout de texto totalmente independente do iOS —
+            nome em linha própria, mensagem em bloco vertical simples,
+            sem herdar styles.text/styles.name (que carregam premissas
+            de lineHeight/largura pensadas para o layout do iOS). Os
+            três valores (displayedText[0/1/2]) e a lógica de digitação
+            são exatamente os mesmos; só a apresentação muda. */}
+        {IS_ANDROID ? (
+          <View style={styles.textBlockAndroid}>
+            <Text
+              style={[
+                styles.greetingLineAndroid,
+                androidIsCompact && styles.greetingLineAndroidCompact,
+              ]}
+            >
+              {fullText[0]}
+            </Text>
+            <Text
+              style={[
+                styles.nameLineAndroid,
+                androidIsCompact && styles.nameLineAndroidCompact,
+              ]}
+            >
+              {fullText[1]}
+            </Text>
+            <Text
+              style={[
+                styles.greetingLineAndroid,
+                androidIsCompact && styles.greetingLineAndroidCompact,
+              ]}
+            >
+              {fullText[2]}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.textContainer}>
+            <Text style={styles.text}>{displayedText[0]}</Text>
 
-          <Text style={[styles.text, styles.name]}>
-            {displayedText[1]}
-          </Text>
+            <Text style={[styles.text, styles.name]}>
+              {displayedText[1]}
+            </Text>
 
-          <Text style={styles.text}>{displayedText[2]}</Text>
-        </View>
+            <Text style={styles.text}>{displayedText[2]}</Text>
+          </View>
+        )}
 
         {/* AÇÕES — eventos e estrutura preservados */}
         <View style={styles.actionsContainer}>
@@ -616,6 +662,11 @@ const styles = StyleSheet.create({
     elevation: Platform.OS === 'android' ? 8 : 18,
   },
 
+  outerContainerAndroid: {
+    alignSelf: 'stretch',
+    width: '100%',
+  },
+
   // Corpo do vidro — overflow:hidden necessário para clip do shimmer e blurs.
   // Android: o bg sólido opaco anterior evitava o bug do "quadrado" mas
   // também matava a sensação de vidro. A correção real do bug é não
@@ -629,10 +680,27 @@ const styles = StyleSheet.create({
     backgroundColor: Platform.OS === 'android' ? 'rgba(12,12,16,0.32)' : 'transparent',
   },
 
+  wrapperAndroid: {
+    paddingTop: 22,
+    paddingBottom: 28,
+    width: '100%',
+    alignSelf: 'stretch',
+    // Sem minHeight fixo: nomes longos ("Maria Eduarda Nascimento,")
+    // podem quebrar em 2-3 linhas em telas estreitas. O card cresce
+    // naturalmente pelo próprio layout de flexbox — altura sempre
+    // acompanha o conteúdo real, nunca compete com ele.
+  },
+
   topRow: {
     flexDirection:  'row',
     alignItems:     'center',
     marginBottom:   20,
+  },
+
+  topRowAndroid: {
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    marginBottom: 16,
   },
 
   // Android: sem BlurView real atrás, o preenchimento translúcido original
@@ -668,6 +736,21 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
+  statusTitleAndroid: {
+    marginBottom: 2,
+  },
+
+  statusBlock: {
+    flexShrink: 1,
+  },
+
+  statusBlockAndroid: {
+    maxWidth: '100%',
+    flexShrink: 1,
+    flexGrow: 1,
+    minWidth: 0,
+  },
+
   // Android: mesmo reforço — sem blur real, o chip translúcido original
   // ficava quase indistinguível do fundo do card.
   statusChip: {
@@ -681,6 +764,12 @@ const styles = StyleSheet.create({
     borderColor:     Platform.OS === 'android' ? 'rgba(255,255,255,0.20)' : 'rgba(255,255,255,0.15)',
   },
 
+  statusChipAndroid: {
+    alignSelf: 'flex-start',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+  },
+
   statusText: {
     color:      '#fff',
     fontWeight: '600',
@@ -688,7 +777,27 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
+  statusTextAndroid: {
+    fontSize: 12,
+    lineHeight: 17,
+    flexShrink: 1,
+  },
+
   textContainer: {
+    width: '100%',
+  },
+
+  // ── Bloco de texto Android — layout independente do iOS ─────────────────
+  // Card de boas-vindas tratado como layout próprio no Android: nome em
+  // linha isolada, mensagem em bloco vertical simples, espaçamento
+  // generoso. Não tenta replicar o texto corrido único do iOS — prioriza
+  // nunca cortar texto, para qualquer tamanho de nome ou tela.
+  textBlockAndroid: {
+    marginTop: 14,
+    marginBottom: 6,
+    width: '100%',
+    alignSelf: 'stretch',
+    alignItems: 'flex-start',
   },
 
   text: {
@@ -698,11 +807,52 @@ const styles = StyleSheet.create({
     lineHeight: IS_SMALL_SCREEN ? 24 : 28,
   },
 
+  // Linhas de saudação ("Seja bem-vindo" / "aproveite nosso app").
+  // Fonte reduzida e lineHeight bem generoso (fontSize * ~1.6) — folga
+  // ampla o bastante para nunca cortar em nenhuma métrica de fonte de
+  // fabricante Android, priorizando robustez sobre densidade visual.
+  greetingLineAndroid: {
+    color: '#fff',
+    fontSize: 15,
+    lineHeight: 24,
+    fontWeight: '500',
+    width: '100%',
+    flexWrap: 'wrap',
+  },
+
+  greetingLineAndroidCompact: {
+    fontSize: 13,
+    lineHeight: 21,
+  },
+
   name: {
     color:           '#ff2b2b',
     textShadowColor:  'rgba(255,0,0,0.8)',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
+  },
+
+  // Nome do usuário — linha própria, isolado da saudação. Mantém a
+  // identidade visual (vermelho + glow) mas com fonte menor e lineHeight
+  // bem generoso (fontSize * ~1.6), já que é o texto de comprimento mais
+  // variável e mais propenso a ter acentos (á, ã, é, ç, õ).
+  nameLineAndroid: {
+    color: '#ff2b2b',
+    textShadowColor: 'rgba(255,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
+    fontSize: 18,
+    lineHeight: 28,
+    fontWeight: '600',
+    marginTop: 6,
+    marginBottom: 6,
+    width: '100%',
+    flexWrap: 'wrap',
+  },
+
+  nameLineAndroidCompact: {
+    fontSize: 16,
+    lineHeight: 25,
   },
 
   // Android: reativado como glow interno vermelho muito sutil — reforça

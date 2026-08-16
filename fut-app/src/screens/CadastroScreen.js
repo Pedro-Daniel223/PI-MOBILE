@@ -345,14 +345,16 @@ export default function CadastroScreen({ navigation }) {
                                                     activeOpacity={0.85}
                                                     style={[
                                                         localStyles.sexoChip,
+                                                        Platform.OS === 'android' && localStyles.sexoChipAndroid,
                                                         isSelected && localStyles.sexoChipActive,
+                                                        isSelected && Platform.OS === 'android' && localStyles.sexoChipActiveAndroid,
                                                     ]}
                                                     onPress={() => {
                                                         setSexo(option);
                                                         clearError('sexo');
                                                     }}
                                                 >
-                                                    {isSelected && (
+                                                    {isSelected && Platform.OS !== 'android' && (
                                                         <LinearGradient
                                                             colors={['#e8000f', '#9c0008']}
                                                             style={StyleSheet.absoluteFill}
@@ -362,10 +364,12 @@ export default function CadastroScreen({ navigation }) {
                                                     )}
                                                     <Text
                                                         style={[
-                                                            localStyles.sexoChipText,
-                                                            isSelected && localStyles.sexoChipTextActive,
-                                                        ]}
-                                                    >
+                                                        localStyles.sexoChipText,
+                                                        Platform.OS === 'android' && localStyles.sexoChipTextAndroid,
+                                                        isSelected && localStyles.sexoChipTextActive,
+                                                        isSelected && Platform.OS === 'android' && localStyles.sexoChipTextActiveAndroid,
+                                                    ]}
+                                                >
                                                         {option}
                                                     </Text>
                                                 </TouchableOpacity>
@@ -553,14 +557,28 @@ export default function CadastroScreen({ navigation }) {
 
                         {/* ── Navegação entre etapas ─────────────────────────── */}
                         <View style={localStyles.navRow}>
-                            {step > 1 && (
+                                    {step > 1 && (
                                 <TouchableOpacity
-                                    style={localStyles.backStepButton}
+                                    style={[
+                                        localStyles.backStepButton,
+                                        Platform.OS === 'android' && localStyles.backStepButtonAndroid,
+                                    ]}
                                     onPress={handleBackStep}
                                     disabled={isSubmitting}
                                 >
-                                    <Ionicons name="chevron-back" size={16} color="rgba(10,10,10,0.75)" />
-                                    <Text style={localStyles.backStepButtonText}>Voltar</Text>
+                                    <Ionicons
+                                        name="chevron-back"
+                                        size={16}
+                                        color={Platform.OS === 'android' ? 'rgba(255,255,255,0.92)' : 'rgba(10,10,10,0.75)'}
+                                    />
+                                    <Text
+                                        style={[
+                                            localStyles.backStepButtonText,
+                                            Platform.OS === 'android' && localStyles.backStepButtonTextAndroid,
+                                        ]}
+                                    >
+                                        Voltar
+                                    </Text>
                                 </TouchableOpacity>
                             )}
 
@@ -693,9 +711,27 @@ const localStyles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 1,
     },
+    sexoChipAndroid: {
+        backgroundColor: 'rgba(255,255,255,0.96)',
+        borderColor: 'rgba(0,0,0,0.08)',
+        shadowColor: '#000',
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2,
+    },
     sexoChipActive: {
         borderColor: 'rgba(192,0,10,0.9)',
         shadowOpacity: 0.12,
+    },
+    sexoChipActiveAndroid: {
+        backgroundColor: '#c0000a',
+        borderColor: '#a80009',
+        shadowColor: '#000',
+        shadowOpacity: 0.16,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2,
     },
     sexoChipText: {
         fontSize: 14,
@@ -703,7 +739,13 @@ const localStyles = StyleSheet.create({
         color: 'rgba(10,10,10,0.60)',
         letterSpacing: 0.3,
     },
+    sexoChipTextAndroid: {
+        color: 'rgba(20,20,20,0.72)',
+    },
     sexoChipTextActive: {
+        color: '#fff',
+    },
+    sexoChipTextActiveAndroid: {
         color: '#fff',
     },
     errorText: {
@@ -744,12 +786,24 @@ const localStyles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 1,
     },
+    backStepButtonAndroid: {
+        backgroundColor: 'rgba(255,255,255,0.96)',
+        borderColor: 'rgba(0,0,0,0.08)',
+        shadowColor: '#000',
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2,
+    },
     backStepButtonText: {
         marginLeft: 4,
         fontSize: 13,
         fontWeight: '600',
         color: 'rgba(10,10,10,0.75)',
         letterSpacing: 0.3,
+    },
+    backStepButtonTextAndroid: {
+        color: 'rgba(10,10,10,0.75)',
     },
 });
 

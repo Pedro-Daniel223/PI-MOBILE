@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { cancelarAssinatura, getMinhaAssinatura } from '../services/subscriptionService';
+import { formatSocioPlanTitle } from '../utils/formatSocioPlanTitle';
 
 const SubscriptionContext = createContext(null);
 
@@ -34,13 +35,13 @@ const normalizeSubscriptionPayload = (payload) => {
     return null;
   }
 
-  const title = String(
+  const title = formatSocioPlanTitle(
     source.title
     || source.nome_plano
     || source.nome
     || source.nome_categoria_clientes
-    || ''
-  ).toUpperCase();
+    || '',
+  );
 
   const price = source.price
     ?? source.valor

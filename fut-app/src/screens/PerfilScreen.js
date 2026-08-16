@@ -42,6 +42,7 @@ import { useProducts } from "../contexts/ProductContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { uploadProfilePhoto } from "../services/authService";
+import { formatSocioPlanTitle } from "../utils/formatSocioPlanTitle";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    PERFIL SCREEN — Estrutura principal:
@@ -325,7 +326,7 @@ const LIGHT_DS = {
 const getTierMeta = (DS) => ({
   diamante: {
     emoji: "👑",
-    label: "Sócio Diamante",
+    label: "SOCIO DIAMANTE",
     accent: DS.scheme === "dark" ? "#ffffff" : "#3a3a3c",
     cardColors:
       DS.scheme === "dark"
@@ -339,7 +340,7 @@ const getTierMeta = (DS) => ({
   },
   ouro: {
     emoji: "⭐",
-    label: "Sócio Ouro",
+    label: "SOCIO OURO",
     accent: DS.scheme === "dark" ? "#ff3b30" : "#c0000a",
     cardColors:
       DS.scheme === "dark"
@@ -353,7 +354,7 @@ const getTierMeta = (DS) => ({
   },
   prata: {
     emoji: "🥈",
-    label: "Sócio Prata",
+    label: "SOCIO PRATA",
     accent: DS.scheme === "dark" ? "#c7c9cc" : "#5c5c60",
     cardColors:
       DS.scheme === "dark"
@@ -407,9 +408,9 @@ const getPlanIdentity = (subscription, DS) => {
   return {
     isSocio: true,
     emoji: meta.emoji,
-    label: meta.label || subscription.title || "Sócio Drakos",
-    sublabel: subscription.title || null,
-    title: subscription.title || null,
+    label: meta.label || formatSocioPlanTitle(subscription.title) || "SOCIO DRAKOS",
+    sublabel: formatSocioPlanTitle(subscription.title) || null,
+    title: formatSocioPlanTitle(subscription.title) || null,
     price: subscription.price || null,
     accent: meta.accent,
     cardColors: meta.cardColors,
