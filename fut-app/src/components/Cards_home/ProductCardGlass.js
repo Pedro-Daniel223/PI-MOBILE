@@ -138,23 +138,49 @@ export default function ProductCardGlass({ image, title, price, product }) {
       onPressOut={handlePressOut}
     >
       <View style={styles.card}>
-        {/* Android: BlurView com intensity muito baixa (10) some quase
-            por completo e deixa só o backgroundColor de fallback plano,
-            reforçando o aspecto artificial. Ajustamos a intensidade só
-            no Android para manter o efeito de vidro perceptível. */}
-        <BlurView intensity={Platform.OS === 'android' ? 30 : 10} tint="dark" style={StyleSheet.absoluteFill} />
+        {/* Android: BlurView com intensity baixa some quase por completo
+            e deixa só o backgroundColor de fallback plano, reforçando o
+            aspecto artificial. Intensity elevada (mesma referência do
+            CardProfileWelcome) para sustentar a leitura de vidro real,
+            já que o backgroundColor abaixo agora é bem mais translúcido. */}
+        <BlurView intensity={Platform.OS === 'android' ? 60 : 10} tint="dark" style={StyleSheet.absoluteFill} />
+
+        {/* Segunda camada de profundidade — só no Android. O iOS já tem
+            refração real vinda do blur; no Android, sem um 2º blur
+            (evitando empilhar BlurViews, que gera o "quadrado" de
+            fallback), usamos um gradiente translúcido puro no lugar. */}
+        {Platform.OS === 'android' && (
+          <LinearGradient
+            colors={['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)']}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        )}
 
         <LinearGradient
-          colors={[
-            'rgba(255,255,255,0.15)',
-            'rgba(255,255,255,0.05)',
-            'transparent'
-          ]}
+          colors={
+            Platform.OS === 'android'
+              ? [
+                  'rgba(255,255,255,0.20)',
+                  'rgba(255,255,255,0.07)',
+                  'transparent'
+                ]
+              : [
+                  'rgba(255,255,255,0.15)',
+                  'rgba(255,255,255,0.05)',
+                  'transparent'
+                ]
+          }
           style={StyleSheet.absoluteFill}
         />
 
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.3)']}
+          colors={
+            Platform.OS === 'android'
+              ? ['transparent', 'rgba(0,0,0,0.22)']
+              : ['transparent', 'rgba(0,0,0,0.3)']
+          }
           style={StyleSheet.absoluteFill}
         />
 
@@ -258,12 +284,15 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     marginRight: 15,
     overflow: 'hidden',
-    // Android: elevation com shadowColor custom é ignorado (Android
-    // sempre usa preto para elevation), e um backgroundColor quase
-    // transparente ('0.06') deixa o retângulo de elevation visível como
-    // um "quadrado" atrás do card. Um fundo levemente mais opaco no
-    // Android resolve isso sem alterar a aparência no iOS.
-    backgroundColor: Platform.OS === 'android' ? 'rgba(18,18,22,0.85)' : 'rgba(255,255,255,0.06)',
+    // Android: o backgroundColor sólido/opaco anterior (0.85) evitava o
+    // bug do "quadrado" de elevation, mas também matava a transparência
+    // de vidro. A correção real do bug não depende de opacidade alta —
+    // depende apenas de não empilhar BlurViews e não deixar o
+    // backgroundColor totalmente 'transparent' junto de elevation alta.
+    // Aqui usamos um fundo bem mais translúcido (mesma referência do
+    // CardProfileWelcome) e deixamos o blur real (intensity elevada
+    // acima) sustentar o efeito de vidro.
+    backgroundColor: Platform.OS === 'android' ? 'rgba(16,16,20,0.32)' : 'rgba(255,255,255,0.06)',
     shadowColor: '#ff2b2b',
     shadowOpacity: 0.2,
     shadowRadius: 20,
@@ -377,9 +406,9 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderRadius: 26,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: Platform.OS === 'android' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.15)',
   },
 
 
-  
+
 });

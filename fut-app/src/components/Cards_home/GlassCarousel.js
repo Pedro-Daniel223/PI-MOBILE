@@ -162,9 +162,14 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           borderRadius: CARD_RADIUS,
           overflow: 'hidden',
           marginHorizontal: 0,
-          // Android: fundo levemente opaco compensa o blur fraco/fallback,
-          // evitando aspecto "cru" de transparência mal resolvida.
-          backgroundColor: Platform.OS === 'android' ? '#0d0d11' : 'transparent',
+          // Android: o bg sólido opaco anterior (#0d0d11) evitava o bug
+          // do "quadrado" mas também matava a sensação de vidro. A
+          // correção real do bug é não empilhar 2 BlurViews (já
+          // resolvido em G1/G2) — aqui usamos um fundo bem mais
+          // translúcido e deixamos o blur real (intensity alta) e as
+          // camadas de luz sustentarem o efeito de vidro, seguindo a
+          // mesma referência aplicada no CardProfileWelcome.
+          backgroundColor: Platform.OS === 'android' ? 'rgba(13,13,17,0.30)' : 'transparent',
         }}
       >
 
@@ -172,18 +177,21 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
             Android: BlurView usa fallback com backgroundColor sólido
             (sem compositor de blur real). Empilhar 2 BlurViews aqui
             somava duas camadas opacas, criando o "quadrado" atrás do
-            card. Mantemos 1 blur real no Android. */}
+            card. Mantemos 1 blur real no Android, com intensity mais
+            alta para sustentar a leitura de vidro agora que o
+            backgroundColor acima é bem mais translúcido. */}
         <BlurView
-          intensity={Platform.OS === 'android' ? 40 : 10}
+          intensity={Platform.OS === 'android' ? 62 : 10}
           tint="dark"
           style={StyleSheet.absoluteFill}
         />
 
         {/* G2. BlurView secundário — camada de profundidade.
-            No Android substituído por gradiente translúcido puro. */}
+            No Android substituído por gradiente translúcido puro.
+            Opacidade reduzida para deixar mais transparência passar. */}
         {Platform.OS === 'android' ? (
           <LinearGradient
-            colors={['rgba(10,10,14,0.30)', 'rgba(10,10,14,0.20)']}
+            colors={['rgba(10,10,14,0.16)', 'rgba(10,10,14,0.10)']}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -196,40 +204,58 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           />
         )}
 
-        {/* G3. Tom base naval escuro — identidade premium */}
+        {/* G3. Tom base naval escuro — identidade premium.
+            Android: opacidade reduzida — o blur real (intensity 62) já
+            sustenta a leitura de vidro; opacidade menor deixa mais
+            transparência passar em vez de mascarar com uma camada
+            sólida clara. */}
         <LinearGradient
-        colors={[
-          'rgba(255,255,255,0.06)',
-          'rgba(255,255,255,0.03)',
-          'rgba(255,255,255,0.05)',
-        ]}
+          colors={
+            Platform.OS === 'android'
+              ? ['rgba(255,255,255,0.035)', 'rgba(255,255,255,0.018)', 'rgba(255,255,255,0.03)']
+              : [
+                  'rgba(255,255,255,0.06)',
+                  'rgba(255,255,255,0.03)',
+                  'rgba(255,255,255,0.05)',
+                ]
+          }
           style={StyleSheet.absoluteFill}
           start={{ x: 0.0, y: 0.0 }}
           end={{ x: 1.0, y: 1.0 }}
         />
 
         {/* G4. Reflexo ambiental superior-esquerdo
-            Fonte de luz de estúdio no canto — efeito visionOS/Apple */}
+            Fonte de luz de estúdio no canto — efeito visionOS/Apple.
+            Android: reforçado sutilmente — sem blur real refratando
+            luz, esta camada carrega mais peso na leitura de "vidro
+            iluminado", mesmo tratamento aplicado nos demais cards. */}
         <LinearGradient
-          colors={[
-            'rgba(255, 255, 255, 0.18)',
-            'rgba(255, 255, 255, 0.07)',
-            'transparent',
-          ]}
+          colors={
+            Platform.OS === 'android'
+              ? ['rgba(255, 255, 255, 0.22)', 'rgba(255, 255, 255, 0.09)', 'transparent']
+              : ['rgba(255, 255, 255, 0.18)', 'rgba(255, 255, 255, 0.07)', 'transparent']
+          }
           style={StyleSheet.absoluteFill}
           start={{ x: 0.0, y: 0.0 }}
           end={{ x: 0.70, y: 0.58 }}
         />
 
-        {/* G5. Highlight de volume central */}
+        {/* G5. Highlight de volume central.
+            Android: reforçado — estava quase morto (0.01) em ambas as
+            plataformas; sem blur real, o card fica "chapado" sem essa
+            curvatura simulada. iOS mantém o valor original intocado. */}
         <LinearGradient
-          colors={[
-            'transparent',
-            'rgba(255, 255, 255, 0)',
-            'rgba(255, 255, 255, 0)',
-            'rgba(255, 255, 255, 0.01)',
-            'transparent',
-          ]}
+          colors={
+            Platform.OS === 'android'
+              ? ['transparent', 'rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.05)', 'transparent']
+              : [
+                  'transparent',
+                  'rgba(255, 255, 255, 0)',
+                  'rgba(255, 255, 255, 0)',
+                  'rgba(255, 255, 255, 0.01)',
+                  'transparent',
+                ]
+          }
           style={[
             StyleSheet.absoluteFill,
             { top: CARD_HEIGHT * 0.15, bottom: CARD_HEIGHT * 0.15 },
@@ -238,14 +264,15 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           end={{ x: 0.88, y: 0.5 }}
         />
 
-        {/* G6. Vignette de profundidade inferior */}
+        {/* G6. Vignette de profundidade inferior.
+            Android: levemente mais forte, compensando a falta de
+            refração real que o blur do iOS produz naturalmente. */}
         <LinearGradient
-          colors={[
-            'transparent',
-            'transparent',
-            'rgba(0, 5, 18, 0.05)',
-            'rgba(0, 5, 18, 0.14)',
-          ]}
+          colors={
+            Platform.OS === 'android'
+              ? ['transparent', 'transparent', 'rgba(0, 5, 18, 0.08)', 'rgba(0, 5, 18, 0.17)']
+              : ['transparent', 'transparent', 'rgba(0, 5, 18, 0.05)', 'rgba(0, 5, 18, 0.14)']
+          }
           style={StyleSheet.absoluteFill}
           start={{ x: 0.5, y: 0.42 }}
           end={{ x: 0.5, y: 1.0 }}
@@ -263,35 +290,85 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           end={{ x: 0.0, y: 1.0 }}
         />
 
-        {/* G8. Shimmer diagonal — varredura de luz premium */}
-        <Animated.View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            top: -(CARD_HEIGHT * 0.5),
-            bottom: -(CARD_HEIGHT * 0.5),
-            width: CARD_WIDTH * 0.28,
-            transform: [
-              { translateX: shimmerX },
-              { skewX: '-18deg' },
-            ],
-          }}
-        >
-          <LinearGradient
-            colors={[
-              'transparent',
-              'rgba(255, 255, 255, 0.03)',
-              'rgba(255, 255, 255, 0.13)',
-              'rgba(255, 255, 255, 0.20)',
-              'rgba(255, 255, 255, 0.13)',
-              'rgba(255, 255, 255, 0.03)',
-              'transparent',
-            ]}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-          />
-        </Animated.View>
+        {/* G8. Shimmer diagonal — varredura de luz premium.
+            Android: Animated.View com transform (translateX + skewX)
+            usando useNativeDriver às vezes não respeita o
+            overflow:'hidden' do pai corretamente no Android, deixando a
+            faixa clara "vazar" como uma listra reta cruzando o card
+            (mesmo bug identificado e corrigido nos demais cards da
+            família). Envolvemos com um View de clip extra, com o mesmo
+            borderRadius do glassBody, e reduzimos a extensão
+            vertical/largura e a opacidade de pico da faixa no Android
+            para minimizar o risco de vazamento e o aspecto "chapado"
+            sobre um fundo agora mais translúcido. */}
+        {Platform.OS === 'android' ? (
+          <View
+            pointerEvents="none"
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              borderRadius: CARD_RADIUS,
+              overflow: 'hidden',
+            }}
+          >
+            <Animated.View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                top: -(CARD_HEIGHT * 0.3),
+                bottom: -(CARD_HEIGHT * 0.3),
+                width: CARD_WIDTH * 0.20,
+                transform: [
+                  { translateX: shimmerX },
+                  { skewX: '-18deg' },
+                ],
+              }}
+            >
+              <LinearGradient
+                colors={[
+                  'transparent',
+                  'rgba(255, 255, 255, 0.03)',
+                  'rgba(255, 255, 255, 0.09)',
+                  'rgba(255, 255, 255, 0.14)',
+                  'rgba(255, 255, 255, 0.09)',
+                  'rgba(255, 255, 255, 0.03)',
+                  'transparent',
+                ]}
+                style={StyleSheet.absoluteFill}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+              />
+            </Animated.View>
+          </View>
+        ) : (
+          <Animated.View
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              top: -(CARD_HEIGHT * 0.5),
+              bottom: -(CARD_HEIGHT * 0.5),
+              width: CARD_WIDTH * 0.28,
+              transform: [
+                { translateX: shimmerX },
+                { skewX: '-18deg' },
+              ],
+            }}
+          >
+            <LinearGradient
+              colors={[
+                'transparent',
+                'rgba(255, 255, 255, 0.03)',
+                'rgba(255, 255, 255, 0.13)',
+                'rgba(255, 255, 255, 0.20)',
+                'rgba(255, 255, 255, 0.13)',
+                'rgba(255, 255, 255, 0.03)',
+                'transparent',
+              ]}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+            />
+          </Animated.View>
+        )}
 
         {/* ── G9. CONTEÚDO ─────────────────────────────────────────────── */}
         <View style={styles.content}>
@@ -381,7 +458,9 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           SPECULAR LAYER (fora do clip)
       ══════════════════════════════════════════════════════════════════ */}
 
-      {/* E1. Barra especular superior */}
+      {/* E1. Barra especular superior.
+          Android: pico de opacidade levemente reforçado, compensando a
+          ausência de refração real que o blur do iOS produz. */}
       <View
         pointerEvents="none"
         style={{
@@ -395,22 +474,35 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
         }}
       >
         <LinearGradient
-          colors={[
-            'transparent',
-            'rgba(255,255,255,0.52)',
-            'rgba(255,255,255,0.88)',
-            'rgba(255,255,255,0.92)',
-            'rgba(255,255,255,0.88)',
-            'rgba(255,255,255,0.52)',
-            'transparent',
-          ]}
+          colors={
+            Platform.OS === 'android'
+              ? [
+                  'transparent',
+                  'rgba(255,255,255,0.60)',
+                  'rgba(255,255,255,0.92)',
+                  'rgba(255,255,255,0.96)',
+                  'rgba(255,255,255,0.92)',
+                  'rgba(255,255,255,0.60)',
+                  'transparent',
+                ]
+              : [
+                  'transparent',
+                  'rgba(255,255,255,0.52)',
+                  'rgba(255,255,255,0.88)',
+                  'rgba(255,255,255,0.92)',
+                  'rgba(255,255,255,0.88)',
+                  'rgba(255,255,255,0.52)',
+                  'transparent',
+                ]
+          }
           style={{ flex: 1 }}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
         />
       </View>
 
-      {/* E2. Rim light esquerdo */}
+      {/* E2. Rim light esquerdo.
+          Android: reforçado, mesmo tratamento do E1. */}
       <View
         pointerEvents="none"
         style={{
@@ -424,13 +516,11 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
         }}
       >
         <LinearGradient
-          colors={[
-            'transparent',
-            'rgba(255,255,255,0.46)',
-            'rgba(255,255,255,0.32)',
-            'rgba(255,255,255,0.14)',
-            'transparent',
-          ]}
+          colors={
+            Platform.OS === 'android'
+              ? ['transparent', 'rgba(255,255,255,0.52)', 'rgba(255,255,255,0.36)', 'rgba(255,255,255,0.16)', 'transparent']
+              : ['transparent', 'rgba(255,255,255,0.46)', 'rgba(255,255,255,0.32)', 'rgba(255,255,255,0.14)', 'transparent']
+          }
           style={{ flex: 1 }}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
@@ -490,7 +580,9 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
         />
       </View>
 
-      {/* E5. Anel externo */}
+      {/* E5. Anel externo.
+          Android: levemente reforçado — sem blur real, bordas finas
+          "somem" mais facilmente contra o fundo agora mais translúcido. */}
       <View
         pointerEvents="none"
         style={{
@@ -499,11 +591,12 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           height: CARD_HEIGHT,
           borderRadius: CARD_RADIUS,
           borderWidth: 0.75,
-          borderColor: 'rgba(255, 255, 255, 0.22)',
+          borderColor: Platform.OS === 'android' ? 'rgba(255, 255, 255, 0.30)' : 'rgba(255, 255, 255, 0.22)',
         }}
       />
 
-      {/* E6. Anel interno inset (espessura do vidro) */}
+      {/* E6. Anel interno inset (espessura do vidro).
+          Android: mesmo reforço do E5. */}
       <View
         pointerEvents="none"
         style={{
@@ -514,7 +607,7 @@ const PremiumMatchCard = ({ item, shimmerAnim }) => {
           height: CARD_HEIGHT - 3,
           borderRadius: CARD_RADIUS - 1.5,
           borderWidth: 0.5,
-          borderColor: 'rgba(255, 255, 255, 0.10)',
+          borderColor: Platform.OS === 'android' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.10)',
         }}
       />
 

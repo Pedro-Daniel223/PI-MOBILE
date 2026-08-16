@@ -7,30 +7,6 @@
  *   – pressAnim (scale spring onPressIn/Out)
  *   – handlePressIn / handlePressOut
  *   – useEffect do float loop
- *
- * Arquitetura de camadas — iOS 26 Liquid Glass Light (baixo → cima):
- *
- *  [Animated.View — outerContainer]
- *   Recebe: scale transform, style prop, flatRight/flatLeft, shadows
- *   Sem overflow:hidden — ancora as camadas especulares externas.
- *
- *   [View — glassBody]  ← overflow:hidden (clip de blur + shimmer)
- *    G1. BlurView primário    (tint="light", intensity 52)
- *    G2. BlurView secundário  (tint="light", intensity 14, opacity 0.42)
- *    G3. Tom base do vidro    (branco-frio, muito sutil)
- *    G4. Reflexo ambiental    (superior-esquerdo)
- *    G5. Volume central       (curvatura 3D ilusória)
- *    G6. Vignette inferior    (espessura de material, levíssima)
- *    G7. Shimmer diagonal     (Animated, varredura periódica)
- *    G8. Conteúdo original    (icon, glow, image, title, desc, button)
- *
- *  [Camada Especular — fora do clip]
- *   E1. Barra especular superior  (1px, gradiente branco)
- *   E2. Rim light esquerdo        (1px vertical, gradiente branco)
- *   E3. Franja cromática inferior (0.75px, azul-índigo sutil)
- *   E4. Franja âmbar superior-dir (0.75px, âmbar sutil)
- *   E5. Anel externo              (0.75px branco, adapta flatRight/flatLeft)
- *   E6. Anel interno inset        (0.5px branco recuado, espessura do vidro)
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -162,18 +138,21 @@ export default function CardActionGlass({
               Android: BlurView usa fallback com backgroundColor sólido
               (sem compositor de blur real). Empilhar 2 BlurViews aqui
               somava duas camadas opacas e gerava o "quadrado" atrás
-              do card. Mantemos 1 blur real no Android. */}
+              do card. Mantemos 1 blur real no Android, com intensity
+              alta para sustentar a leitura de vidro agora que o
+              backgroundColor do glassBody é bem mais translúcido. */}
           <BlurView
-            intensity={Platform.OS === 'android' ? 45 : 50}
+            intensity={Platform.OS === 'android' ? 62 : 50}
             tint="dark"
             style={StyleSheet.absoluteFill}
           />
 
           {/* G2: BlurView secundário — camada de profundidade, muito sutil.
-              No Android substituído por gradiente translúcido puro. */}
+              No Android substituído por gradiente translúcido puro.
+              Opacidade reduzida para deixar mais transparência passar. */}
           {Platform.OS === 'android' ? (
             <LinearGradient
-              colors={['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)']}
+              colors={['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.005)']}
               style={StyleSheet.absoluteFill}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -188,55 +167,74 @@ export default function CardActionGlass({
 
           {/* G3: Tom base do vidro — branco-frio, opacidade mínima
               O vidro Apple tem um tint frio discreto; aqui muito sutil
-              para não esconder o fundo */}
+              para não esconder o fundo.
+              Android: reduzido — o blur real (intensity 62) já sustenta
+              a leitura de vidro; opacidade menor deixa mais transparência
+              passar em vez de mascarar com uma camada sólida clara. */}
           <LinearGradient
-          colors={[
-            'rgba(255,255,255,0.06)',
-            'rgba(255,255,255,0.03)',
-            'rgba(255,255,255,0.05)',
-          ]}
+            colors={
+              Platform.OS === 'android'
+                ? ['rgba(255,255,255,0.035)', 'rgba(255,255,255,0.018)', 'rgba(255,255,255,0.03)']
+                : [
+                    'rgba(255,255,255,0.06)',
+                    'rgba(255,255,255,0.03)',
+                    'rgba(255,255,255,0.05)',
+                  ]
+            }
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           />
 
           {/* G4: Reflexo ambiental superior-esquerdo
-              Fonte de luz de estúdio no canto — efeito visionOS clássico */}
+              Fonte de luz de estúdio no canto — efeito visionOS clássico.
+              Android: reforçado sutilmente — sem blur real refratando
+              luz, esta camada carrega mais peso na leitura de "vidro
+              iluminado", mesmo tratamento aplicado nos demais cards. */}
           <LinearGradient
-            colors={[
-              'rgba(255, 255, 255, 0.18)',
-              'rgba(255, 255, 255, 0.06)',
-              'transparent',
-            ]}
+            colors={
+              Platform.OS === 'android'
+                ? ['rgba(255, 255, 255, 0.22)', 'rgba(255, 255, 255, 0.08)', 'transparent']
+                : ['rgba(255, 255, 255, 0.18)', 'rgba(255, 255, 255, 0.06)', 'transparent']
+            }
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 0.65, y: 0.55 }}
           />
 
           {/* G5: Highlight de volume central
-              Centro levemente mais luminoso — ilusão de curvatura 3D sutil */}
+              Centro levemente mais luminoso — ilusão de curvatura 3D sutil.
+              Android: reativado — estava morto (transparent→transparent)
+              em ambas as plataformas; sem blur real, o card fica "chapado"
+              sem essa curvatura simulada. iOS mantém o comportamento
+              original (camada transparente/inerte, comentário preservado). */}
           <LinearGradient
-            colors={[
-              'transparent',
-              // 'rgba(255, 255, 255, 0.04)',
-              // 'rgba(255, 255, 255, 0.08)',
-              // 'rgba(255, 255, 255, 0.04)',
-              'transparent',
-            ]}
+            colors={
+              Platform.OS === 'android'
+                ? ['transparent', 'rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.05)', 'transparent']
+                : [
+                    'transparent',
+                    // 'rgba(255, 255, 255, 0.04)',
+                    // 'rgba(255, 255, 255, 0.08)',
+                    // 'rgba(255, 255, 255, 0.04)',
+                    'transparent',
+                  ]
+            }
             style={[StyleSheet.absoluteFill, { top: '16%', bottom: '16%' }]}
             start={{ x: 0.12, y: 0.5 }}
             end={{ x: 0.88, y: 0.5 }}
           />
 
           {/* G6: Vignette de profundidade inferior — levíssima
-              Densidade mínima na base; reforça espessura sem escurecer */}
+              Densidade mínima na base; reforça espessura sem escurecer.
+              Android: levemente mais forte, compensando a falta de
+              refração real que o blur do iOS produz naturalmente. */}
           <LinearGradient
-            colors={[
-              'transparent',
-              'transparent',
-              'rgba(0,5,18,0.05)',
-              'rgba(0,5,18,0.14)',
-            ]}
+            colors={
+              Platform.OS === 'android'
+                ? ['transparent', 'transparent', 'rgba(0,5,18,0.08)', 'rgba(0,5,18,0.17)']
+                : ['transparent', 'transparent', 'rgba(0,5,18,0.05)', 'rgba(0,5,18,0.14)']
+            }
             style={StyleSheet.absoluteFill}
             start={{ x: 0.5, y: 0.44 }}
             end={{ x: 0.5, y: 1.0 }}
@@ -244,35 +242,85 @@ export default function CardActionGlass({
 
           {/* G7: Shimmer diagonal
               Faixa de luz percorrendo o card em diagonal — reflexo de
-              ambiente se movendo. skewX cria o ângulo de incidência natural. */}
-          <Animated.View
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              top:    -125,
-              bottom: -125,
-              width:  SCREEN_WIDTH * 0.30,
-              transform: [
-                { translateX: shimmerX },
-                { skewX: '-18deg' },
-              ],
-            }}
-          >
-            <LinearGradient
-              colors={[
-                'transparent',
-                'rgba(255, 255, 255, 0.04)',
-                'rgba(255, 255, 255, 0.14)',
-                'rgba(255, 255, 255, 0.22)',
-                'rgba(255, 255, 255, 0.14)',
-                'rgba(255, 255, 255, 0.04)',
-                'transparent',
-              ]}
-              style={StyleSheet.absoluteFill}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-            />
-          </Animated.View>
+              ambiente se movendo. skewX cria o ângulo de incidência natural.
+              Android: Animated.View com transform (translateX + skewX)
+              usando useNativeDriver às vezes não respeita o
+              overflow:'hidden' do pai corretamente no Android, deixando
+              a faixa clara "vazar" como uma listra reta cruzando o card
+              (mesmo bug identificado e corrigido nos demais cards da
+              família). Envolvemos com um View de clip extra, com o
+              mesmo borderRadius do glassBody, e reduzimos a extensão
+              vertical/largura e a opacidade de pico da faixa no Android
+              para minimizar o risco de vazamento e o aspecto "chapado"
+              sobre um fundo agora mais translúcido. */}
+          {Platform.OS === 'android' ? (
+            <View
+              pointerEvents="none"
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                borderRadius: 22,
+                overflow: 'hidden',
+              }}
+            >
+              <Animated.View
+                pointerEvents="none"
+                style={{
+                  position: 'absolute',
+                  top:    -60,
+                  bottom: -60,
+                  width:  SCREEN_WIDTH * 0.22,
+                  transform: [
+                    { translateX: shimmerX },
+                    { skewX: '-18deg' },
+                  ],
+                }}
+              >
+                <LinearGradient
+                  colors={[
+                    'transparent',
+                    'rgba(255, 255, 255, 0.03)',
+                    'rgba(255, 255, 255, 0.09)',
+                    'rgba(255, 255, 255, 0.14)',
+                    'rgba(255, 255, 255, 0.09)',
+                    'rgba(255, 255, 255, 0.03)',
+                    'transparent',
+                  ]}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                />
+              </Animated.View>
+            </View>
+          ) : (
+            <Animated.View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                top:    -125,
+                bottom: -125,
+                width:  SCREEN_WIDTH * 0.30,
+                transform: [
+                  { translateX: shimmerX },
+                  { skewX: '-18deg' },
+                ],
+              }}
+            >
+              <LinearGradient
+                colors={[
+                  'transparent',
+                  'rgba(255, 255, 255, 0.04)',
+                  'rgba(255, 255, 255, 0.14)',
+                  'rgba(255, 255, 255, 0.22)',
+                  'rgba(255, 255, 255, 0.14)',
+                  'rgba(255, 255, 255, 0.04)',
+                  'transparent',
+                ]}
+                style={StyleSheet.absoluteFill}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+              />
+            </Animated.View>
+          )}
 
           {/* ── G8: CONTEÚDO — preservado integralmente ──────────────── */}
           <View style={styles.content}>
@@ -345,7 +393,9 @@ export default function CardActionGlass({
         ════════════════════════════════════════════════════════════════ */}
 
         {/* E1: Barra especular superior — a "linha diagnóstica" do vidro real
-            Reflexo direto da fonte de luz na aresta superior. */}
+            Reflexo direto da fonte de luz na aresta superior.
+            Android: pico de opacidade levemente reforçado, compensando
+            a ausência de refração real que o blur do iOS produz. */}
         <View
           pointerEvents="none"
           style={{
@@ -359,15 +409,27 @@ export default function CardActionGlass({
           }}
         >
           <LinearGradient
-            colors={[
-              'transparent',
-              'rgba(255, 255, 255, 0.55)',
-              'rgba(255, 255, 255, 0.90)',
-              'rgba(255, 255, 255, 0.95)',
-              'rgba(255, 255, 255, 0.90)',
-              'rgba(255, 255, 255, 0.55)',
-              'transparent',
-            ]}
+            colors={
+              Platform.OS === 'android'
+                ? [
+                    'transparent',
+                    'rgba(255, 255, 255, 0.60)',
+                    'rgba(255, 255, 255, 0.92)',
+                    'rgba(255, 255, 255, 0.96)',
+                    'rgba(255, 255, 255, 0.92)',
+                    'rgba(255, 255, 255, 0.60)',
+                    'transparent',
+                  ]
+                : [
+                    'transparent',
+                    'rgba(255, 255, 255, 0.55)',
+                    'rgba(255, 255, 255, 0.90)',
+                    'rgba(255, 255, 255, 0.95)',
+                    'rgba(255, 255, 255, 0.90)',
+                    'rgba(255, 255, 255, 0.55)',
+                    'transparent',
+                  ]
+            }
             style={{ flex: 1 }}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
@@ -375,7 +437,8 @@ export default function CardActionGlass({
         </View>
 
         {/* E2: Rim light esquerdo — iluminação lateral de estúdio
-            Visível apenas quando flatLeft não está ativo. */}
+            Visível apenas quando flatLeft não está ativo.
+            Android: reforçado, mesmo tratamento do E1. */}
         {!flatLeft && (
           <View
             pointerEvents="none"
@@ -390,13 +453,11 @@ export default function CardActionGlass({
             }}
           >
             <LinearGradient
-              colors={[
-                'transparent',
-                'rgba(255, 255, 255, 0.50)',
-                'rgba(255, 255, 255, 0.34)',
-                'rgba(255, 255, 255, 0.12)',
-                'transparent',
-              ]}
+              colors={
+                Platform.OS === 'android'
+                  ? ['transparent', 'rgba(255, 255, 255, 0.56)', 'rgba(255, 255, 255, 0.38)', 'rgba(255, 255, 255, 0.16)', 'transparent']
+                  : ['transparent', 'rgba(255, 255, 255, 0.50)', 'rgba(255, 255, 255, 0.34)', 'rgba(255, 255, 255, 0.12)', 'transparent']
+              }
               style={{ flex: 1 }}
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
@@ -462,7 +523,9 @@ export default function CardActionGlass({
         )}
 
         {/* E5: Anel de borda externo (0.75px) — envelope do vidro
-            Adapta os raios de canto para flatRight e flatLeft. */}
+            Adapta os raios de canto para flatRight e flatLeft.
+            Android: levemente reforçado — sem blur real, bordas finas
+            "somem" mais facilmente contra o fundo agora mais translúcido. */}
         <View
           pointerEvents="none"
           style={{
@@ -477,13 +540,14 @@ export default function CardActionGlass({
               borderBottomLeftRadius:  4,
             }),
             borderWidth: 0.75,
-            borderColor: 'rgba(255, 255, 255, 0.52)',
+            borderColor: Platform.OS === 'android' ? 'rgba(255, 255, 255, 0.58)' : 'rgba(255, 255, 255, 0.52)',
           }}
         />
 
         {/* E6: Anel interno inset (0.5px) — espessura do vidro
             Segunda borda recuada 1.5px: ilusão das duas superfícies do material.
-            Detalhe que separa o premium do comum. */}
+            Detalhe que separa o premium do comum.
+            Android: mesmo reforço do E5. */}
         <View
           pointerEvents="none"
           style={{
@@ -502,7 +566,7 @@ export default function CardActionGlass({
               borderBottomLeftRadius:  3,
             }),
             borderWidth: 0.5,
-            borderColor: 'rgba(255, 255, 255, 0.22)',
+            borderColor: Platform.OS === 'android' ? 'rgba(255, 255, 255, 0.30)' : 'rgba(255, 255, 255, 0.22)',
           }}
         />
 
@@ -534,13 +598,17 @@ const styles = StyleSheet.create({
 
   // Corpo do vidro — overflow:hidden para clip do blur e shimmer.
   // Mesmas dimensões do outerContainer via flex: 1.
-  // Android: fundo levemente mais opaco compensa o blur fraco/fallback,
-  // evitando aspecto "cru" de transparência mal resolvida.
+  // Android: o bg sólido opaco anterior (#141418) evitava o bug do
+  // "quadrado" mas também matava a sensação de vidro. A correção real
+  // do bug é não empilhar 2 BlurViews (já resolvido em G1/G2) — aqui
+  // usamos um fundo bem mais translúcido e deixamos o blur real
+  // (intensity alta) e as camadas de luz sustentarem o efeito de vidro,
+  // seguindo a mesma referência aplicada nos demais cards da família.
   glassBody: {
     flex:            1,
     borderRadius:    22,
     overflow:        'hidden',
-    backgroundColor: Platform.OS === 'android' ? '#141418' : 'rgba(255,255,255,0.03)',
+    backgroundColor: Platform.OS === 'android' ? 'rgba(13,13,17,0.30)' : 'rgba(255,255,255,0.03)',
   },
 
   // ── Conteúdo — preservado ─────────────────────────────────────────────

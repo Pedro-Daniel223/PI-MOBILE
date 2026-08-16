@@ -37,16 +37,18 @@ const GlassItemWrapper = React.memo(({ children, shimmerX }) => (
           backgroundColor sólido de fallback. Dois BlurViews com
           intensity=0 empilhados somavam duas camadas opacas idênticas,
           aparecendo como um "quadrado" atrás do card. Mantemos 1 blur
-          real no Android; a 2ª camada vira gradiente translúcido puro. */}
+          real no Android, com intensity mais alta para sustentar a
+          leitura de vidro agora que o backgroundColor do glassBody é
+          bem mais translúcido (mesma referência do CardProfileWelcome). */}
       <BlurView
-        intensity={Platform.OS === 'android' ? 30 : 0}
+        intensity={Platform.OS === 'android' ? 55 : 0}
         tint="dark"
         style={StyleSheet.absoluteFill}
       />
 
       {Platform.OS === 'android' ? (
         <LinearGradient
-          colors={['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)']}
+          colors={['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.005)']}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -59,35 +61,72 @@ const GlassItemWrapper = React.memo(({ children, shimmerX }) => (
         />
       )}
 
+      {/* Camada de tom base — no original é morta (transparent→transparent)
+          em ambas as plataformas. Android: reativada com opacidade
+          mínima, já que sem blur real esta é uma das poucas camadas
+          disponíveis para dar textura de vidro. iOS mantém intocado
+          (transparent→transparent, comportamento original preservado). */}
       <LinearGradient
-        colors={['transparent', 'transparent']}
+        colors={
+          Platform.OS === 'android'
+            ? ['rgba(255,255,255,0.035)', 'rgba(255,255,255,0.018)']
+            : ['transparent', 'transparent']
+        }
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
 
+      {/* Reflexo ambiental superior-esquerdo — também morto no original.
+          Android: reativado como fonte de luz de estúdio, compensando a
+          ausência de refração real do blur. iOS mantém intocado. */}
       <LinearGradient
-        colors={['transparent', 'transparent']}
+        colors={
+          Platform.OS === 'android'
+            ? ['rgba(255, 255, 255, 0.20)', 'rgba(255, 255, 255, 0.07)', 'transparent']
+            : ['transparent', 'transparent']
+        }
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 0.65, y: 0.55 }}
       />
 
+      {/* Highlight de volume central — reforçado no Android, já ativo em
+          ambas as plataformas no original; opacidade elevada só no
+          Android para compensar a ausência de curvatura simulada que o
+          blur real do iOS já entrega. */}
       <LinearGradient
-        colors={[
-          'transparent',
-          'rgba(255, 255, 255, 0.04)',
-          'rgba(255, 255, 255, 0.08)',
-          'rgba(255, 255, 255, 0.04)',
-          'transparent',
-        ]}
+        colors={
+          Platform.OS === 'android'
+            ? [
+                'transparent',
+                'rgba(255, 255, 255, 0.06)',
+                'rgba(255, 255, 255, 0.10)',
+                'rgba(255, 255, 255, 0.06)',
+                'transparent',
+              ]
+            : [
+                'transparent',
+                'rgba(255, 255, 255, 0.04)',
+                'rgba(255, 255, 255, 0.08)',
+                'rgba(255, 255, 255, 0.04)',
+                'transparent',
+              ]
+        }
         style={[StyleSheet.absoluteFill, { top: '16%', bottom: '16%' }]}
         start={{ x: 0.12, y: 0.5 }}
         end={{ x: 0.88, y: 0.5 }}
       />
 
+      {/* Vignette de profundidade inferior — morta no original.
+          Android: reativada sutilmente para reforçar espessura do
+          material sem blur real fazendo esse trabalho. iOS intocado. */}
       <LinearGradient
-        colors={['transparent', 'transparent']}
+        colors={
+          Platform.OS === 'android'
+            ? ['transparent', 'transparent', 'rgba(0, 8, 24, 0.05)', 'rgba(0, 8, 24, 0.11)']
+            : ['transparent', 'transparent']
+        }
         style={StyleSheet.absoluteFill}
         start={{ x: 0.5, y: 0.44 }}
         end={{ x: 0.5, y: 1.0 }}
@@ -101,15 +140,27 @@ const GlassItemWrapper = React.memo(({ children, shimmerX }) => (
 
     <View pointerEvents="none" style={styles.specularTop}>
       <LinearGradient
-        colors={[
-          'transparent',
-          'rgba(255, 255, 255, 0.55)',
-          'rgba(255, 255, 255, 0.90)',
-          'rgba(255, 255, 255, 0.95)',
-          'rgba(255, 255, 255, 0.90)',
-          'rgba(255, 255, 255, 0.55)',
-          'transparent',
-        ]}
+        colors={
+          Platform.OS === 'android'
+            ? [
+                'transparent',
+                'rgba(255, 255, 255, 0.62)',
+                'rgba(255, 255, 255, 0.92)',
+                'rgba(255, 255, 255, 0.96)',
+                'rgba(255, 255, 255, 0.92)',
+                'rgba(255, 255, 255, 0.62)',
+                'transparent',
+              ]
+            : [
+                'transparent',
+                'rgba(255, 255, 255, 0.55)',
+                'rgba(255, 255, 255, 0.90)',
+                'rgba(255, 255, 255, 0.95)',
+                'rgba(255, 255, 255, 0.90)',
+                'rgba(255, 255, 255, 0.55)',
+                'transparent',
+              ]
+        }
         style={{ flex: 1 }}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
@@ -118,13 +169,11 @@ const GlassItemWrapper = React.memo(({ children, shimmerX }) => (
 
     <View pointerEvents="none" style={styles.rimLight}>
       <LinearGradient
-        colors={[
-          'transparent',
-          'rgba(255, 255, 255, 0.50)',
-          'rgba(255, 255, 255, 0.34)',
-          'rgba(255, 255, 255, 0.12)',
-          'transparent',
-        ]}
+        colors={
+          Platform.OS === 'android'
+            ? ['transparent', 'rgba(255, 255, 255, 0.56)', 'rgba(255, 255, 255, 0.38)', 'rgba(255, 255, 255, 0.16)', 'transparent']
+            : ['transparent', 'rgba(255, 255, 255, 0.50)', 'rgba(255, 255, 255, 0.34)', 'rgba(255, 255, 255, 0.12)', 'transparent']
+        }
         style={{ flex: 1 }}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
@@ -213,12 +262,16 @@ const styles = StyleSheet.create({
     elevation: Platform.OS === 'android' ? 5 : 10,
   },
 
-  // Android: fundo levemente opaco compensa o blur fraco/fallback,
-  // evitando aspecto "cru" de transparência mal resolvida.
+  // Android: o bg sólido opaco anterior (#131317) evitava o bug do
+  // "quadrado" mas também matava a sensação de vidro. A correção real
+  // do bug é não empilhar 2 BlurViews (já resolvido acima) — aqui
+  // usamos um fundo bem mais translúcido e deixamos o blur real
+  // (intensity alta) e as camadas de luz sustentarem o efeito de vidro,
+  // seguindo a mesma referência aplicada no CardProfileWelcome.
   glassBody: {
     borderRadius:    CARD_RADIUS,
     overflow:        'hidden',
-    backgroundColor: Platform.OS === 'android' ? '#131317' : 'transparent',
+    backgroundColor: Platform.OS === 'android' ? 'rgba(13,13,17,0.30)' : 'transparent',
   },
 
   glassContent: {
@@ -268,7 +321,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderRadius: CARD_RADIUS,
     borderWidth:  0.75,
-    borderColor: 'rgba(255,255,255,0.18)'
+    borderColor: Platform.OS === 'android' ? 'rgba(255,255,255,0.26)' : 'rgba(255,255,255,0.18)',
   },
 
   ringInner: {
@@ -279,7 +332,7 @@ const styles = StyleSheet.create({
     bottom:       1.5,
     borderRadius: CARD_RADIUS - 1.5,
     borderWidth:  0.5,
-    borderColor:  'rgba(255, 255, 255, 0.22)',
+    borderColor: Platform.OS === 'android' ? 'rgba(255, 255, 255, 0.30)' : 'rgba(255, 255, 255, 0.22)',
   },
 
 });
