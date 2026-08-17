@@ -1,7 +1,7 @@
-import { View, Animated, Image, Text } from 'react-native';
-import { useEffect, useRef } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { stylesSplash } from '../styles/styleSplash/styleSplash';
+import { View, Animated, Image, Text } from "react-native";
+import { useEffect, useRef } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { stylesSplash } from "../styles/styleSplash/styleSplash";
 
 export default function Splash({ navigation }) {
   const { authenticated } = useAuth();
@@ -26,16 +26,15 @@ export default function Splash({ navigation }) {
         useNativeDriver: true,
       }),
     ]).start(() => {
-
       // 2️⃣ Movimento sincronizado
       Animated.parallel([
         Animated.timing(logoTranslateX, {
-          toValue: -75, // 👈 ajustado (menos distância)
+          toValue: -75, // ajustado (menos distância)
           duration: 900,
           useNativeDriver: true,
         }),
         Animated.timing(textTranslateX, {
-          toValue: 40, // 👈 mais próximo da logo
+          toValue: 40, // mais próximo da logo
           duration: 900,
           useNativeDriver: true,
         }),
@@ -46,23 +45,23 @@ export default function Splash({ navigation }) {
         }),
       ]).start(() => {
         setTimeout(() => {
-          navigation.replace(authenticated ? 'MainTabs' : 'BoasVindas');
+          navigation.replace(authenticated ? "MainTabs" : "BoasVindas");
         }, 800);
       });
-
     });
   }, []);
 
   return (
     <View style={stylesSplash.container}>
-
       <View style={stylesSplash.centerWrap}>
-
         {/* TEXTO */}
         <Animated.Text
           style={[
             stylesSplash.animatedText,
-            { opacity: textOpacity, transform: [{ translateX: textTranslateX }] }
+            {
+              opacity: textOpacity,
+              transform: [{ translateX: textTranslateX }],
+            },
           ]}
         >
           DRAKOS APP
@@ -70,14 +69,13 @@ export default function Splash({ navigation }) {
 
         {/* LOGO */}
         <Animated.Image
-          source={require('../assets/img/Escudo_Drakos.png')}
+          source={require("../assets/img/Escudo_Drakos.png")}
           style={[
             stylesSplash.logo,
-            { opacity, transform: [{ scale }, { translateX: logoTranslateX }] }
+            { opacity, transform: [{ scale }, { translateX: logoTranslateX }] },
           ]}
           resizeMode="contain"
         />
-
       </View>
     </View>
   );

@@ -17,7 +17,11 @@ import { useAuth } from "../contexts/AuthContext";
 import { useSubscription } from "../contexts/SubscriptionContext";
 import { useTheme } from "../contexts/ThemeContext";
 import CheckoutModal from "./CheckoutModal";
-import { makeStyles, DARK_DS, LIGHT_DS } from "../styles/styleCarrinhos/styleCarrinhos";
+import {
+  makeStyles,
+  DARK_DS,
+  LIGHT_DS,
+} from "../styles/styleCarrinhos/styleCarrinhos";
 import { checkout, previewCheckout } from "../services/checkoutService";
 
 const resolveImageSource = (value) => {
@@ -139,7 +143,11 @@ const CartItem = ({
               />
             ) : (
               <View style={styles.imagePlaceholder}>
-                <Ionicons name="shirt-outline" size={28} color={DS.colors.imagePlaceholderIcon} />
+                <Ionicons
+                  name="shirt-outline"
+                  size={28}
+                  color={DS.colors.imagePlaceholderIcon}
+                />
               </View>
             )}
           </View>
@@ -166,15 +174,36 @@ const CartItem = ({
             <View style={styles.pricingBlock}>
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabel}>Preço original</Text>
-                <Text style={styles.pricingValueMuted}>{formatBRL(pricing?.preco_original_unitario ?? item.precoOriginal ?? item.preco ?? item.price)}</Text>
+                <Text style={styles.pricingValueMuted}>
+                  {formatBRL(
+                    pricing?.preco_original_unitario ??
+                      item.precoOriginal ??
+                      item.preco ??
+                      item.price,
+                  )}
+                </Text>
               </View>
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabel}>Preço final</Text>
-                <Text style={styles.pricingValue}>{formatBRL(pricing?.preco_final_unitario ?? item.precoFinal ?? item.preco ?? item.price)}</Text>
+                <Text style={styles.pricingValue}>
+                  {formatBRL(
+                    pricing?.preco_final_unitario ??
+                      item.precoFinal ??
+                      item.preco ??
+                      item.price,
+                  )}
+                </Text>
               </View>
               <View style={styles.pricingRow}>
                 <Text style={styles.pricingLabel}>Economia</Text>
-                <Text style={styles.economyText}>{formatBRL(pricing?.economia_total ?? item.economia_total ?? item.economia ?? 0)}</Text>
+                <Text style={styles.economyText}>
+                  {formatBRL(
+                    pricing?.economia_total ??
+                      item.economia_total ??
+                      item.economia ??
+                      0,
+                  )}
+                </Text>
               </View>
             </View>
 
@@ -191,10 +220,13 @@ const CartItem = ({
                   <Text
                     style={[
                       styles.qtySymbol,
-                      item.quantity <= 1 && { color: DS.colors.qtySymbolDisabled },
+                      item.quantity <= 1 && {
+                        color: DS.colors.qtySymbolDisabled,
+                      },
                     ]}
                   >
-                    -</Text>
+                    -
+                  </Text>
                 </TouchableOpacity>
                 <Text style={styles.qtyNumber}>
                   {item.quantity.toString().padStart(2, "0")}
@@ -225,20 +257,16 @@ const CartItem = ({
   );
 };
 
-
 export default function CarrinhosScreen({ navigation }) {
   const { isDark } = useTheme();
 
-  const DS = useMemo(
-    () => (isDark ? DARK_DS : LIGHT_DS),
-    [isDark],
-  );
+  const DS = useMemo(() => (isDark ? DARK_DS : LIGHT_DS), [isDark]);
 
   const styles = useMemo(() => makeStyles(DS), [DS]);
   const { cartItems, updateQuantity, removeItem, clearCart, subtotal } =
     useCart();
-  const { token } = useAuth();
-  const { subscription } = useSubscription();
+  const { token, demoMode } = useAuth();
+  const { subscription, addToPurchaseHistory } = useSubscription();
   const total = subtotal;
   const hasItems = cartItems.length > 0;
   const [checkoutVisible, setCheckoutVisible] = useState(false);
@@ -250,10 +278,15 @@ export default function CarrinhosScreen({ navigation }) {
 
   const pricingMap = useMemo(() => {
     const map = new Map();
-    const items = Array.isArray(pricingSummary?.itens) ? pricingSummary.itens : [];
+    const items = Array.isArray(pricingSummary?.itens)
+      ? pricingSummary.itens
+      : [];
 
     items.forEach((item) => {
-      map.set(`${String(item.produto_id)}::${String(item.tamanho || "__no-size__")}`, item);
+      map.set(
+        `${String(item.produto_id)}::${String(item.tamanho || "__no-size__")}`,
+        item,
+      );
     });
 
     return map;
@@ -317,6 +350,17 @@ export default function CarrinhosScreen({ navigation }) {
   };
 
   const handleConfirmPurchase = async () => {
+    if (demoMode && !token) {
+      addToPurchaseHistory(checkoutSnapshot.cartItems, checkoutSnapshot.total);
+      clearCart();
+      return {
+        demo: true,
+        pedido_id: "demo-local",
+        status: "confirmado",
+        total: checkoutSnapshot.total,
+      };
+    }
+
     if (!token) {
       const error = new Error(
         "Você precisa estar autenticado para finalizar a compra.",
@@ -344,7 +388,7 @@ export default function CarrinhosScreen({ navigation }) {
 
   const handleGoToShop = () => {
     setCheckoutVisible(false);
-    navigation.navigate('MainTabs', { screen: 'Loja' });
+    navigation.navigate("MainTabs", { screen: "Loja" });
   };
 
   return (
@@ -384,7 +428,7 @@ export default function CarrinhosScreen({ navigation }) {
       >
         {hasItems ? (
           cartItems.map((item) => (
-          <CartItem
+            <CartItem
               key={`${item.id}-${item.tamanho}`}
               item={item}
               pricing={pricingMap.get(itemKey(item))}
@@ -392,16 +436,16 @@ export default function CarrinhosScreen({ navigation }) {
               onRemove={removeItem}
               styles={styles}
               DS={DS}
-          />
+            />
           ))
         ) : (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconCircle}>
-                <Ionicons
-                    name="cart-outline"
-                    size={28}
-                    color={DS.colors.accent}
-                />
+              <Ionicons
+                name="cart-outline"
+                size={28}
+                color={DS.colors.accent}
+              />
             </View>
             <Text style={styles.emptyTitle}>Sacola vazia</Text>
             <Text style={styles.emptySubtitle}>
@@ -409,7 +453,9 @@ export default function CarrinhosScreen({ navigation }) {
             </Text>
             <TouchableOpacity
               style={styles.shopButton}
-              onPress={() => navigation.navigate('MainTabs', { screen: 'Loja' })}
+              onPress={() =>
+                navigation.navigate("MainTabs", { screen: "Loja" })
+              }
             >
               <Text style={styles.shopButtonText}>Explorar Loja</Text>
             </TouchableOpacity>
@@ -427,13 +473,17 @@ export default function CarrinhosScreen({ navigation }) {
             <View>
               <Text style={styles.totalLabel}>Total geral</Text>
               {pricingSummary?.subtotal_original != null ? (
-                <Text style={styles.totalOldAmount}>{formatBRL(pricingSummary.subtotal_original)}</Text>
+                <Text style={styles.totalOldAmount}>
+                  {formatBRL(pricingSummary.subtotal_original)}
+                </Text>
               ) : null}
               <Text style={styles.totalAmount}>
                 {formatBRL(pricingSummary?.total_final ?? total)}
               </Text>
               {pricingSummary?.economia_total != null ? (
-                <Text style={styles.totalSavings}>Economia {formatBRL(pricingSummary.economia_total)}</Text>
+                <Text style={styles.totalSavings}>
+                  Economia {formatBRL(pricingSummary.economia_total)}
+                </Text>
               ) : null}
             </View>
 
@@ -444,7 +494,11 @@ export default function CarrinhosScreen({ navigation }) {
             >
               <Text style={styles.checkoutText}>Comprar</Text>
               <View style={styles.checkoutIcon}>
-                <Ionicons name="arrow-forward" size={18} color={DS.colors.checkoutIconColor} />
+                <Ionicons
+                  name="arrow-forward"
+                  size={18}
+                  color={DS.colors.checkoutIconColor}
+                />
               </View>
             </TouchableOpacity>
           </View>
@@ -464,5 +518,3 @@ export default function CarrinhosScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * IngressosScreen — Liquid Glass Edition
  * ─────────────────────────────────────────────────────────────────────────
  * Redesign 100% visual sobre a tela original de ingressos.
@@ -1512,7 +1512,7 @@ export default function IngressosScreen({ navigation }) {
               DS={DS}
             >
               <InfoRow
-                icon="🎫"
+                icon="ticket-outline"
                 title="Entrada Digital"
                 subtitle="QR Code liberado após confirmação."
                 DS={DS}
@@ -1525,7 +1525,7 @@ export default function IngressosScreen({ navigation }) {
                 }}
               />
               <InfoRow
-                icon="💳"
+                icon="card-outline"
                 title="Pagamento Seguro"
                 subtitle="Compra protegida."
                 DS={DS}
@@ -1538,7 +1538,7 @@ export default function IngressosScreen({ navigation }) {
                 }}
               />
               <InfoRow
-                icon="⚡"
+                icon="flash-outline"
                 title="Acesso Rápido"
                 subtitle="Entrada imediata."
                 isLast
@@ -1595,8 +1595,18 @@ export default function IngressosScreen({ navigation }) {
                 borderRadius={28}
                 padding={20}
                 enableShimmer={false}
-                style={{ backgroundColor: platformPick("transparent", "rgba(6,6,8,0.92)") }}
-                innerStyle={{ backgroundColor: platformPick("transparent", "rgba(6,6,8,0.94)") }}
+                style={{
+                  backgroundColor: platformPick(
+                    "transparent",
+                    "rgba(6,6,8,0.92)",
+                  ),
+                }}
+                innerStyle={{
+                  backgroundColor: platformPick(
+                    "transparent",
+                    "rgba(6,6,8,0.94)",
+                  ),
+                }}
                 DS={DS}
               >
                 <Text
@@ -1674,8 +1684,18 @@ export default function IngressosScreen({ navigation }) {
                 borderRadius={26}
                 padding={26}
                 enableShimmer={false}
-                style={{ backgroundColor: platformPick("transparent", "rgba(6,6,8,0.92)") }}
-                innerStyle={{ backgroundColor: platformPick("transparent", "rgba(6,6,8,0.94)") }}
+                style={{
+                  backgroundColor: platformPick(
+                    "transparent",
+                    "rgba(6,6,8,0.92)",
+                  ),
+                }}
+                innerStyle={{
+                  backgroundColor: platformPick(
+                    "transparent",
+                    "rgba(6,6,8,0.94)",
+                  ),
+                }}
                 DS={DS}
               >
                 <View style={{ alignItems: "center" }}>
@@ -1745,7 +1765,12 @@ export default function IngressosScreen({ navigation }) {
 function InfoRow({ icon, title, subtitle, DS }) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <Text style={{ fontSize: 20, marginRight: 14 }}>{icon}</Text>
+      <Ionicons
+        name={icon}
+        size={20}
+        color={DS.textPrimary}
+        style={{ marginRight: 14 }}
+      />
       <View style={{ flex: 1 }}>
         <Text
           style={{ color: DS.textPrimary, fontSize: 14, fontWeight: "600" }}

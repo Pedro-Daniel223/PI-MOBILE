@@ -1,10 +1,17 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   clearCachedProducts,
   getProductById as fetchProductById,
   loadProducts as fetchProducts,
-} from '../services/productService';
-import { useAuth } from './AuthContext';
+} from "../services/productService";
+import { useAuth } from "./AuthContext";
 
 const ProductContext = createContext(null);
 
@@ -47,18 +54,23 @@ export function ProductProvider({ children }) {
     return loadProducts();
   }, [loadProducts]);
 
-  const getProductById = useCallback(async (id) => {
-    if (!id) {
-      return null;
-    }
+  const getProductById = useCallback(
+    async (id) => {
+      if (!id) {
+        return null;
+      }
 
-    const cachedProduct = products.find((product) => String(product.id) === String(id));
-    if (cachedProduct) {
-      return cachedProduct;
-    }
+      const cachedProduct = products.find(
+        (product) => String(product.id) === String(id),
+      );
+      if (cachedProduct) {
+        return cachedProduct;
+      }
 
-    return fetchProductById(id, token);
-  }, [products, token]);
+      return fetchProductById(id, token);
+    },
+    [products, token],
+  );
 
   useEffect(() => {
     loadProducts().catch(() => {
@@ -75,14 +87,16 @@ export function ProductProvider({ children }) {
     getProductById,
   };
 
-  return <ProductContext.Provider value={value}>{children}</ProductContext.Provider>;
+  return (
+    <ProductContext.Provider value={value}>{children}</ProductContext.Provider>
+  );
 }
 
 export function useProducts() {
   const context = useContext(ProductContext);
 
   if (!context) {
-    throw new Error('useProducts must be used within a ProductProvider');
+    throw new Error("useProducts must be used within a ProductProvider");
   }
 
   return context;

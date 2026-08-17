@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   useCallback,
   useEffect,
   useMemo,
@@ -259,7 +259,7 @@ const LIGHT_DS = {
 
   shadowColor: "#402020",
   shadowOpacityCard: 0.14,
-  shadowOpacityPromo: 0.10,
+  shadowOpacityPromo: 0.1,
   shadowOpacityModal: 0.16,
 
   accent: "#c0000a",
@@ -325,7 +325,7 @@ const LIGHT_DS = {
 // ─────────────────────────────────────────────────────────────────────────────
 const getTierMeta = (DS) => ({
   diamante: {
-    emoji: "👑",
+    icon: "trophy-outline",
     label: "SOCIO DIAMANTE",
     accent: DS.scheme === "dark" ? "#ffffff" : "#3a3a3c",
     cardColors:
@@ -339,7 +339,7 @@ const getTierMeta = (DS) => ({
     textColor: DS.scheme === "dark" ? "#ffffff" : "#1a1414",
   },
   ouro: {
-    emoji: "⭐",
+    icon: "star-outline",
     label: "SOCIO OURO",
     accent: DS.scheme === "dark" ? "#ff3b30" : "#c0000a",
     cardColors:
@@ -353,7 +353,7 @@ const getTierMeta = (DS) => ({
     textColor: DS.scheme === "dark" ? "#ffece9" : "#5c0a06",
   },
   prata: {
-    emoji: "🥈",
+    icon: "medal-outline",
     label: "SOCIO PRATA",
     accent: DS.scheme === "dark" ? "#c7c9cc" : "#5c5c60",
     cardColors:
@@ -369,7 +369,7 @@ const getTierMeta = (DS) => ({
 });
 
 const getDefaultTierMeta = (DS) => ({
-  emoji: "⭐",
+  icon: "star-outline",
   label: null,
   accent: DS.accent,
   cardColors:
@@ -377,7 +377,8 @@ const getDefaultTierMeta = (DS) => ({
       ? ["#3a0006", "#1c0002", "#0a0a0a"]
       : ["#fdebe9", "#fbd8d4", "#f5c1bc"],
   borderColor: DS.accentBorder,
-  glowColor: DS.scheme === "dark" ? "rgba(232,0,15,0.20)" : "rgba(192,0,10,0.10)",
+  glowColor:
+    DS.scheme === "dark" ? "rgba(232,0,15,0.20)" : "rgba(192,0,10,0.10)",
   textColor: DS.scheme === "dark" ? "#ffece9" : "#5c0a06",
 });
 
@@ -385,7 +386,7 @@ const getPlanIdentity = (subscription, DS) => {
   if (!subscription) {
     return {
       isSocio: false,
-      emoji: null,
+      icon: null,
       label: "Ainda não é Sócio Drakos",
       sublabel: "Torne-se Sócio Drakos",
       title: null,
@@ -396,19 +397,23 @@ const getPlanIdentity = (subscription, DS) => {
           ? ["rgba(255,255,255,0.07)", "rgba(255,255,255,0.02)"]
           : ["rgba(20,10,10,0.05)", "rgba(20,10,10,0.015)"],
       borderColor: DS.glassBorder,
-      glowColor: DS.scheme === "dark" ? "rgba(255,255,255,0.05)" : "rgba(20,10,10,0.03)",
+      glowColor:
+        DS.scheme === "dark" ? "rgba(255,255,255,0.05)" : "rgba(20,10,10,0.03)",
       textColor: DS.textSecondary,
     };
   }
 
-  const tierKey = String(subscription.tier || "").trim().toLowerCase();
+  const tierKey = String(subscription.tier || "")
+    .trim()
+    .toLowerCase();
   const TIER_META = getTierMeta(DS);
   const meta = TIER_META[tierKey] || getDefaultTierMeta(DS);
 
   return {
     isSocio: true,
     emoji: meta.emoji,
-    label: meta.label || formatSocioPlanTitle(subscription.title) || "SOCIO DRAKOS",
+    label:
+      meta.label || formatSocioPlanTitle(subscription.title) || "SOCIO DRAKOS",
     sublabel: formatSocioPlanTitle(subscription.title) || null,
     title: formatSocioPlanTitle(subscription.title) || null,
     price: subscription.price || null,
@@ -489,11 +494,17 @@ const GlassField = React.memo(function GlassField({
           valid && editStyles.inputShellValid,
         ]}
       >
-        <BlurView intensity={26} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+        <BlurView
+          intensity={26}
+          tint={DS.modalBlurTint}
+          style={StyleSheet.absoluteFill}
+        />
         <LinearGradient
-          colors={DS.scheme === "dark"
-            ? ["rgba(255,255,255,0.07)", "rgba(255,255,255,0.02)"]
-            : ["rgba(255,255,255,0.5)", "rgba(255,255,255,0.15)"]}
+          colors={
+            DS.scheme === "dark"
+              ? ["rgba(255,255,255,0.07)", "rgba(255,255,255,0.02)"]
+              : ["rgba(255,255,255,0.5)", "rgba(255,255,255,0.15)"]
+          }
           style={StyleSheet.absoluteFill}
         />
         <Ionicons
@@ -548,7 +559,11 @@ const ReadOnlyField = React.memo(function ReadOnlyField({
     <View style={editStyles.fieldWrap}>
       <Text style={editStyles.fieldLabel}>{label}</Text>
       <View style={[editStyles.inputShell, editStyles.inputShellReadOnly]}>
-        <BlurView intensity={14} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+        <BlurView
+          intensity={14}
+          tint={DS.modalBlurTint}
+          style={StyleSheet.absoluteFill}
+        />
         <Ionicons
           name={icon}
           size={16}
@@ -636,19 +651,30 @@ export default function PerfilScreen({ navigation }) {
   // ── Estado exclusivo de UI — bottom sheet "Gerenciar assinatura" e modal
   // de confirmação de cancelamento. Nenhum dos dois toca em contexts,
   // services ou lógica de negócio: apenas controlam visibilidade local.
-  const [manageSubscriptionVisible, setManageSubscriptionVisible] = useState(false);
+  const [manageSubscriptionVisible, setManageSubscriptionVisible] =
+    useState(false);
   const [cancelConfirmVisible, setCancelConfirmVisible] = useState(false);
-  const { subscription, cancelSubscription } = useSubscription();
+  const {
+    subscription,
+    cancelSubscription,
+    purchaseHistory: localPurchaseHistory,
+  } = useSubscription();
   const { refreshProducts } = useProducts();
-  const { cliente, token, signOut, updateCliente } = useAuth();
+  const { cliente, token, signOut, updateCliente, demoMode } = useAuth();
   const [purchaseHistory, setPurchaseHistory] = useState([]);
-  const [isCancellingSubscription, setIsCancellingSubscription] = useState(false);
+  const [isCancellingSubscription, setIsCancellingSubscription] =
+    useState(false);
   const renderCountRef = useRef(0);
   renderCountRef.current += 1;
-  console.log('[PerfilScreen] render', {
+  console.log("[PerfilScreen] render", {
     render: renderCountRef.current,
     hasSubscription: Boolean(subscription),
-    subscriptionTitle: subscription?.title || subscription?.nome_plano || subscription?.nome || subscription?.plan?.title || null,
+    subscriptionTitle:
+      subscription?.title ||
+      subscription?.nome_plano ||
+      subscription?.nome ||
+      subscription?.plan?.title ||
+      null,
     manageSubscriptionVisible,
     cancelConfirmVisible,
     isCancellingSubscription,
@@ -656,11 +682,11 @@ export default function PerfilScreen({ navigation }) {
 
   const currentCliente = buildProfileSnapshot(cliente);
   const activePlanCategory = trimValue(
-    subscription?.title
-      || subscription?.nome_plano
-      || subscription?.nome
-      || subscription?.plan?.title
-      || subscription?.plan?.nome,
+    subscription?.title ||
+      subscription?.nome_plano ||
+      subscription?.nome ||
+      subscription?.plan?.title ||
+      subscription?.plan?.nome,
   );
   const currentUser = {
     name: buildDisplayName(currentCliente),
@@ -690,9 +716,7 @@ export default function PerfilScreen({ navigation }) {
   // estado de negócio, apenas uma comparação para controlar a UI.
   const hasPendingPhoto = useMemo(() => {
     const draftPhoto = trimValue(profileDraft.url_foto_clientes);
-    const savedPhoto = trimValue(
-      originalProfileRef.current?.url_foto_clientes,
-    );
+    const savedPhoto = trimValue(originalProfileRef.current?.url_foto_clientes);
     return draftPhoto.length > 0 && draftPhoto !== savedPhoto;
   }, [profileDraft.url_foto_clientes]);
 
@@ -714,7 +738,7 @@ export default function PerfilScreen({ navigation }) {
   const complementoRef = useRef(null);
 
   useEffect(() => {
-    console.log('[PerfilScreen] sync profileDraft effect', {
+    console.log("[PerfilScreen] sync profileDraft effect", {
       hasCliente: Boolean(cliente),
       editModalVisible,
     });
@@ -730,21 +754,28 @@ export default function PerfilScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-      console.log('[PerfilScreen] useFocusEffect purchaseHistory start', {
+      console.log("[PerfilScreen] useFocusEffect purchaseHistory start", {
         hasToken: Boolean(token),
       });
 
       const loadPurchaseHistory = async () => {
         if (!token) {
-          setPurchaseHistory([]);
-          console.log('[PerfilScreen] purchaseHistory skipped - no token');
+          if (demoMode) {
+            setPurchaseHistory(localPurchaseHistory);
+            console.log(
+              "[PerfilScreen] purchaseHistory skipped - demo mode, using local history",
+            );
+          } else {
+            setPurchaseHistory([]);
+            console.log("[PerfilScreen] purchaseHistory skipped - no token");
+          }
           return;
         }
 
         setIsLoadingHistory(true);
         try {
           const history = await fetchPurchaseHistory(token);
-          console.log('[PerfilScreen] purchaseHistory fetched', {
+          console.log("[PerfilScreen] purchaseHistory fetched", {
             hasHistory: Array.isArray(history),
             length: Array.isArray(history) ? history.length : null,
           });
@@ -752,7 +783,7 @@ export default function PerfilScreen({ navigation }) {
             setPurchaseHistory(history);
           }
         } catch (error) {
-          console.log('[PerfilScreen] purchaseHistory error', {
+          console.log("[PerfilScreen] purchaseHistory error", {
             status: error?.status,
             message: error?.message,
           });
@@ -770,13 +801,13 @@ export default function PerfilScreen({ navigation }) {
 
       return () => {
         isActive = false;
-        console.log('[PerfilScreen] useFocusEffect purchaseHistory cleanup');
+        console.log("[PerfilScreen] useFocusEffect purchaseHistory cleanup");
       };
-    }, [token]),
+    }, [demoMode, localPurchaseHistory, token]),
   );
 
   useEffect(() => {
-    console.log('[PerfilScreen] edit modal sync effect', {
+    console.log("[PerfilScreen] edit modal sync effect", {
       clienteChanged: Boolean(cliente),
       editModalVisible,
     });
@@ -844,7 +875,7 @@ export default function PerfilScreen({ navigation }) {
   const cancelSheetAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    console.log('[PerfilScreen] cancelConfirmVisible effect', {
+    console.log("[PerfilScreen] cancelConfirmVisible effect", {
       cancelConfirmVisible,
     });
     if (cancelConfirmVisible) {
@@ -858,18 +889,18 @@ export default function PerfilScreen({ navigation }) {
   }, [cancelConfirmVisible]);
 
   const openCancelConfirm = () => {
-    console.log('[PerfilScreen] openCancelConfirm');
+    console.log("[PerfilScreen] openCancelConfirm");
     setCancelConfirmVisible(true);
   };
 
   const closeCancelConfirm = () => {
-    console.log('[PerfilScreen] closeCancelConfirm start');
+    console.log("[PerfilScreen] closeCancelConfirm start");
     Animated.timing(cancelSheetAnim, {
       toValue: 0,
       duration: 220,
       useNativeDriver: true,
     }).start(() => {
-      console.log('[PerfilScreen] closeCancelConfirm finished');
+      console.log("[PerfilScreen] closeCancelConfirm finished");
       setCancelConfirmVisible(false);
     });
   };
@@ -877,24 +908,24 @@ export default function PerfilScreen({ navigation }) {
   // Confirmação de cancelamento — atualiza o backend e limpa o estado global.
   const handleConfirmCancelSubscription = async () => {
     if (isCancellingSubscription) {
-      console.log('[PerfilScreen] cancel handler skipped - already cancelling');
+      console.log("[PerfilScreen] cancel handler skipped - already cancelling");
       return;
     }
 
-    console.log('[PerfilScreen] cancel handler start', {
+    console.log("[PerfilScreen] cancel handler start", {
       hasToken: Boolean(token),
     });
     setIsCancellingSubscription(true);
 
     try {
-      console.log('[PerfilScreen] before cancelSubscription()');
+      console.log("[PerfilScreen] before cancelSubscription()");
       const response = await cancelSubscription(token);
-      console.log('[PerfilScreen] after cancelSubscription()', {
+      console.log("[PerfilScreen] after cancelSubscription()", {
         hasResponse: Boolean(response),
         message: response?.message,
       });
       await refreshProducts().catch((error) => {
-        console.log('[PerfilScreen] refreshProducts after cancel failed', {
+        console.log("[PerfilScreen] refreshProducts after cancel failed", {
           status: error?.status,
           message: error?.message,
         });
@@ -905,7 +936,7 @@ export default function PerfilScreen({ navigation }) {
         response?.message || "Sua assinatura foi cancelada com sucesso.",
       );
     } catch (error) {
-      console.log('[PerfilScreen] cancel handler error', {
+      console.log("[PerfilScreen] cancel handler error", {
         status: error?.status,
         message: error?.message,
       });
@@ -914,7 +945,7 @@ export default function PerfilScreen({ navigation }) {
         error?.message || "Tente novamente em instantes.",
       );
     } finally {
-      console.log('[PerfilScreen] cancel handler finally');
+      console.log("[PerfilScreen] cancel handler finally");
       setIsCancellingSubscription(false);
     }
   };
@@ -1020,11 +1051,15 @@ export default function PerfilScreen({ navigation }) {
     try {
       const pendingPhoto = trimValue(changes.url_foto_clientes);
       const savedPhoto = trimValue(originalDraft.url_foto_clientes);
-      const shouldUploadPhoto = pendingPhoto !== '' && pendingPhoto !== savedPhoto && pendingPhoto.startsWith('file://');
+      const shouldUploadPhoto =
+        pendingPhoto !== "" &&
+        pendingPhoto !== savedPhoto &&
+        pendingPhoto.startsWith("file://");
 
-      if (shouldUploadPhoto && token) {
+      if (shouldUploadPhoto && token && !demoMode) {
         const uploadedUrl = await uploadProfilePhoto(pendingPhoto, token);
-        changes.url_foto_clientes = uploadedUrl.url_foto_clientes || uploadedUrl;
+        changes.url_foto_clientes =
+          uploadedUrl.url_foto_clientes || uploadedUrl;
       }
 
       const updatedCliente = await updateCliente(changes);
@@ -1070,10 +1105,7 @@ export default function PerfilScreen({ navigation }) {
   return (
     <View style={ps.container}>
       {/* BACKGROUND */}
-      <LinearGradient
-        colors={DS.bgGradient}
-        style={StyleSheet.absoluteFill}
-      />
+      <LinearGradient colors={DS.bgGradient} style={StyleSheet.absoluteFill} />
 
       <ScrollView
         contentContainerStyle={ps.content}
@@ -1107,23 +1139,27 @@ export default function PerfilScreen({ navigation }) {
 
           <View style={ps.avatarStage}>
             <View
-              style={[ps.avatarGlow, { backgroundColor: planIdentity.glowColor }]}
+              style={[
+                ps.avatarGlow,
+                { backgroundColor: planIdentity.glowColor },
+              ]}
               pointerEvents="none"
             />
             <View
               style={[ps.avatarRing, { borderColor: planIdentity.borderColor }]}
             >
-              <Image
-                source={{ uri: currentAvatarUri }}
-                style={ps.avatar}
-              />
+              <Image source={{ uri: currentAvatarUri }} style={ps.avatar} />
             </View>
             <TouchableOpacity
               style={ps.editAvatarBtn}
               activeOpacity={0.8}
               onPress={pickProfileImage}
             >
-              <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+              <BlurView
+                intensity={30}
+                tint={DS.modalBlurTint}
+                style={StyleSheet.absoluteFill}
+              />
               <View style={ps.editAvatarBorder} />
               <Ionicons name="camera" size={13} color="#fff" />
             </TouchableOpacity>
@@ -1133,7 +1169,11 @@ export default function PerfilScreen({ navigation }) {
 
           {/* Chip de status — identificação premium do plano do sócio */}
           <View style={ps.statusChip}>
-            <BlurView intensity={34} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+            <BlurView
+              intensity={34}
+              tint={DS.modalBlurTint}
+              style={StyleSheet.absoluteFill}
+            />
             <LinearGradient
               colors={[planIdentity.glowColor, "transparent"]}
               style={StyleSheet.absoluteFill}
@@ -1141,12 +1181,22 @@ export default function PerfilScreen({ navigation }) {
               end={{ x: 1, y: 1 }}
             />
             <View
-              style={[ps.statusChipBorder, { borderColor: planIdentity.borderColor }]}
+              style={[
+                ps.statusChipBorder,
+                { borderColor: planIdentity.borderColor },
+              ]}
             />
-            {planIdentity.isSocio && (
-              <Text style={ps.statusChipEmoji}>{planIdentity.emoji}</Text>
+            {planIdentity.isSocio && planIdentity.icon && (
+              <Ionicons
+                name={planIdentity.icon}
+                size={14}
+                color={planIdentity.textColor}
+                style={ps.statusChipEmoji}
+              />
             )}
-            <Text style={[ps.statusChipText, { color: planIdentity.textColor }]}>
+            <Text
+              style={[ps.statusChipText, { color: planIdentity.textColor }]}
+            >
               {planIdentity.label}
             </Text>
           </View>
@@ -1204,21 +1254,42 @@ export default function PerfilScreen({ navigation }) {
               style={[StyleSheet.absoluteFill, { opacity: 0.35 }]}
             />
             <View
-              style={[ps.membershipBorder, { borderColor: planIdentity.borderColor }]}
+              style={[
+                ps.membershipBorder,
+                { borderColor: planIdentity.borderColor },
+              ]}
             />
             <View style={ps.membershipSpecularTop} />
 
             <View style={ps.membershipTopRow}>
               <View style={ps.membershipBadge}>
-                <Ionicons name="shield-checkmark" size={11} color={planIdentity.accent} />
-                <Text style={[ps.membershipBadgeText, { color: planIdentity.accent }]}>
+                <Ionicons
+                  name="shield-checkmark"
+                  size={11}
+                  color={planIdentity.accent}
+                />
+                <Text
+                  style={[
+                    ps.membershipBadgeText,
+                    { color: planIdentity.accent },
+                  ]}
+                >
                   MEMBRO ATIVO
                 </Text>
               </View>
-              <Text style={ps.membershipEmoji}>{planIdentity.emoji}</Text>
+              {planIdentity.icon && (
+                <Ionicons
+                  name={planIdentity.icon}
+                  size={20}
+                  color={planIdentity.textColor}
+                  style={ps.membershipEmoji}
+                />
+              )}
             </View>
 
-            <Text style={[ps.membershipTitle, { color: planIdentity.textColor }]}>
+            <Text
+              style={[ps.membershipTitle, { color: planIdentity.textColor }]}
+            >
               {planIdentity.title || planIdentity.label}
             </Text>
             <Text style={ps.membershipSubtitle}>Sócio-torcedor Drakos FC</Text>
@@ -1227,20 +1298,26 @@ export default function PerfilScreen({ navigation }) {
 
             <View style={ps.membershipFooterRow}>
               <View style={ps.membershipBenefits}>
-                <Text style={ps.membershipBenefitsTitle}>Benefícios do plano</Text>
+                <Text style={ps.membershipBenefitsTitle}>
+                  Benefícios do plano
+                </Text>
                 <Text style={ps.membershipBenefitsSubtitle}>
                   Vantagens ativas da assinatura atual
                 </Text>
                 {beneficiosAtivos.map((beneficio, index) => (
-                  <View key={`${String(beneficio)}-${index}`} style={ps.membershipBenefitItem}>
-                    <Ionicons name="checkmark-circle" size={13} color={planIdentity.accent} />
+                  <View
+                    key={`${String(beneficio)}-${index}`}
+                    style={ps.membershipBenefitItem}
+                  >
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={13}
+                      color={planIdentity.accent}
+                    />
                     <Text style={ps.membershipBenefitText}>{beneficio}</Text>
                   </View>
                 ))}
               </View>
-              {planIdentity.price ? (
-                <Text style={[ps.membershipPrice, { color: planIdentity.textColor }]}>{planIdentity.price}</Text>
-              ) : null}
             </View>
 
             <TouchableOpacity
@@ -1248,10 +1325,25 @@ export default function PerfilScreen({ navigation }) {
               activeOpacity={0.85}
               onPress={openManageSubscription}
             >
-              <BlurView intensity={24} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+              <BlurView
+                intensity={24}
+                tint={DS.modalBlurTint}
+                style={StyleSheet.absoluteFill}
+              />
               <View style={ps.membershipManageBorder} />
-              <Text style={[ps.membershipManageBtnText, { color: planIdentity.textColor }]}>Gerenciar assinatura</Text>
-              <Ionicons name="chevron-forward" size={14} color={planIdentity.textColor} />
+              <Text
+                style={[
+                  ps.membershipManageBtnText,
+                  { color: planIdentity.textColor },
+                ]}
+              >
+                Gerenciar assinatura
+              </Text>
+              <Ionicons
+                name="chevron-forward"
+                size={14}
+                color={planIdentity.textColor}
+              />
             </TouchableOpacity>
           </View>
         ) : (
@@ -1299,7 +1391,11 @@ export default function PerfilScreen({ navigation }) {
             - notifBadge + notifDot: ícone de notificação com dot vermelho
         ══════════════════════════════════════════════════════════════ */}
         <View style={ps.welcomeCard}>
-          <BlurView intensity={32} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+          <BlurView
+            intensity={32}
+            tint={DS.modalBlurTint}
+            style={StyleSheet.absoluteFill}
+          />
           <LinearGradient
             colors={DS.glassFillGradient}
             style={StyleSheet.absoluteFill}
@@ -1310,12 +1406,15 @@ export default function PerfilScreen({ navigation }) {
             <Ionicons name="sparkles-outline" size={16} color={DS.accent} />
           </View>
           <Text style={ps.welcomeBody}>
-            Olá, {currentUser.name.split(" ")[0]}. Explore as novidades,
-            confira seus dados e aproveite ao máximo sua experiência com a
-            gente.
+            Olá, {currentUser.name.split(" ")[0]}. Explore as novidades, confira
+            seus dados e aproveite ao máximo sua experiência com a gente.
           </Text>
           <TouchableOpacity style={ps.notifBadge} activeOpacity={0.8}>
-            <Ionicons name="notifications-outline" size={18} color={DS.textPrimary} />
+            <Ionicons
+              name="notifications-outline"
+              size={18}
+              color={DS.textPrimary}
+            />
             <View style={ps.notifDot} />
           </TouchableOpacity>
         </View>
@@ -1336,7 +1435,11 @@ export default function PerfilScreen({ navigation }) {
             activeOpacity={0.85}
             onPress={() => setShowHistory(true)}
           >
-            <BlurView intensity={30} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+            <BlurView
+              intensity={30}
+              tint={DS.modalBlurTint}
+              style={StyleSheet.absoluteFill}
+            />
             <LinearGradient
               colors={DS.glassFillGradient}
               style={StyleSheet.absoluteFill}
@@ -1344,11 +1447,17 @@ export default function PerfilScreen({ navigation }) {
             <View style={ps.actionWideBorder} />
             <View style={ps.actionWideInner}>
               <View style={ps.actionIconWrap}>
-                <Ionicons name="receipt-outline" size={19} color={DS.textPrimary} />
+                <Ionicons
+                  name="receipt-outline"
+                  size={19}
+                  color={DS.textPrimary}
+                />
               </View>
               <View style={ps.actionWideTextGroup}>
                 <Text style={ps.actionWideLabel}>Compras</Text>
-                <Text style={ps.actionWideSubtitle}>Ver histórico e detalhes dos pedidos</Text>
+                <Text style={ps.actionWideSubtitle}>
+                  Ver histórico e detalhes dos pedidos
+                </Text>
               </View>
             </View>
             <View style={ps.actionWideTrailing}>
@@ -1377,7 +1486,11 @@ export default function PerfilScreen({ navigation }) {
         </View>
 
         <View style={ps.infoCard}>
-          <BlurView intensity={32} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+          <BlurView
+            intensity={32}
+            tint={DS.modalBlurTint}
+            style={StyleSheet.absoluteFill}
+          />
           <LinearGradient
             colors={DS.glassFillGradient}
             style={StyleSheet.absoluteFill}
@@ -1387,7 +1500,11 @@ export default function PerfilScreen({ navigation }) {
           <View style={ps.infoRow}>
             <View style={ps.infoLeft}>
               <View style={ps.infoIconWrap}>
-                <Ionicons name="person-outline" size={15} color={DS.textPrimary} />
+                <Ionicons
+                  name="person-outline"
+                  size={15}
+                  color={DS.textPrimary}
+                />
               </View>
               <View style={ps.infoTextGroup}>
                 <Text style={ps.infoLabel}>Nome completo</Text>
@@ -1401,7 +1518,11 @@ export default function PerfilScreen({ navigation }) {
           <View style={ps.infoRow}>
             <View style={ps.infoLeft}>
               <View style={ps.infoIconWrap}>
-                <Ionicons name="mail-outline" size={15} color={DS.textPrimary} />
+                <Ionicons
+                  name="mail-outline"
+                  size={15}
+                  color={DS.textPrimary}
+                />
               </View>
               <View style={ps.infoTextGroup}>
                 <Text style={ps.infoLabel}>Email</Text>
@@ -1415,7 +1536,11 @@ export default function PerfilScreen({ navigation }) {
           <View style={ps.infoRow}>
             <View style={ps.infoLeft}>
               <View style={ps.infoIconWrap}>
-                <Ionicons name="call-outline" size={15} color={DS.textPrimary} />
+                <Ionicons
+                  name="call-outline"
+                  size={15}
+                  color={DS.textPrimary}
+                />
               </View>
               <View style={ps.infoTextGroup}>
                 <Text style={ps.infoLabel}>Telefone</Text>
@@ -1436,7 +1561,11 @@ export default function PerfilScreen({ navigation }) {
           activeOpacity={0.8}
           onPress={handleLogout}
         >
-          <BlurView intensity={22} tint={DS.modalBlurTint} style={StyleSheet.absoluteFill} />
+          <BlurView
+            intensity={22}
+            tint={DS.modalBlurTint}
+            style={StyleSheet.absoluteFill}
+          />
           <View style={ps.logoutBorder} />
           <Ionicons name="log-out-outline" size={17} color={DS.logoutText} />
           <Text style={ps.logoutText}>Sair da conta</Text>
@@ -1444,7 +1573,6 @@ export default function PerfilScreen({ navigation }) {
 
         <View style={{ height: 20 }} />
       </ScrollView>
-
 
       {/* ══════════════════════════════════════════════════════════════
           [7] MODAL EDITAR PERFIL — Liquid Glass
@@ -1946,8 +2074,13 @@ export default function PerfilScreen({ navigation }) {
               <View style={ps.manageInfoRow}>
                 <Text style={ps.manageInfoLabel}>Plano</Text>
                 <View style={ps.managePlanValue}>
-                  {planIdentity.emoji && (
-                    <Text style={ps.managePlanEmoji}>{planIdentity.emoji}</Text>
+                  {planIdentity.icon && (
+                    <Ionicons
+                      name={planIdentity.icon}
+                      size={18}
+                      color={planIdentity.textColor}
+                      style={ps.managePlanEmoji}
+                    />
                   )}
                   <Text style={ps.manageInfoValue}>
                     {planIdentity.title || planIdentity.label}
@@ -1964,7 +2097,11 @@ export default function PerfilScreen({ navigation }) {
                   <View
                     style={[
                       ps.manageStatusDot,
-                      { backgroundColor: planIdentity.isSocio ? "#3ecf7a" : DS.textFaint },
+                      {
+                        backgroundColor: planIdentity.isSocio
+                          ? "#3ecf7a"
+                          : DS.textFaint,
+                      },
                     ]}
                   />
                   <Text style={ps.manageInfoValue}>
@@ -2026,8 +2163,14 @@ export default function PerfilScreen({ navigation }) {
                 activeOpacity={0.85}
                 onPress={handleOpenPaymentHistory}
               >
-                <Ionicons name="time-outline" size={16} color={DS.textPrimary} />
-                <Text style={ps.manageSecondaryBtnText}>Histórico de pagamentos</Text>
+                <Ionicons
+                  name="time-outline"
+                  size={16}
+                  color={DS.textPrimary}
+                />
+                <Text style={ps.manageSecondaryBtnText}>
+                  Histórico de pagamentos
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -2037,7 +2180,11 @@ export default function PerfilScreen({ navigation }) {
                   closeManageSubscription(openCancelConfirm);
                 }}
               >
-                <Ionicons name="close-circle-outline" size={16} color={DS.logoutText} />
+                <Ionicons
+                  name="close-circle-outline"
+                  size={16}
+                  color={DS.logoutText}
+                />
                 <Text style={ps.manageDangerBtnText}>Cancelar assinatura</Text>
               </TouchableOpacity>
 
@@ -2059,7 +2206,7 @@ export default function PerfilScreen({ navigation }) {
         transparent
         visible={cancelConfirmVisible}
         onRequestClose={() => {
-          console.log('[PerfilScreen] cancel modal onRequestClose');
+          console.log("[PerfilScreen] cancel modal onRequestClose");
           closeCancelConfirm();
         }}
         statusBarTranslucent
@@ -2079,7 +2226,7 @@ export default function PerfilScreen({ navigation }) {
           <Pressable
             style={StyleSheet.absoluteFill}
             onPress={() => {
-              console.log('[PerfilScreen] cancel backdrop press');
+              console.log("[PerfilScreen] cancel backdrop press");
               closeCancelConfirm();
             }}
           />
@@ -2113,13 +2260,18 @@ export default function PerfilScreen({ navigation }) {
             <View style={ps.cancelSpecularTop} />
 
             <View style={ps.cancelIconWrap}>
-              <Ionicons name="alert-circle-outline" size={26} color={DS.logoutText} />
+              <Ionicons
+                name="alert-circle-outline"
+                size={26}
+                color={DS.logoutText}
+              />
             </View>
 
             <Text style={ps.cancelTitle}>Cancelar assinatura?</Text>
             <Text style={ps.cancelBody}>
               Tem certeza que deseja cancelar sua assinatura?{"\n"}
-              Você continuará com seus benefícios até o término do período vigente.
+              Você continuará com seus benefícios até o término do período
+              vigente.
             </Text>
 
             <View style={ps.cancelActionsRow}>
@@ -2127,7 +2279,7 @@ export default function PerfilScreen({ navigation }) {
                 style={ps.cancelBackBtn}
                 activeOpacity={0.85}
                 onPress={() => {
-                  console.log('[PerfilScreen] cancel back button press');
+                  console.log("[PerfilScreen] cancel back button press");
                   closeCancelConfirm();
                 }}
               >
@@ -2139,11 +2291,13 @@ export default function PerfilScreen({ navigation }) {
                 activeOpacity={0.85}
                 disabled={isCancellingSubscription}
                 onPress={() => {
-                  console.log('[PerfilScreen] cancel confirm button press');
+                  console.log("[PerfilScreen] cancel confirm button press");
                   handleConfirmCancelSubscription();
                 }}
               >
-                <Text style={ps.cancelConfirmBtnText}>Confirmar cancelamento</Text>
+                <Text style={ps.cancelConfirmBtnText}>
+                  Confirmar cancelamento
+                </Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -2235,13 +2389,17 @@ const makePsLegacy = (DS) =>
       overflow: "hidden",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: DS.scheme === "dark" ? "rgba(232,0,15,0.9)" : "rgba(192,0,10,0.92)",
+      backgroundColor:
+        DS.scheme === "dark" ? "rgba(232,0,15,0.9)" : "rgba(192,0,10,0.92)",
     },
     editAvatarBorder: {
       ...StyleSheet.absoluteFillObject,
       borderRadius: 15,
       borderWidth: 1,
-      borderColor: DS.scheme === "dark" ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.55)",
+      borderColor:
+        DS.scheme === "dark"
+          ? "rgba(255,255,255,0.35)"
+          : "rgba(255,255,255,0.55)",
     },
     username: {
       color: DS.textPrimary,
@@ -2419,7 +2577,8 @@ const makePsLegacy = (DS) =>
       ...StyleSheet.absoluteFillObject,
       borderRadius: 13,
       borderWidth: 1,
-      borderColor: DS.scheme === "dark" ? "rgba(255,255,255,0.16)" : "rgba(20,10,10,0.10)",
+      borderColor:
+        DS.scheme === "dark" ? "rgba(255,255,255,0.16)" : "rgba(20,10,10,0.10)",
     },
     membershipManageBtnText: {
       color: DS.textPrimary,
@@ -2640,7 +2799,8 @@ const makePsLegacy = (DS) =>
       paddingVertical: 8,
       borderRadius: 10,
       borderWidth: 1,
-      borderColor: DS.scheme === "dark" ? "rgba(232,0,15,0.20)" : "rgba(192,0,10,0.16)",
+      borderColor:
+        DS.scheme === "dark" ? "rgba(232,0,15,0.20)" : "rgba(192,0,10,0.16)",
       marginBottom: 14,
       gap: 8,
     },

@@ -10,7 +10,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -19,13 +19,13 @@ import {
   Animated,
   Dimensions,
   Platform,
-} from 'react-native';
+} from "react-native";
 
-import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const { Value, timing, loop, sequence, delay } = Animated;
 
 export default function CardActionGlass({
@@ -34,11 +34,10 @@ export default function CardActionGlass({
   desc,
   image,
   onPress,
-  flatRight, // ✅ preservado
-  flatLeft,  // ✅ preservado
-  style,     // ✅ preservado
+  flatRight, // preservado
+  flatLeft, // preservado
+  style, // preservado
 }) {
-
   // ── Lógica original — intacta ─────────────────────────────────────────────
   const floatAnim = useRef(new Animated.Value(0)).current;
   const pressAnim = useRef(new Animated.Value(1)).current;
@@ -71,7 +70,7 @@ export default function CardActionGlass({
           duration: 2000,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
   }, []);
   // ── fim lógica original ───────────────────────────────────────────────────
@@ -83,16 +82,20 @@ export default function CardActionGlass({
     const anim = loop(
       sequence([
         delay(3800),
-        timing(shimmerAnim, { toValue: 1, duration: 1400, useNativeDriver: true }),
-        timing(shimmerAnim, { toValue: 0, duration: 0,    useNativeDriver: true }),
-      ])
+        timing(shimmerAnim, {
+          toValue: 1,
+          duration: 1400,
+          useNativeDriver: true,
+        }),
+        timing(shimmerAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
+      ]),
     );
     anim.start();
     return () => anim.stop();
   }, []);
 
   const shimmerX = shimmerAnim.interpolate({
-    inputRange:  [0, 1],
+    inputRange: [0, 1],
     outputRange: [-(SCREEN_WIDTH * 1.2), SCREEN_WIDTH * 1.2],
   });
   // ─────────────────────────────────────────────────────────────────────────
@@ -105,7 +108,6 @@ export default function CardActionGlass({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
     >
-
       {/*
         outerContainer — Animated.View
         Recebe a transformação de escala (pressAnim), style prop e flat styles.
@@ -117,11 +119,10 @@ export default function CardActionGlass({
           styles.outerContainer,
           style,
           flatRight && styles.flatRight,
-          flatLeft  && styles.flatLeft,
+          flatLeft && styles.flatLeft,
           { transform: [{ scale: pressAnim }] },
         ]}
       >
-
         {/* ════════════════════════════════════════════════════════════════
             CORPO DE VIDRO — overflow:hidden
             Clip necessário para conter BlurViews e varredura de shimmer.
@@ -130,10 +131,9 @@ export default function CardActionGlass({
           style={[
             styles.glassBody,
             flatRight && styles.flatRight,
-            flatLeft  && styles.flatLeft,
+            flatLeft && styles.flatLeft,
           ]}
         >
-
           {/* G1: BlurView primário — base translúcida leve.
               Android: BlurView usa fallback com backgroundColor sólido
               (sem compositor de blur real). Empilhar 2 BlurViews aqui
@@ -142,7 +142,7 @@ export default function CardActionGlass({
               alta para sustentar a leitura de vidro agora que o
               backgroundColor do glassBody é bem mais translúcido. */}
           <BlurView
-            intensity={Platform.OS === 'android' ? 62 : 50}
+            intensity={Platform.OS === "android" ? 62 : 50}
             tint="dark"
             style={StyleSheet.absoluteFill}
           />
@@ -150,9 +150,9 @@ export default function CardActionGlass({
           {/* G2: BlurView secundário — camada de profundidade, muito sutil.
               No Android substituído por gradiente translúcido puro.
               Opacidade reduzida para deixar mais transparência passar. */}
-          {Platform.OS === 'android' ? (
+          {Platform.OS === "android" ? (
             <LinearGradient
-              colors={['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.005)']}
+              colors={["rgba(255,255,255,0.02)", "rgba(255,255,255,0.005)"]}
               style={StyleSheet.absoluteFill}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -173,12 +173,16 @@ export default function CardActionGlass({
               passar em vez de mascarar com uma camada sólida clara. */}
           <LinearGradient
             colors={
-              Platform.OS === 'android'
-                ? ['rgba(255,255,255,0.035)', 'rgba(255,255,255,0.018)', 'rgba(255,255,255,0.03)']
+              Platform.OS === "android"
+                ? [
+                    "rgba(255,255,255,0.035)",
+                    "rgba(255,255,255,0.018)",
+                    "rgba(255,255,255,0.03)",
+                  ]
                 : [
-                    'rgba(255,255,255,0.06)',
-                    'rgba(255,255,255,0.03)',
-                    'rgba(255,255,255,0.05)',
+                    "rgba(255,255,255,0.06)",
+                    "rgba(255,255,255,0.03)",
+                    "rgba(255,255,255,0.05)",
                   ]
             }
             style={StyleSheet.absoluteFill}
@@ -193,9 +197,17 @@ export default function CardActionGlass({
               iluminado", mesmo tratamento aplicado nos demais cards. */}
           <LinearGradient
             colors={
-              Platform.OS === 'android'
-                ? ['rgba(255, 255, 255, 0.22)', 'rgba(255, 255, 255, 0.08)', 'transparent']
-                : ['rgba(255, 255, 255, 0.18)', 'rgba(255, 255, 255, 0.06)', 'transparent']
+              Platform.OS === "android"
+                ? [
+                    "rgba(255, 255, 255, 0.22)",
+                    "rgba(255, 255, 255, 0.08)",
+                    "transparent",
+                  ]
+                : [
+                    "rgba(255, 255, 255, 0.18)",
+                    "rgba(255, 255, 255, 0.06)",
+                    "transparent",
+                  ]
             }
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
@@ -210,17 +222,23 @@ export default function CardActionGlass({
               original (camada transparente/inerte, comentário preservado). */}
           <LinearGradient
             colors={
-              Platform.OS === 'android'
-                ? ['transparent', 'rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.05)', 'transparent']
+              Platform.OS === "android"
+                ? [
+                    "transparent",
+                    "rgba(255, 255, 255, 0.05)",
+                    "rgba(255, 255, 255, 0.08)",
+                    "rgba(255, 255, 255, 0.05)",
+                    "transparent",
+                  ]
                 : [
-                    'transparent',
+                    "transparent",
                     // 'rgba(255, 255, 255, 0.04)',
                     // 'rgba(255, 255, 255, 0.08)',
                     // 'rgba(255, 255, 255, 0.04)',
-                    'transparent',
+                    "transparent",
                   ]
             }
-            style={[StyleSheet.absoluteFill, { top: '16%', bottom: '16%' }]}
+            style={[StyleSheet.absoluteFill, { top: "16%", bottom: "16%" }]}
             start={{ x: 0.12, y: 0.5 }}
             end={{ x: 0.88, y: 0.5 }}
           />
@@ -231,9 +249,19 @@ export default function CardActionGlass({
               refração real que o blur do iOS produz naturalmente. */}
           <LinearGradient
             colors={
-              Platform.OS === 'android'
-                ? ['transparent', 'transparent', 'rgba(0,5,18,0.08)', 'rgba(0,5,18,0.17)']
-                : ['transparent', 'transparent', 'rgba(0,5,18,0.05)', 'rgba(0,5,18,0.14)']
+              Platform.OS === "android"
+                ? [
+                    "transparent",
+                    "transparent",
+                    "rgba(0,5,18,0.08)",
+                    "rgba(0,5,18,0.17)",
+                  ]
+                : [
+                    "transparent",
+                    "transparent",
+                    "rgba(0,5,18,0.05)",
+                    "rgba(0,5,18,0.14)",
+                  ]
             }
             style={StyleSheet.absoluteFill}
             start={{ x: 0.5, y: 0.44 }}
@@ -253,37 +281,34 @@ export default function CardActionGlass({
               vertical/largura e a opacidade de pico da faixa no Android
               para minimizar o risco de vazamento e o aspecto "chapado"
               sobre um fundo agora mais translúcido. */}
-          {Platform.OS === 'android' ? (
+          {Platform.OS === "android" ? (
             <View
               pointerEvents="none"
               style={{
                 ...StyleSheet.absoluteFillObject,
                 borderRadius: 22,
-                overflow: 'hidden',
+                overflow: "hidden",
               }}
             >
               <Animated.View
                 pointerEvents="none"
                 style={{
-                  position: 'absolute',
-                  top:    -60,
+                  position: "absolute",
+                  top: -60,
                   bottom: -60,
-                  width:  SCREEN_WIDTH * 0.22,
-                  transform: [
-                    { translateX: shimmerX },
-                    { skewX: '-18deg' },
-                  ],
+                  width: SCREEN_WIDTH * 0.22,
+                  transform: [{ translateX: shimmerX }, { skewX: "-18deg" }],
                 }}
               >
                 <LinearGradient
                   colors={[
-                    'transparent',
-                    'rgba(255, 255, 255, 0.03)',
-                    'rgba(255, 255, 255, 0.09)',
-                    'rgba(255, 255, 255, 0.14)',
-                    'rgba(255, 255, 255, 0.09)',
-                    'rgba(255, 255, 255, 0.03)',
-                    'transparent',
+                    "transparent",
+                    "rgba(255, 255, 255, 0.03)",
+                    "rgba(255, 255, 255, 0.09)",
+                    "rgba(255, 255, 255, 0.14)",
+                    "rgba(255, 255, 255, 0.09)",
+                    "rgba(255, 255, 255, 0.03)",
+                    "transparent",
                   ]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 0.5 }}
@@ -295,25 +320,22 @@ export default function CardActionGlass({
             <Animated.View
               pointerEvents="none"
               style={{
-                position: 'absolute',
-                top:    -125,
+                position: "absolute",
+                top: -125,
                 bottom: -125,
-                width:  SCREEN_WIDTH * 0.30,
-                transform: [
-                  { translateX: shimmerX },
-                  { skewX: '-18deg' },
-                ],
+                width: SCREEN_WIDTH * 0.3,
+                transform: [{ translateX: shimmerX }, { skewX: "-18deg" }],
               }}
             >
               <LinearGradient
                 colors={[
-                  'transparent',
-                  'rgba(255, 255, 255, 0.04)',
-                  'rgba(255, 255, 255, 0.14)',
-                  'rgba(255, 255, 255, 0.22)',
-                  'rgba(255, 255, 255, 0.14)',
-                  'rgba(255, 255, 255, 0.04)',
-                  'transparent',
+                  "transparent",
+                  "rgba(255, 255, 255, 0.04)",
+                  "rgba(255, 255, 255, 0.14)",
+                  "rgba(255, 255, 255, 0.22)",
+                  "rgba(255, 255, 255, 0.14)",
+                  "rgba(255, 255, 255, 0.04)",
+                  "transparent",
                 ]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0.5 }}
@@ -324,7 +346,6 @@ export default function CardActionGlass({
 
           {/* ── G8: CONTEÚDO — preservado integralmente ──────────────── */}
           <View style={styles.content}>
-
             {/* ÍCONE — preservado */}
             <Ionicons
               name={icon}
@@ -342,10 +363,7 @@ export default function CardActionGlass({
               style={[
                 styles.image,
                 {
-                  transform: [
-                    { translateY: floatAnim },
-                    { scale: 1.05 },
-                  ],
+                  transform: [{ translateY: floatAnim }, { scale: 1.05 }],
                 },
               ]}
             />
@@ -357,16 +375,13 @@ export default function CardActionGlass({
             {/* BOTÃO GLASS — estrutura preservada, acabamento refinado */}
             <View style={styles.button}>
               <BlurView
-                intensity={Platform.OS === 'android' ? 55 : 15}
+                intensity={Platform.OS === "android" ? 55 : 15}
                 tint="dark"
                 style={StyleSheet.absoluteFill}
               />
 
               <LinearGradient
-                colors={[
-                  'transparent',
-                  'transparent',
-                ]}
+                colors={["transparent", "transparent"]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0.5, y: 0 }}
                 end={{ x: 0.5, y: 1 }}
@@ -379,10 +394,8 @@ export default function CardActionGlass({
 
               <Text style={styles.buttonText}>VER</Text>
             </View>
-
           </View>
           {/* ── fim conteúdo ──────────────────────────────────────────── */}
-
         </View>
         {/* ── fim glassBody ─────────────────────────────────────────── */}
 
@@ -399,35 +412,35 @@ export default function CardActionGlass({
         <View
           pointerEvents="none"
           style={{
-            position: 'absolute',
-            top:   0,
-            left:  '10%',
-            right: '10%',
+            position: "absolute",
+            top: 0,
+            left: "10%",
+            right: "10%",
             height: 1,
             borderRadius: 1,
-            overflow: 'hidden',
+            overflow: "hidden",
           }}
         >
           <LinearGradient
             colors={
-              Platform.OS === 'android'
+              Platform.OS === "android"
                 ? [
-                    'transparent',
-                    'rgba(255, 255, 255, 0.60)',
-                    'rgba(255, 255, 255, 0.92)',
-                    'rgba(255, 255, 255, 0.96)',
-                    'rgba(255, 255, 255, 0.92)',
-                    'rgba(255, 255, 255, 0.60)',
-                    'transparent',
+                    "transparent",
+                    "rgba(255, 255, 255, 0.60)",
+                    "rgba(255, 255, 255, 0.92)",
+                    "rgba(255, 255, 255, 0.96)",
+                    "rgba(255, 255, 255, 0.92)",
+                    "rgba(255, 255, 255, 0.60)",
+                    "transparent",
                   ]
                 : [
-                    'transparent',
-                    'rgba(255, 255, 255, 0.55)',
-                    'rgba(255, 255, 255, 0.90)',
-                    'rgba(255, 255, 255, 0.95)',
-                    'rgba(255, 255, 255, 0.90)',
-                    'rgba(255, 255, 255, 0.55)',
-                    'transparent',
+                    "transparent",
+                    "rgba(255, 255, 255, 0.55)",
+                    "rgba(255, 255, 255, 0.90)",
+                    "rgba(255, 255, 255, 0.95)",
+                    "rgba(255, 255, 255, 0.90)",
+                    "rgba(255, 255, 255, 0.55)",
+                    "transparent",
                   ]
             }
             style={{ flex: 1 }}
@@ -443,20 +456,32 @@ export default function CardActionGlass({
           <View
             pointerEvents="none"
             style={{
-              position: 'absolute',
-              left:   0,
-              top:    '12%',
-              width:  1,
-              height: '60%',
+              position: "absolute",
+              left: 0,
+              top: "12%",
+              width: 1,
+              height: "60%",
               borderRadius: 1,
-              overflow: 'hidden',
+              overflow: "hidden",
             }}
           >
             <LinearGradient
               colors={
-                Platform.OS === 'android'
-                  ? ['transparent', 'rgba(255, 255, 255, 0.56)', 'rgba(255, 255, 255, 0.38)', 'rgba(255, 255, 255, 0.16)', 'transparent']
-                  : ['transparent', 'rgba(255, 255, 255, 0.50)', 'rgba(255, 255, 255, 0.34)', 'rgba(255, 255, 255, 0.12)', 'transparent']
+                Platform.OS === "android"
+                  ? [
+                      "transparent",
+                      "rgba(255, 255, 255, 0.56)",
+                      "rgba(255, 255, 255, 0.38)",
+                      "rgba(255, 255, 255, 0.16)",
+                      "transparent",
+                    ]
+                  : [
+                      "transparent",
+                      "rgba(255, 255, 255, 0.50)",
+                      "rgba(255, 255, 255, 0.34)",
+                      "rgba(255, 255, 255, 0.12)",
+                      "transparent",
+                    ]
               }
               style={{ flex: 1 }}
               start={{ x: 0, y: 0 }}
@@ -471,22 +496,22 @@ export default function CardActionGlass({
         <View
           pointerEvents="none"
           style={{
-            position: 'absolute',
+            position: "absolute",
             bottom: 0,
-            left:   '16%',
-            right:  '16%',
+            left: "16%",
+            right: "16%",
             height: 0.75,
             borderRadius: 0.75,
-            overflow: 'hidden',
+            overflow: "hidden",
           }}
         >
           <LinearGradient
             colors={[
-              'transparent',
-              'rgba(160, 185, 255, 0.30)',
-              'rgba(180, 200, 255, 0.45)',
-              'rgba(160, 185, 255, 0.30)',
-              'transparent',
+              "transparent",
+              "rgba(160, 185, 255, 0.30)",
+              "rgba(180, 200, 255, 0.45)",
+              "rgba(160, 185, 255, 0.30)",
+              "transparent",
             ]}
             style={{ flex: 1 }}
             start={{ x: 0, y: 0.5 }}
@@ -499,21 +524,21 @@ export default function CardActionGlass({
           <View
             pointerEvents="none"
             style={{
-              position: 'absolute',
-              top:   0,
-              right: '12%',
-              width: '28%',
+              position: "absolute",
+              top: 0,
+              right: "12%",
+              width: "28%",
               height: 0.75,
               borderRadius: 0.75,
-              overflow: 'hidden',
+              overflow: "hidden",
             }}
           >
             <LinearGradient
               colors={[
-                'transparent',
+                "transparent",
                 // 'rgba(255, 230, 180, 0.26)',
                 // 'rgba(255, 210, 140, 0.36)',
-                'transparent',
+                "transparent",
               ]}
               style={{ flex: 1 }}
               start={{ x: 0, y: 0.5 }}
@@ -530,17 +555,20 @@ export default function CardActionGlass({
           pointerEvents="none"
           style={{
             ...StyleSheet.absoluteFillObject,
-            borderRadius:              22,
+            borderRadius: 22,
             ...(flatRight && {
-              borderTopRightRadius:    4,
+              borderTopRightRadius: 4,
               borderBottomRightRadius: 4,
             }),
             ...(flatLeft && {
-              borderTopLeftRadius:     4,
-              borderBottomLeftRadius:  4,
+              borderTopLeftRadius: 4,
+              borderBottomLeftRadius: 4,
             }),
             borderWidth: 0.75,
-            borderColor: Platform.OS === 'android' ? 'rgba(255, 255, 255, 0.58)' : 'rgba(255, 255, 255, 0.52)',
+            borderColor:
+              Platform.OS === "android"
+                ? "rgba(255, 255, 255, 0.58)"
+                : "rgba(255, 255, 255, 0.52)",
           }}
         />
 
@@ -551,25 +579,27 @@ export default function CardActionGlass({
         <View
           pointerEvents="none"
           style={{
-            position: 'absolute',
-            top:    1.5,
-            left:   1.5,
-            right:  1.5,
+            position: "absolute",
+            top: 1.5,
+            left: 1.5,
+            right: 1.5,
             bottom: 1.5,
-            borderRadius:              20.5,
+            borderRadius: 20.5,
             ...(flatRight && {
-              borderTopRightRadius:    3,
+              borderTopRightRadius: 3,
               borderBottomRightRadius: 3,
             }),
             ...(flatLeft && {
-              borderTopLeftRadius:     3,
-              borderBottomLeftRadius:  3,
+              borderTopLeftRadius: 3,
+              borderBottomLeftRadius: 3,
             }),
             borderWidth: 0.5,
-            borderColor: Platform.OS === 'android' ? 'rgba(255, 255, 255, 0.30)' : 'rgba(255, 255, 255, 0.22)',
+            borderColor:
+              Platform.OS === "android"
+                ? "rgba(255, 255, 255, 0.30)"
+                : "rgba(255, 255, 255, 0.22)",
           }}
         />
-
       </Animated.View>
     </TouchableOpacity>
   );
@@ -577,7 +607,6 @@ export default function CardActionGlass({
 
 // ─────────────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-
   // Container de transformação — sem overflow:hidden.
   // Sombras aqui funcionam corretamente no iOS (overflow:hidden as cancelaria).
   // Android: elevation com borderRadius e sem backgroundColor opaco pinta
@@ -585,15 +614,15 @@ const styles = StyleSheet.create({
   // Design). Fix: backgroundColor 'transparent' explícito + elevation
   // reduzida, sombra suave (shadow*) carrega o efeito de profundidade.
   outerContainer: {
-    height:       250,
+    height: 250,
     borderRadius: 22,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     // Sombra premium: soft, difusa, neutral — levitação sem peso
-    shadowColor:   '#182040',
+    shadowColor: "#182040",
     shadowOpacity: 0.16,
-    shadowRadius:  28,
-    shadowOffset:  { width: 0, height: 14 },
-    elevation: Platform.OS === 'android' ? 6 : 12,
+    shadowRadius: 28,
+    shadowOffset: { width: 0, height: 14 },
+    elevation: Platform.OS === "android" ? 6 : 12,
   },
 
   // Corpo do vidro — overflow:hidden para clip do blur e shimmer.
@@ -605,97 +634,100 @@ const styles = StyleSheet.create({
   // (intensity alta) e as camadas de luz sustentarem o efeito de vidro,
   // seguindo a mesma referência aplicada nos demais cards da família.
   glassBody: {
-    flex:            1,
-    borderRadius:    22,
-    overflow:        'hidden',
-    backgroundColor: Platform.OS === 'android' ? 'rgba(13,13,17,0.30)' : 'rgba(255,255,255,0.03)',
+    flex: 1,
+    borderRadius: 22,
+    overflow: "hidden",
+    backgroundColor:
+      Platform.OS === "android"
+        ? "rgba(13,13,17,0.30)"
+        : "rgba(255,255,255,0.03)",
   },
 
   // ── Conteúdo — preservado ─────────────────────────────────────────────
   content: {
     padding: 20,
-    flex:    1,
+    flex: 1,
   },
 
   image: {
-    width:         '100%',
-    height:        90,
-    resizeMode:    'contain',
-    alignSelf:     'center',
+    width: "100%",
+    height: 90,
+    resizeMode: "contain",
+    alignSelf: "center",
     marginVertical: 10,
-    opacity:       0.95,
+    opacity: 0.95,
   },
 
   title: {
-    color:      '#fff',
-    fontSize:   17,
-    fontWeight: '800',
-    marginTop:  6,
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "800",
+    marginTop: 6,
   },
 
   desc: {
-    color:     '#fff',
-    fontSize:  11,
-    opacity:   0.6,
+    color: "#fff",
+    fontSize: 11,
+    opacity: 0.6,
     marginTop: 3,
   },
 
   // Botão glass — estrutura preservada
   button: {
-    marginTop:     'auto',
-    height:        26,
-    borderRadius:  14,
-    overflow:      'hidden',
-    justifyContent: 'center',
-    alignItems:    'center',
-    width:         '55%',
-    alignSelf:     'flex-start',
+    marginTop: "auto",
+    height: 26,
+    borderRadius: 14,
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "55%",
+    alignSelf: "flex-start",
   },
 
   // Linha especular interna do botão — aresta superior de vidro
   buttonSpecular: {
-    position:        'absolute',
-    top:             0,
-    left:            '12%',
-    right:           '12%',
-    height:          0.5,
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
-    borderRadius:    0.5,
+    position: "absolute",
+    top: 0,
+    left: "12%",
+    right: "12%",
+    height: 0.5,
+    backgroundColor: "rgba(255, 255, 255, 0.65)",
+    borderRadius: 0.5,
   },
 
   buttonBorder: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 14,
-    borderWidth:  0.75,
-    borderColor:  'rgba(255, 255, 255, 0.38)',
+    borderWidth: 0.75,
+    borderColor: "rgba(255, 255, 255, 0.38)",
   },
 
   buttonText: {
-    color:       '#fff',
-    fontSize:    12,
-    fontWeight:  '700',
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
     letterSpacing: 1,
   },
 
   // Glow atrás da imagem — preservado
   glow: {
-    position:        'absolute',
-    width:           110,
-    height:          110,
-    borderRadius:    90,
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    top:             45,
-    alignSelf:       'center',
+    position: "absolute",
+    width: 110,
+    height: 110,
+    borderRadius: 90,
+    backgroundColor: "rgba(255,255,255,0.02)",
+    top: 45,
+    alignSelf: "center",
   },
 
   // ── Flat border styles — preservados ────────────────────────────────
   flatRight: {
-    borderTopRightRadius:    4,
+    borderTopRightRadius: 4,
     borderBottomRightRadius: 4,
   },
 
   flatLeft: {
-    borderTopLeftRadius:    4,
+    borderTopLeftRadius: 4,
     borderBottomLeftRadius: 4,
   },
 
@@ -703,5 +735,4 @@ const styles = StyleSheet.create({
   flatRightBorderFix: {
     borderRightWidth: 0,
   },
-
 });
