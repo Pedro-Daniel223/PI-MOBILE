@@ -88,8 +88,8 @@ export const LIGHT_DS = {
   blurTint: 'light',
   statusBarStyle: 'dark-content',
 
-  bg: '#11111',
-  bgElevated: '#ffff',
+  bg: '#f3f2f0',
+  bgElevated: '#ffffff',
   accent: '#8b0000',
   accentBright: '#a3000a',
   text: '#1a1414',
@@ -129,14 +129,14 @@ export const LIGHT_DS = {
 
   // Bottom sheet (GlassBottomSheet)
   backdropTintColor: platformPick('rgba(30,15,15,0.28)', 'rgba(0,0,0,0.72)'),
-  sheetBorderColor: platformPick('rgba(20,10,10,0.10)', 'rgba(255,255,255,0.10)'),
+  sheetBorderColor: platformPick('rgba(20,10,10,0.10)', 'rgba(20,10,10,0.10)'),
   sheetGradientColors: platformPick(
     ['rgba(255,255,255,0.65)', 'rgba(255,255,255,0.35)', 'rgba(20,10,10,0.04)'],
-    ['rgba(8,8,8,0.96)', 'rgba(8,8,8,0.90)', 'rgba(0,0,0,0.94)'],
+    ['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.78)', 'rgba(245,239,237,0.96)'],
   ),
   handleColor: 'rgba(20,10,10,0.18)',
   beneficioDotColor: '#a3000a',
-  footerBg: platformPick('rgba(255,251,250,0.75)', 'rgba(6,6,6,0.92)'),
+  footerBg: platformPick('rgba(255,251,250,0.75)', 'rgba(255,251,250,0.96)'),
   footerTopLineColor: 'rgba(20,10,10,0.08)',
   fecharBorderColor: 'rgba(20,10,10,0.14)',
   assinarSpecularColor: 'rgba(255,255,255,0.55)',
