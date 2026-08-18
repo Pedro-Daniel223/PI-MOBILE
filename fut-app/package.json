@@ -5,6 +5,7 @@
   "scripts": {
     "start": "expo start",
     "start:tunnel": "npx expo start --tunnel",
+    "start:wifi": "set REACT_NATIVE_PACKAGER_HOSTNAME=169.254.194.87 && npx expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web"
