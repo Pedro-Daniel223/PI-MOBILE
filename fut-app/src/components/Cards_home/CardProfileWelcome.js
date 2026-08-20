@@ -42,6 +42,12 @@ export default function CardProfileWelcome() {
   const { isDark, toggleTheme } = useTheme();
   const renderCountRef = useRef(0);
   renderCountRef.current += 1;
+  console.log('[CardProfileWelcome] render', {
+    render: renderCountRef.current,
+    loadingSubscription,
+    hasSubscription: Boolean(subscription),
+    subscriptionTitle: subscription?.title || subscription?.nome_plano || subscription?.plan?.title || null,
+  });
   const avatarUri = cliente?.url_foto_clientes?.trim() || DEFAULT_AVATAR_URL;
 
   // ── Lógica original — intacta ──────────────────────────────────────────
@@ -67,19 +73,12 @@ export default function CardProfileWelcome() {
   const [charIndex, setCharIndex]         = useState(0);
 
   useEffect(() => {
-    if (IS_ANDROID) {
-      return;
-    }
     setDisplayedText(['', '', '']);
     setLineIndex(0);
     setCharIndex(0);
   }, [nomeCompleto, avatarUri]);
 
   useEffect(() => {
-    if (IS_ANDROID) {
-      return undefined;
-    }
-
     const typingSpeed = 40;
 
     const interval = setInterval(() => {
@@ -219,7 +218,7 @@ export default function CardProfileWelcome() {
             mais alta para sustentar a leitura de vidro agora que o
             backgroundColor do wrapper é bem mais translúcido. */}
         <BlurView
-          intensity={Platform.OS === 'android' ? 62 : 100}
+          intensity={Platform.OS === 'android' ? 62 : 10}
           tint="dark"
           style={StyleSheet.absoluteFill}
         />
@@ -231,7 +230,7 @@ export default function CardProfileWelcome() {
             Opacidade reduzida para deixar mais transparência passar. */}
         {Platform.OS === 'android' ? (
           <LinearGradient
-            colors={['rgba(10,10,14,0.16)', 'rgba(75, 75, 77, 0.43)']}
+            colors={['rgba(10,10,14,0.16)', 'rgba(10,10,14,0.10)']}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -252,7 +251,7 @@ export default function CardProfileWelcome() {
         <LinearGradient
           colors={
             Platform.OS === 'android'
-              ? ['rgba(239, 239, 240, 0.06)', 'rgba(10, 10, 233, 0.03)', 'rgba(13, 13, 199, 0.04)']
+              ? ['rgba(210, 210, 215, 0.06)', 'rgba(160, 160, 170, 0.025)', 'rgba(190, 190, 200, 0.045)']
               : [
                   'rgba(192, 192, 192, 0.07)',
                   'rgba(192, 192, 192, 0.07)',
@@ -271,8 +270,8 @@ export default function CardProfileWelcome() {
         <LinearGradient
           colors={
             Platform.OS === 'android'
-              ? ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.06)', 'transparent']
-              : ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'transparent']
+              ? ['rgba(255, 255, 255, 0.16)', 'rgba(255, 255, 255, 0.06)', 'transparent']
+              : ['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0.05)', 'transparent']
           }
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
@@ -287,13 +286,13 @@ export default function CardProfileWelcome() {
         <LinearGradient
           colors={
             Platform.OS === 'android'
-              ? ['transparent', 'rgba(255, 255, 255, 0.03)', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'transparent']
+              ? ['transparent', 'rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.05)', 'transparent']
               : [
-                  // 'transparent',
-                  // 'transparent',
-                  // 'transparent',
-                  // 'transparent',
-                  // 'transparent',
+                  'transparent',
+                  // 'rgba(192, 192, 192, 0.07)',
+                  // 'rgba(192, 192, 192, 0.07)',
+                  // 'rgba(192, 192, 192, 0.07)',
+                  'transparent',
                 ]
           }
           style={[StyleSheet.absoluteFill, { top: '18%', bottom: '18%' }]}
@@ -308,8 +307,8 @@ export default function CardProfileWelcome() {
         <LinearGradient
           colors={
             Platform.OS === 'android'
-              ? ['transparent', 'transparent', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.16)']
-              : ['transparent', 'transparent', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.11)']
+              ? ['transparent', 'transparent', 'rgba(0, 0, 0, 0.07)', 'rgba(0, 0, 0, 0.16)']
+              : ['transparent', 'transparent', 'rgba(0, 0, 0, 0.04)', 'rgba(0, 0, 0, 0.11)']
           }
           style={StyleSheet.absoluteFill}
           start={{ x: 0.5, y: 0.45 }}
@@ -454,24 +453,27 @@ export default function CardProfileWelcome() {
                 styles.greetingLineAndroid,
                 androidIsCompact && styles.greetingLineAndroidCompact,
               ]}
+              numberOfLines={2}
             >
-              {fullText[0]}
+              {displayedText[0]}
             </Text>
             <Text
               style={[
                 styles.nameLineAndroid,
                 androidIsCompact && styles.nameLineAndroidCompact,
               ]}
+              numberOfLines={2}
             >
-              {fullText[1]}
+              {displayedText[1]}
             </Text>
             <Text
               style={[
                 styles.greetingLineAndroid,
                 androidIsCompact && styles.greetingLineAndroidCompact,
               ]}
+              numberOfLines={2}
             >
-              {fullText[2]}
+              {displayedText[2]}
             </Text>
           </View>
         ) : (

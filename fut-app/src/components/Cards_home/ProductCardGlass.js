@@ -15,6 +15,7 @@ import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { useCart } from "../../contexts/CartContext";
+import { useSubscription } from "../../contexts/SubscriptionContext";
 
 const resolveImageSource = (value) => {
   if (!value) {
@@ -41,9 +42,28 @@ const formatBRL = (value) =>
     currency: "BRL",
   });
 
+const formatBRLFromAny = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return "";
+  }
+
+  if (typeof value === "number") {
+    return formatBRL(value);
+  }
+
+  const normalized = String(value)
+    .replace(/[^\d,.-]/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
+  const parsed = Number(normalized);
+
+  return Number.isFinite(parsed) ? formatBRL(parsed) : String(value);
+};
+
 export default function ProductCardGlass({ image, title, price, product }) {
   const navigation = useNavigation();
   const { addItem } = useCart();
+  const { subscription } = useSubscription();
 
   const pressAnim = useRef(new Animated.Value(0)).current;
 
@@ -62,6 +82,12 @@ export default function ProductCardGlass({ image, title, price, product }) {
   const productHasDiscount =
     Number(productData.desconto_percent || 0) > 0 &&
     productData.preco_original != null;
+  const isSocio = Boolean(
+    subscription?.title ||
+      subscription?.nome_plano ||
+      subscription?.plan?.title,
+  );
+  const productPriceDisplay = formatBRLFromAny(productPrice);
   const productDetails = {
     id: productData.id ?? productTitle,
     nome: productData.nome ?? productTitle,
@@ -264,7 +290,9 @@ export default function ProductCardGlass({ image, title, price, product }) {
                   </Text>
                 </>
               ) : (
-                <Text style={styles.price}>{productPrice}</Text>
+                <Text style={styles.price}>
+                  {isSocio ? productPrice : productPriceDisplay}
+                </Text>
               )}
               {productHasDiscount ? (
                 <Text style={styles.priceSavings}>

@@ -974,7 +974,7 @@ const CheckoutModal = ({
                 </View>
 
                 <TouchableOpacity
-                  style={[s.primaryBtn, { marginTop: 28 }]}
+                  style={[s.primaryBtn, { marginTop: 28, paddingHorizontal: 24 }]}
                   activeOpacity={0.88}
                   onPress={() => {
                     handleRequestClose();

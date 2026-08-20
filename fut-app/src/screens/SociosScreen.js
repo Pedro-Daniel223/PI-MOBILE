@@ -460,7 +460,13 @@ const PlanGlassCard = memo(
 // Recebe DS e sheetStyles do pai para refletir o tema ativo.
 // ═══════════════════════════════════════════════════════════════════════════════
 const GlassBottomSheet = memo(
-  ({ visible, plan, onClose, onAssinar, DS, sheetStyles }) => (
+  ({ visible, plan, onClose, onAssinar, DS, sheetStyles }) => {
+    const benefitsCount = Array.isArray(plan?.beneficios)
+      ? plan.beneficios.length
+      : 0;
+    const hasExtendedBenefits = benefitsCount > 7;
+
+    return (
     <Modal
       animationType="slide"
       transparent
@@ -511,7 +517,15 @@ const GlassBottomSheet = memo(
             </Text>
 
             {/* Imagem ilustrativa do cartão */}
-            <View style={sheetStyles.imageWrap}>
+            <View
+              style={[
+                sheetStyles.imageWrap,
+                hasExtendedBenefits && {
+                  height: 120,
+                  marginVertical: 16,
+                },
+              ]}
+            >
               <View style={sheetStyles.imageGlowModal} />
               <Image
                 source={plan?.cardImage}
@@ -522,7 +536,15 @@ const GlassBottomSheet = memo(
 
             {/* Benefícios */}
             <Text style={sheetStyles.beneficiosTitle}>Benefícios</Text>
-            <View style={sheetStyles.beneficiosList}>
+            <View
+              style={[
+                sheetStyles.beneficiosList,
+                hasExtendedBenefits && {
+                  maxHeight: 240,
+                  marginBottom: 18,
+                },
+              ]}
+            >
               {(Array.isArray(plan?.beneficios) ? plan.beneficios : []).map(
                 (beneficio, index) => (
                   <View
@@ -600,7 +622,8 @@ const GlassBottomSheet = memo(
         </View>
       </View>
     </Modal>
-  ),
+    );
+  },
 );
 
 // ═══════════════════════════════════════════════════════════════════════════════

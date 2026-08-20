@@ -18,6 +18,7 @@ import {
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { platformPick } from '../styles/platformUiTokens';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -84,6 +85,10 @@ const BUBBLE_RATIO = 0.82;
 
 export default function NavbarGlass({ state, descriptors, navigation }) {
   const activeIndex = state?.index ?? 0;
+  const insets = useSafeAreaInsets();
+  const bottomOffset = Platform.OS === 'android'
+    ? Math.max(12, insets.bottom + 8)
+    : 24;
   const [containerWidth, setContainerWidth] = useState(0);
   const navTabs = Array.isArray(TABS) ? TABS : [];
 
@@ -280,7 +285,7 @@ export default function NavbarGlass({ state, descriptors, navigation }) {
   const bubW = tabW * BUBBLE_RATIO;
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, { bottom: bottomOffset }]}>
 
       <Animated.View
         style={{ transform: [{ scale: barS }] }}
@@ -494,7 +499,6 @@ const styles = StyleSheet.create({
   // sombra suave (shadow*) carregar o efeito de profundidade.
   wrapper: {
     position: 'absolute',
-    bottom: 24,
     left: 16,
     right: 16,
     backgroundColor: 'transparent',

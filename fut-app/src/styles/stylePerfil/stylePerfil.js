@@ -198,7 +198,7 @@ export const makePs = (DS) =>
     content: {
       paddingHorizontal: 20,
       paddingTop: 56,
-      paddingBottom: 40,
+      paddingBottom: 120,
       gap: 18,
     },
 

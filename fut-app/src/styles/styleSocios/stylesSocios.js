@@ -232,7 +232,7 @@ export const makeCardStyles = (DS) =>
       paddingHorizontal: 16,
       borderRadius: 18,
       overflow: 'hidden',
-      marginTop: 14,
+      marginTop: 10,
     },
     buttonSpecular: {
       position: 'absolute',
@@ -336,7 +336,8 @@ export const makeSheetStyles = (DS) =>
       right: 0,
       ...Platform.select({
         ios: {
-          maxHeight: SCREEN_HEIGHT * 0.82,
+          bottom: 10,
+          maxHeight: SCREEN_HEIGHT * 0.9,
         },
         android: {
           height: SCREEN_HEIGHT * 0.88,
@@ -447,16 +448,20 @@ export const makeSheetStyles = (DS) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      gap: 12,
     },
     modalPrice: {
       fontSize: 22,
       fontWeight: '900',
       color: DS.text,
       letterSpacing: -0.5,
+      flexShrink: 1,
+      maxWidth: '44%',
     },
     modalButtons: {
       flexDirection: 'row',
       gap: 10,
+      flexShrink: 0,
     },
     fecharButton: {
       height: 42,

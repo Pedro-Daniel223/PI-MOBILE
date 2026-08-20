@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { scaleFont } from '../../utils/fontScale';
 
 export const stylesHome = StyleSheet.create({
@@ -9,7 +9,7 @@ export const stylesHome = StyleSheet.create({
 
   content: {
     padding: 20,
-    paddingBottom: 120,
+    paddingBottom: Platform.OS === 'android' ? 180 : 120,
     gap: 20,
     justifyContent: 'space-between',
   },

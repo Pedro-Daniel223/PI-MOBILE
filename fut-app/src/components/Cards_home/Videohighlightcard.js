@@ -58,20 +58,21 @@ const VideoHighlightCard = ({
   const resolvedHeight = Math.round((resolvedWidth * height) / width);
 
   return (
-    <PremiumGlassCard
-      onPress={onPress}
-      width={resolvedWidth}
-      height={resolvedHeight}
-      borderRadius={borderRadius}
-      blurIntensity={55}
-      tint="dark"
-      enableShimmer={true}
-      enableBreathing={true}
-      enableFloat={false}
-      glowColor="rgba(224, 20, 35, 0.85)"
-      contentPadding={0}
-      style={style}
-    >
+    <View style={[styles.container, style]}>
+      <PremiumGlassCard
+        onPress={onPress}
+        width={resolvedWidth}
+        height={resolvedHeight}
+        borderRadius={borderRadius}
+        blurIntensity={55}
+        tint="dark"
+        enableShimmer={true}
+        enableBreathing={true}
+        enableFloat={false}
+        glowColor="rgba(224, 20, 35, 0.85)"
+        contentPadding={0}
+        style={styles.card}
+      >
       {/* ══════════════════════════════════════════════════════════════════
           THUMBNAIL — ocupa toda a área interna do vidro
       ══════════════════════════════════════════════════════════════════ */}
@@ -153,7 +154,8 @@ const VideoHighlightCard = ({
           </View>
         </View>
       </ImageBackground>
-    </PremiumGlassCard>
+      </PremiumGlassCard>
+    </View>
   );
 };
 
@@ -163,6 +165,15 @@ export default VideoHighlightCard;
 // ESTILOS
 // ─────────────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    alignItems: 'center',
+  },
+
+  card: {
+    alignSelf: 'center',
+  },
+
   thumb: {
     flex: 1,
     width: '100%',

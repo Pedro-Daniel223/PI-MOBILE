@@ -56,6 +56,7 @@ import {
   Animated,
   Dimensions,
   Alert,
+  Platform,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -812,16 +813,13 @@ export default function IngressosScreen({ navigation }) {
   // ── Offsets para posicionar o botão flutuante acima da Tab Bar ──────────
   const tabBarHeight = useBottomTabBarHeight();
   const insets = useSafeAreaInsets();
-  const BUY_BUTTON_GAP = 20; // distância desejada acima da Tab Bar (16–24px)
+  const BUY_BUTTON_GAP = Platform.OS === "android" ? 32 : 20; // mais respiro no Android
   // tabBarHeight já soma a safe area inferior; usamos insets.bottom apenas
   // como piso de segurança caso a tela seja renderizada sem Tab Bar visível.
   const buyButtonBottomOffset = Math.max(
     tabBarHeight + BUY_BUTTON_GAP,
     insets.bottom + BUY_BUTTON_GAP,
   );
-  // Espaço extra no fim do scroll para o conteúdo não ficar escondido atrás do botão
-  const scrollBottomPadding = buyButtonBottomOffset + 90;
-
   // ── Estado original — intocado ─────────────────────────────────────────
   const [games, setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
@@ -1070,6 +1068,9 @@ export default function IngressosScreen({ navigation }) {
     (item) =>
       Number.isFinite(Number(item.produto_id)) && Number(item.produto_id) > 0,
   );
+  const hasSelectedTickets = ingressos.some(
+    (item) => (quantities[item.id] || 0) > 0,
+  );
   const purchaseDisabled =
     loadingGames || !selectedGame || !hasValidApiIngressos;
   const totalLabelValue =
@@ -1100,7 +1101,11 @@ export default function IngressosScreen({ navigation }) {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: scrollBottomPadding }}
+        contentContainerStyle={{
+          paddingBottom: hasSelectedTickets
+            ? buyButtonBottomOffset + 90
+            : insets.bottom + 40,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <Animated.View
@@ -1552,24 +1557,26 @@ export default function IngressosScreen({ navigation }) {
       {/* ══════════════════════════════════════════════════════════════════
           BOTÃO COMPRAR — fixo no rodapé
       ══════════════════════════════════════════════════════════════════ */}
-      <View
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: buyButtonBottomOffset,
-          paddingHorizontal: 16,
-        }}
-      >
-        <GlassBuyButton
-          label={purchaseButtonLabel}
-          onPress={handlePurchase}
-          breatheAnim={breatheAnim}
-          shimmerAnim={shimmerAnim}
-          DS={DS}
-          disabled={purchaseDisabled}
-        />
-      </View>
+      {hasSelectedTickets && (
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: buyButtonBottomOffset,
+            paddingHorizontal: 16,
+          }}
+        >
+          <GlassBuyButton
+            label={purchaseButtonLabel}
+            onPress={handlePurchase}
+            breatheAnim={breatheAnim}
+            shimmerAnim={shimmerAnim}
+            DS={DS}
+            disabled={purchaseDisabled}
+          />
+        </View>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════
           MODAL — SELEÇÃO DE JOGO (mesma lógica, visual em glass)
