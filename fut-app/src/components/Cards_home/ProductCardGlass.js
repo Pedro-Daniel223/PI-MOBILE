@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 import {
   View,
   Text,
@@ -8,20 +8,21 @@ import {
   Alert,
   Platform,
   Dimensions,
-} from 'react-native';
+} from "react-native";
 
-import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
-import { useCart } from '../../contexts/CartContext';
+import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
+import { useCart } from "../../contexts/CartContext";
+import { useSubscription } from "../../contexts/SubscriptionContext";
 
 const resolveImageSource = (value) => {
   if (!value) {
     return null;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return { uri: value };
   }
 
@@ -29,18 +30,40 @@ const resolveImageSource = (value) => {
 };
 
 const normalizeCategory = (value) =>
-  String(value ?? '')
+  String(value ?? "")
     .trim()
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
 const formatBRL = (value) =>
-  Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  Number(value || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+
+const formatBRLFromAny = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return "";
+  }
+
+  if (typeof value === "number") {
+    return formatBRL(value);
+  }
+
+  const normalized = String(value)
+    .replace(/[^\d,.-]/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
+  const parsed = Number(normalized);
+
+  return Number.isFinite(parsed) ? formatBRL(parsed) : String(value);
+};
 
 export default function ProductCardGlass({ image, title, price, product }) {
   const navigation = useNavigation();
   const { addItem } = useCart();
+  const { subscription } = useSubscription();
 
   const pressAnim = useRef(new Animated.Value(0)).current;
 
@@ -53,9 +76,18 @@ export default function ProductCardGlass({ image, title, price, product }) {
     productData.imagens?.[0] ??
     null;
   const productImage = resolveImageSource(productImageRaw);
-  const productTitle = productData.title ?? title ?? 'Produto';
-  const productPrice = productData.preco_final ?? productData.preco ?? price ?? '';
-  const productHasDiscount = Number(productData.desconto_percent || 0) > 0 && productData.preco_original != null;
+  const productTitle = productData.title ?? title ?? "Produto";
+  const productPrice =
+    productData.preco_final ?? productData.preco ?? price ?? "";
+  const productHasDiscount =
+    Number(productData.desconto_percent || 0) > 0 &&
+    productData.preco_original != null;
+  const isSocio = Boolean(
+    subscription?.title ||
+      subscription?.nome_plano ||
+      subscription?.plan?.title,
+  );
+  const productPriceDisplay = formatBRLFromAny(productPrice);
   const productDetails = {
     id: productData.id ?? productTitle,
     nome: productData.nome ?? productTitle,
@@ -65,7 +97,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
     descricao:
       productData.descricao ??
       productData.description ??
-      'Produto em destaque da Home',
+      "Produto em destaque da Home",
     categoria: productData.categoria,
     precoAntigo: productData.preco_original ?? null,
     preco_original: productData.preco_original ?? null,
@@ -76,9 +108,10 @@ export default function ProductCardGlass({ image, title, price, product }) {
     beneficios_plano: productData.beneficios_plano ?? [],
     plano_atual: productData.plano_atual ?? null,
   };
-  const isCamisasFC = normalizeCategory(productDetails.categoria) === 'camisas fc';
+  const isCamisasFC =
+    normalizeCategory(productDetails.categoria) === "camisas fc";
 
-  console.log('[ProductCardGlass] image payload', {
+  console.log("[ProductCardGlass] image payload", {
     id: productDetails.id,
     image: productData.image ?? null,
     imagem: productData.imagem ?? null,
@@ -107,7 +140,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
   };
 
   const handlePress = () => {
-    navigation.navigate('DetalhesProdutos', { produto: productDetails });
+    navigation.navigate("DetalhesProdutos", { produto: productDetails });
   };
 
   const handleAddToCart = () => {
@@ -117,12 +150,12 @@ export default function ProductCardGlass({ image, title, price, product }) {
     }
 
     addItem(productDetails);
-    Alert.alert('Sucesso', 'Produto adicionado ao carrinho!');
+    Alert.alert("Sucesso", "Produto adicionado ao carrinho!");
   };
 
   const rotate = pressAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['-8deg', '0deg'],
+    outputRange: ["-8deg", "0deg"],
   });
 
   const overlayOpacity = pressAnim.interpolate({
@@ -143,15 +176,19 @@ export default function ProductCardGlass({ image, title, price, product }) {
             aspecto artificial. Intensity elevada (mesma referência do
             CardProfileWelcome) para sustentar a leitura de vidro real,
             já que o backgroundColor abaixo agora é bem mais translúcido. */}
-        <BlurView intensity={Platform.OS === 'android' ? 60 : 10} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView
+          intensity={Platform.OS === "android" ? 60 : 10}
+          tint="dark"
+          style={StyleSheet.absoluteFill}
+        />
 
         {/* Segunda camada de profundidade — só no Android. O iOS já tem
             refração real vinda do blur; no Android, sem um 2º blur
             (evitando empilhar BlurViews, que gera o "quadrado" de
             fallback), usamos um gradiente translúcido puro no lugar. */}
-        {Platform.OS === 'android' && (
+        {Platform.OS === "android" && (
           <LinearGradient
-            colors={['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)']}
+            colors={["rgba(255,255,255,0.03)", "rgba(255,255,255,0.01)"]}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -160,16 +197,16 @@ export default function ProductCardGlass({ image, title, price, product }) {
 
         <LinearGradient
           colors={
-            Platform.OS === 'android'
+            Platform.OS === "android"
               ? [
-                  'rgba(255,255,255,0.20)',
-                  'rgba(255,255,255,0.07)',
-                  'transparent'
+                  "rgba(255,255,255,0.20)",
+                  "rgba(255,255,255,0.07)",
+                  "transparent",
                 ]
               : [
-                  'rgba(255,255,255,0.15)',
-                  'rgba(255,255,255,0.05)',
-                  'transparent'
+                  "rgba(255,255,255,0.15)",
+                  "rgba(255,255,255,0.05)",
+                  "transparent",
                 ]
           }
           style={StyleSheet.absoluteFill}
@@ -177,9 +214,9 @@ export default function ProductCardGlass({ image, title, price, product }) {
 
         <LinearGradient
           colors={
-            Platform.OS === 'android'
-              ? ['transparent', 'rgba(0,0,0,0.22)']
-              : ['transparent', 'rgba(0,0,0,0.3)']
+            Platform.OS === "android"
+              ? ["transparent", "rgba(0,0,0,0.22)"]
+              : ["transparent", "rgba(0,0,0,0.3)"]
           }
           style={StyleSheet.absoluteFill}
         />
@@ -188,21 +225,17 @@ export default function ProductCardGlass({ image, title, price, product }) {
 
         {/* IMAGEM */}
         <View style={styles.imageContainer}>
-
           <Animated.Image
             source={productImage}
-            style={[
-              styles.productImage,
-              { transform: [{ rotate }] },
-            ]}
+            style={[styles.productImage, { transform: [{ rotate }] }]}
             onLoad={() => {
-              console.log('[ProductCardGlass] image loaded', {
+              console.log("[ProductCardGlass] image loaded", {
                 id: productDetails.id,
                 source: productImage,
               });
             }}
             onError={(event) => {
-              console.log('[ProductCardGlass] image error', {
+              console.log("[ProductCardGlass] image error", {
                 id: productDetails.id,
                 source: productImage,
                 error: event?.nativeEvent,
@@ -213,10 +246,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
           {/* OVERLAY */}
           <Animated.View
             pointerEvents="none"
-            style={[
-              styles.overlay,
-              { opacity: overlayOpacity },
-            ]}
+            style={[styles.overlay, { opacity: overlayOpacity }]}
           >
             <View style={styles.overlayButton}>
               <Text style={styles.overlayText}>Ver detalhes</Text>
@@ -224,10 +254,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
           </Animated.View>
 
           <LinearGradient
-            colors={[
-              'rgba(255,255,255,0.08)',
-              'transparent'
-            ]}
+            colors={["rgba(255,255,255,0.08)", "transparent"]}
             style={StyleSheet.absoluteFill}
           />
 
@@ -239,9 +266,15 @@ export default function ProductCardGlass({ image, title, price, product }) {
 
         {/* INFO */}
         <View style={styles.infoContainer}>
-          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{productTitle}</Text>
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+            {productTitle}
+          </Text>
 
-          <Text style={styles.description} numberOfLines={2} ellipsizeMode="tail">
+          <Text
+            style={styles.description}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
             Edição clássica retrô com tecido premium
           </Text>
 
@@ -249,11 +282,17 @@ export default function ProductCardGlass({ image, title, price, product }) {
             <View style={styles.priceWrap}>
               {productHasDiscount ? (
                 <>
-                  <Text style={styles.priceOld}>{formatBRL(productData.preco_original)}</Text>
-                  <Text style={styles.price}>{formatBRL(productData.preco_final)}</Text>
+                  <Text style={styles.priceOld}>
+                    {formatBRL(productData.preco_original)}
+                  </Text>
+                  <Text style={styles.price}>
+                    {formatBRL(productData.preco_final)}
+                  </Text>
                 </>
               ) : (
-                <Text style={styles.price}>{productPrice}</Text>
+                <Text style={styles.price}>
+                  {isSocio ? productPrice : productPriceDisplay}
+                </Text>
               )}
               {productHasDiscount ? (
                 <Text style={styles.priceSavings}>
@@ -262,7 +301,11 @@ export default function ProductCardGlass({ image, title, price, product }) {
               ) : null}
             </View>
 
-            <TouchableOpacity style={styles.addButton} onPress={handleAddToCart} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={handleAddToCart}
+              activeOpacity={0.8}
+            >
               <Ionicons name="cart-outline" size={18} color="#a90000" />
             </TouchableOpacity>
           </View>
@@ -272,7 +315,7 @@ export default function ProductCardGlass({ image, title, price, product }) {
   );
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 // width responsivo: 260 fixo causava overflow em telas Android estreitas.
 // Limitado por uma fração da largura da tela, preservando a proporção
 // visual original em telas médias/grandes.
@@ -283,7 +326,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     width: CARD_WIDTH,
     marginRight: 15,
-    overflow: 'hidden',
+    overflow: "hidden",
     // Android: o backgroundColor sólido/opaco anterior (0.85) evitava o
     // bug do "quadrado" de elevation, mas também matava a transparência
     // de vidro. A correção real do bug não depende de opacidade alta —
@@ -292,60 +335,63 @@ const styles = StyleSheet.create({
     // Aqui usamos um fundo bem mais translúcido (mesma referência do
     // CardProfileWelcome) e deixamos o blur real (intensity elevada
     // acima) sustentar o efeito de vidro.
-    backgroundColor: Platform.OS === 'android' ? 'rgba(16,16,20,0.32)' : 'rgba(255,255,255,0.06)',
-    shadowColor: '#ff2b2b',
+    backgroundColor:
+      Platform.OS === "android"
+        ? "rgba(16,16,20,0.32)"
+        : "rgba(255,255,255,0.06)",
+    shadowColor: "#ff2b2b",
     shadowOpacity: 0.2,
     shadowRadius: 20,
-    elevation: Platform.OS === 'android' ? 4 : 8,
+    elevation: Platform.OS === "android" ? 4 : 8,
   },
 
   imageContainer: {
     height: 220,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   productImage: {
-    width: '85%',
-    height: '85%',
-    resizeMode: 'contain',
+    width: "85%",
+    height: "85%",
+    resizeMode: "contain",
   },
 
   overlay: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.35)', // 🔥 melhora MUITO o visual
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.35)", // melhora MUITO o visual
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   overlayButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 20,
   },
 
   overlayText: {
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
   },
 
   badge: {
-    position: 'absolute',
+    position: "absolute",
     top: 14,
     left: 14,
-    backgroundColor: '#ff2b2b',
+    backgroundColor: "#ff2b2b",
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 12,
   },
 
   badgeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 
   infoContainer: {
@@ -354,21 +400,21 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 18,
-    fontWeight: '800',
-    color: '#fff',
+    fontWeight: "800",
+    color: "#fff",
   },
 
   description: {
     fontSize: 13,
-    color: '#fff',
+    color: "#fff",
     marginTop: 6,
     marginBottom: 16,
   },
 
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   priceWrap: {
     flex: 1,
@@ -377,38 +423,38 @@ const styles = StyleSheet.create({
 
   price: {
     fontSize: 18,
-    fontWeight: '900',
-    color: '#f2f2f2',
+    fontWeight: "900",
+    color: "#f2f2f2",
   },
   priceOld: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.55)',
-    textDecorationLine: 'line-through',
+    color: "rgba(255,255,255,0.55)",
+    textDecorationLine: "line-through",
     marginBottom: 2,
   },
   priceSavings: {
     marginTop: 2,
     fontSize: 11,
-    fontWeight: '700',
-    color: '#ff7a73',
+    fontWeight: "700",
+    color: "#ff7a73",
   },
 
   addButton: {
-    backgroundColor: '#dadada',
+    backgroundColor: "#dadada",
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   border: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 26,
     borderWidth: 1,
-    borderColor: Platform.OS === 'android' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.15)',
+    borderColor:
+      Platform.OS === "android"
+        ? "rgba(255,255,255,0.22)"
+        : "rgba(255,255,255,0.15)",
   },
-
-
-
 });
