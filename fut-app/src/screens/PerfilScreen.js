@@ -325,7 +325,7 @@ const LIGHT_DS = {
 // ─────────────────────────────────────────────────────────────────────────────
 const getTierMeta = (DS) => ({
   diamante: {
-    emoji: "👑",
+    emoji: null,
     label: "SOCIO DIAMANTE",
     accent: DS.scheme === "dark" ? "#ffffff" : "#3a3a3c",
     cardColors:
@@ -339,7 +339,7 @@ const getTierMeta = (DS) => ({
     textColor: DS.scheme === "dark" ? "#ffffff" : "#1a1414",
   },
   ouro: {
-    emoji: "⭐",
+    emoji: null,
     label: "SOCIO OURO",
     accent: DS.scheme === "dark" ? "#ff3b30" : "#c0000a",
     cardColors:
@@ -353,7 +353,7 @@ const getTierMeta = (DS) => ({
     textColor: DS.scheme === "dark" ? "#ffece9" : "#5c0a06",
   },
   prata: {
-    emoji: "🥈",
+    emoji: null,
     label: "SOCIO PRATA",
     accent: DS.scheme === "dark" ? "#c7c9cc" : "#5c5c60",
     cardColors:
@@ -369,7 +369,7 @@ const getTierMeta = (DS) => ({
 });
 
 const getDefaultTierMeta = (DS) => ({
-  emoji: "⭐",
+  emoji: null,
   label: null,
   accent: DS.accent,
   cardColors:
@@ -1143,9 +1143,9 @@ export default function PerfilScreen({ navigation }) {
             <View
               style={[ps.statusChipBorder, { borderColor: planIdentity.borderColor }]}
             />
-            {planIdentity.isSocio && (
+            {planIdentity.emoji ? (
               <Text style={ps.statusChipEmoji}>{planIdentity.emoji}</Text>
-            )}
+            ) : null}
             <Text style={[ps.statusChipText, { color: planIdentity.textColor }]}>
               {planIdentity.label}
             </Text>
@@ -1215,7 +1215,9 @@ export default function PerfilScreen({ navigation }) {
                   MEMBRO ATIVO
                 </Text>
               </View>
+            {planIdentity.emoji ? (
               <Text style={ps.membershipEmoji}>{planIdentity.emoji}</Text>
+            ) : null}
             </View>
 
             <Text style={[ps.membershipTitle, { color: planIdentity.textColor }]}>
@@ -1238,9 +1240,6 @@ export default function PerfilScreen({ navigation }) {
                   </View>
                 ))}
               </View>
-              {planIdentity.price ? (
-                <Text style={[ps.membershipPrice, { color: planIdentity.textColor }]}>{planIdentity.price}</Text>
-              ) : null}
             </View>
 
             <TouchableOpacity
@@ -1946,9 +1945,9 @@ export default function PerfilScreen({ navigation }) {
               <View style={ps.manageInfoRow}>
                 <Text style={ps.manageInfoLabel}>Plano</Text>
                 <View style={ps.managePlanValue}>
-                  {planIdentity.emoji && (
+                  {planIdentity.emoji ? (
                     <Text style={ps.managePlanEmoji}>{planIdentity.emoji}</Text>
-                  )}
+                  ) : null}
                   <Text style={ps.manageInfoValue}>
                     {planIdentity.title || planIdentity.label}
                   </Text>

@@ -34,9 +34,9 @@ export default function CardActionGlass({
   desc,
   image,
   onPress,
-  flatRight, // ✅ preservado
-  flatLeft,  // ✅ preservado
-  style,     // ✅ preservado
+  flatRight, // preservado
+  flatLeft,  // preservado
+  style,     // preservado
 }) {
 
   // ── Lógica original — intacta ─────────────────────────────────────────────

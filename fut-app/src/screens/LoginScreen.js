@@ -144,13 +144,7 @@ export default function LoginScreen({ navigation }) {
                 keyboardType={identifierType === 'cpf' ? 'numeric' : 'email-address'}
                 autoCapitalize="none"
                 style={stylesLogin.inputStyle}
-                rightComponent={
-                  identifierValid && identifier.length > 0 && (
-                    <View style={stylesLogin.iconContainer}>
-                      <Text style={stylesLogin.checkIcon}>✓</Text>
-                    </View>
-                  )
-                }
+                rightComponent={null}
               />
 
               <Text style={[stylesLogin.label, stylesLogin.passwordLabel]}>Senha:</Text>

@@ -417,9 +417,7 @@ export default function CadastroScreen({ navigation }) {
                                         keyboardType="email-address"
                                         autoCapitalize="none"
                                         style={[styles.inputStyle, errors.email && localStyles.inputErrorBorder]}
-                                        rightComponent={isValidEmail(email) ? (
-                                            <View style={styles.iconContainer}><Text style={styles.checkIcon}>✓</Text></View>
-                                        ) : null}
+                                        rightComponent={null}
                                     />
                                     {!!errors.email && <Text style={localStyles.errorText}>{errors.email}</Text>}
 
@@ -546,9 +544,7 @@ export default function CadastroScreen({ navigation }) {
                                         <TouchableOpacity
                                             style={[styles.checkbox, accepted && styles.checkboxActive]}
                                             onPress={() => setAccepted(!accepted)}
-                                        >
-                                            {accepted && <Text style={styles.checkIconSmall}>✓</Text>}
-                                        </TouchableOpacity>
+                                        />
                                         <Text style={styles.acceptText}>Aceito as políticas de privacidade</Text>
                                     </View>
                                 </>

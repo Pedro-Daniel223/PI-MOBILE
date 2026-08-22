@@ -13,7 +13,7 @@ export default function Splash({ navigation }) {
   const textOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // 1️⃣ Logo aparece no centro
+    // Etapa 1: logo aparece no centro
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
@@ -27,15 +27,15 @@ export default function Splash({ navigation }) {
       }),
     ]).start(() => {
 
-      // 2️⃣ Movimento sincronizado
+      // Etapa 2: movimento sincronizado
       Animated.parallel([
         Animated.timing(logoTranslateX, {
-          toValue: -75, // 👈 ajustado (menos distância)
+          toValue: -75, // ajustado (menos distância)
           duration: 900,
           useNativeDriver: true,
         }),
         Animated.timing(textTranslateX, {
-          toValue: 40, // 👈 mais próximo da logo
+          toValue: 40, // mais próximo da logo
           duration: 900,
           useNativeDriver: true,
         }),

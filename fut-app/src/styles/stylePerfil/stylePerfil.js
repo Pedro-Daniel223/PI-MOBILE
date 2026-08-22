@@ -1028,12 +1028,14 @@ export const makePs = (DS) =>
       borderRadius: 14,
       alignItems: "center",
       justifyContent: "center",
+      paddingHorizontal: 12,
       backgroundColor: DS.logoutText,
     },
     cancelConfirmBtnText: {
       fontSize: 13.5,
       fontWeight: "700",
       color: "#ffffff",
+      textAlign: "center",
     },
 
     // ── SAIR ──────────────────────────────────────────────────────────────

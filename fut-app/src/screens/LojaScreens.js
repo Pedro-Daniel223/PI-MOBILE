@@ -213,11 +213,15 @@ const Hero = memo(({ DS, s, onExplorePress }) => {
       >
         <Text style={s.heroCtaText}>Explorar Coleção</Text>
         <View style={s.heroCtaIcon}>
-          <Ionicons name="arrow-forward" size={16} color="#15130F" />
+          <Ionicons
+            name="arrow-forward"
+            size={16}
+            color={DS.mode === "dark" ? "#FFFFFF" : "#15130F"}
+          />
         </View>
       </TouchableOpacity>
 
-      <Text style={s.heroFootnote}>Nº 09 · EDIÇÃO LIMITADA · 500 UNIDADES</Text>
+      <Text style={s.heroFootnote}>APROVEITE · BONS PRODUTOS · 50 UNIDADES</Text>
     </View>
   );
 });
