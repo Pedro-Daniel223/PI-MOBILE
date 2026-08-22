@@ -10,7 +10,7 @@ import {
   Easing,
   Dimensions,
 } from "react-native";
-import { platformPick } from "../styles/platformUiTokens";
+import { platformPick } from "../../styles/platformUiTokens";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";

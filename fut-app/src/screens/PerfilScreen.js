@@ -34,8 +34,8 @@ import {
 } from "../styles/stylePerfil/stylePerfil";
 import { escudoDrakos, user as defaultUser } from "../data/dataPerfil";
 import { fetchPurchaseHistory } from "../services/purchaseService";
-import PurchaseHistoryModal from "../components/PurchaseHistoryModal";
-import PurchaseDetailsModal from "../components/PurchaseDetailsModal";
+import PurchaseHistoryModal from "../components/purchases/PurchaseHistoryModal";
+import PurchaseDetailsModal from "../components/purchases/PurchaseDetailsModal";
 
 import { useSubscription } from "../contexts/SubscriptionContext";
 import { useProducts } from "../contexts/ProductContext";
